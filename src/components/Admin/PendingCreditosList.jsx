@@ -3,14 +3,13 @@ import {
     FiFilter,
      FiSearch 
 } from 'react-icons/fi';
-import { EditCreditModal } from '../Modals/EditCreditModal';
+
 import '../../assets/styles/AdminCredits.css';
 import { CreditRow } from './CreditRow';
 
-export const PendingCreditosList = ({ creditos = [], onAction, onManagePayments, onUpdateSuccess }) => {
+export const PendingCreditosList = ({ creditos = [], onAction, onUpdateSuccess }) => {
     const [filterStatus, setFilterStatus] = useState('activo');
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCreditToEdit, setSelectedCreditToEdit] = useState(null);
 
     // Contadores dinámicos
     const counts = useMemo(() => ({
@@ -84,8 +83,6 @@ export const PendingCreditosList = ({ creditos = [], onAction, onManagePayments,
                                     key={cre.id} 
                                     cre={cre} 
                                     onAction={onAction} 
-                                    onManagePayments={onManagePayments}
-                                    setSelectedCreditToEdit={setSelectedCreditToEdit}
                                 />
                             ))
                         ) : (
@@ -99,16 +96,6 @@ export const PendingCreditosList = ({ creditos = [], onAction, onManagePayments,
                 </table>
             </div>
 
-            {selectedCreditToEdit && (
-                <EditCreditModal 
-                    credit={selectedCreditToEdit}
-                    onClose={() => setSelectedCreditToEdit(null)}
-                    onRefreshList={async () => {
-                        await onUpdateSuccess(); 
-                        setSelectedCreditToEdit(null);
-                    }}
-                />
-            )}
         </div>
     );
 };

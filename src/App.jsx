@@ -27,6 +27,9 @@ import LegalTransparency from './pages/Legal/LegalTransparency';
 // Pages Admin 
 import { UserManagement } from './pages/Admin/UserManagement';
 import { PageConfig } from './pages/Admin/PageConfig';
+import { EditCreditPage } from './pages/Admin/EditCreditPage';
+import { CreditPaymentPage } from './pages/Admin/CreditPaymentPage';
+import { DocumentReviewPage } from './pages/Admin/DocumentReviewPage';
 
 // --- COMPONENTE DE RUTA PRIVADA (CLIENTES) ---
 const PrivateRoute = ({ children }) => {
@@ -95,6 +98,33 @@ const { isAuthModalOpen, closeLogin } = useAuth();
             element={
               <AdminRoute>
                 <PageConfig />
+              </AdminRoute>
+            } 
+          />
+
+          <Route 
+            path="/admin/editar-credito/:id" 
+            element={
+              <AdminRoute>
+                <EditCreditPage />
+              </AdminRoute>
+            } 
+          />
+
+          <Route 
+            path="/admin/pagos-credito/:id" 
+            element={
+              <AdminRoute>
+                <CreditPaymentPage />
+              </AdminRoute>
+            } 
+          />
+
+          <Route 
+            path="/admin/revisar-documentos/:id" 
+            element={
+              <AdminRoute>
+                <DocumentReviewPage />
               </AdminRoute>
             } 
           />

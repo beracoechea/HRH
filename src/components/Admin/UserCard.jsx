@@ -1,11 +1,11 @@
-/* src/components/Admin/UserCard.js */
 import React from 'react';
-import { FiEdit2, FiAlertCircle, FiUserCheck } from 'react-icons/fi';
+import { FiAlertCircle, FiUserCheck, FiRefreshCw } from 'react-icons/fi';
+import { useAuthActions } from '../../pages/hooks/useAuthActions';
+import { StatusModal } from '../Common/StatusModal';
 import '../../assets/styles/UserCard.css';
 
-// CAMBIO: Recibimos onEditRole para que coincida con UserManagement
-export const UserCard = ({ user, onEditRole, isPriority }) => {
-  
+export const UserCard = ({ user, onUpdateRole, isPriority }) => {
+  const { updateUserRole, loading, status, closeStatus } = useAuthActions(onUpdateRole);
   const getRoleClass = (rol) => {
     const roles = {
       admin: 'role-admin',
@@ -30,30 +30,48 @@ export const UserCard = ({ user, onEditRole, isPriority }) => {
           <div className={`user-avatar ${isPriority ? 'pulse-avatar' : ''}`}>
             {user.email ? user.email.charAt(0).toUpperCase() : <FiUserCheck />}
           </div>
-          
+
           <div className="user-text">
             <h3>{user.nombre || 'Sin nombre configurado'}</h3>
             <p className="user-email-sub">{user.email}</p>
-            <div className="role-container">
-              <span className={`role-badge ${getRoleClass(user.rol)}`}>
-                {user.rol || 'cliente'}
-              </span>
+            <div className="role-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {onUpdateRole ? (
+                  <select 
+                      className={`role-badge ${getRoleClass(user.rol)}`} 
+                      style={{ cursor: 'pointer', appearance: 'none', border: 'none', outline: 'none' }}
+                      value={user.rol || 'cliente'} 
+                      onChange={async (e) => {
+                          const newRole = e.target.value;
+                          if (newRole !== user.rol) {
+                              await updateUserRole(user.id, user.email, newRole);
+                          }
+                      }}
+                      disabled={loading}
+                      title="Cambiar permisos del usuario"
+                  >
+                      <option value="cliente">Cliente</option>
+                      <option value="marketing">Marketing</option>
+                      <option value="tesorero">Tesorero</option>
+                      <option value="aprobador">Aprobador</option>
+                      <option value="admin">Administrador</option>
+                  </select>
+              ) : (
+                  <span className={`role-badge ${getRoleClass(user.rol)}`}>
+                    {user.rol || 'cliente'}
+                  </span>
+              )}
+              {loading && <FiRefreshCw className="spinner" style={{ color: '#64748b', fontSize: '0.9rem' }} />}
             </div>
           </div>
         </div>
-
-        <div className="user-actions">
-          <button 
-            className="edit-role-btn" 
-            // CAMBIO: Aquí usamos onEditRole
-            onClick={() => onEditRole(user)} 
-            title="Asignar o Cambiar Rol"
-          >
-            <FiEdit2 />
-            <span>Gestionar Rol</span>
-          </button>
-        </div>
       </div>
+      
+      <StatusModal 
+          isOpen={status.open} 
+          type={status.type} 
+          message={status.message} 
+          onClose={closeStatus} 
+      />
     </div>
   );
 };

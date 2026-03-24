@@ -46,8 +46,8 @@ export const Navbar = () => {
     { name: 'Noticias', path: '/condusef', icon: <FiShield /> },
   ];
 
-  // Agregar Mi Perfil solo a clientes
-  if (isAuthenticated && user?.rol === 'cliente') {
+  // Agregar Mi Perfil a todos los usuarios autenticados
+  if (isAuthenticated) {
     navItems.push({ name: 'Mi Perfil', path: '/mi-perfil', icon: <FiBriefcase /> });
   }
 

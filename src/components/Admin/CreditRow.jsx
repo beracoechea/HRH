@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
     FiCheck, FiX, FiTrendingUp, FiEdit, 
     FiClock, FiCheckCircle, FiAlertTriangle 
@@ -6,7 +7,8 @@ import {
 // Eliminamos la importación del hook que causaba el error 404
 import { formatMoney } from '../../utils/creditCalculations';
 
-export const CreditRow = ({ cre, onAction, onManagePayments, setSelectedCreditToEdit }) => {
+export const CreditRow = ({ cre, onAction, onManagePayments }) => {
+    const navigate = useNavigate();
     
     // --- LÓGICA DE CÁLCULO INTEGRADA (Reemplaza al hook) ---
     const calculos = useMemo(() => {
@@ -121,8 +123,13 @@ export const CreditRow = ({ cre, onAction, onManagePayments, setSelectedCreditTo
                                 />
                             )}
                             <button 
+                                type="button"
                                 className="btn-icon-edit" 
-                                onClick={() => setSelectedCreditToEdit(cre)} 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    navigate(`/admin/editar-credito/${cre.id}`);
+                                }} 
                                 title="Editar montos"
                             >
                                 <FiEdit />
@@ -143,7 +150,15 @@ export const CreditRow = ({ cre, onAction, onManagePayments, setSelectedCreditTo
                             </button>
                         </div>
                     ) : (cre.estado === 'activo' || cre.estado === 'atrasado') ? (
-                        <button className="btn-manage-credit" onClick={() => onManagePayments(cre)}>
+                        <button 
+                            type="button"
+                            className="btn-manage-credit" 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                navigate(`/admin/pagos-credito/${cre.id}`);
+                            }}
+                        >
                             <FiTrendingUp /> Gestionar Pago
                         </button>
                     ) : (

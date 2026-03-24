@@ -4,25 +4,27 @@
 
 import { REGLAS_NEGOCIO } from './Propiedades';
 
-export const calcularEstructuraCredito = (monto, plazoMeses, tipo) => {
+export const calcularEstructuraCredito = (monto, plazoMeses, tipo, manualTasa = null) => {
     const config = REGLAS_NEGOCIO[tipo] || REGLAS_NEGOCIO.personal;
     const montoNum = Number(monto);
     const plazoNum = Number(plazoMeses);
     
+    // Si se provee manualTasa, se usa directamente (asumida como tasa mensual decimal, ej: 0.05)
+    const tasaMensualEfectiva = manualTasa !== null ? Number(manualTasa) : config.tasaMensual;
+
     // 1. Definir Quincenas
     const quincenasTotales = plazoNum * 2;
     const qAno1 = plazoNum > 12 ? 24 : quincenasTotales;
     const qAno2 = quincenasTotales > 24 ? quincenasTotales - 24 : 0;
 
-    // 2. Cálculo Año 1 (Basado en tu fórmula de interés simple mensual)
-    // Interés total = Monto * Tasa * Meses
-    const interesTotalAno1 = montoNum * config.tasaMensual * (qAno1 / 2);
+    // 2. Cálculo Año 1
+    const interesTotalAno1 = montoNum * tasaMensualEfectiva * (qAno1 / 2);
     const cuotaQuincenal1 = (montoNum + interesTotalAno1) / quincenasTotales;
 
     // 3. Cálculo Año 2 (Tasa reducida al 50% según tu lógica de fidelidad)
     let cuotaQuincenal2 = 0;
     if (plazoNum > 12) {
-        const tasaMensualReducida = config.tasaMensual / 2;
+        const tasaMensualReducida = tasaMensualEfectiva / 2;
         // Amortización base + Interés reducido
         cuotaQuincenal2 = (montoNum / quincenasTotales) + (montoNum * (tasaMensualReducida / 2));
     }
@@ -37,7 +39,7 @@ export const calcularEstructuraCredito = (monto, plazoMeses, tipo) => {
         quincenasTotales,
         qAno1,
         qAno2,
-        tasaMensual: config.tasaMensual
+        tasaMensual: tasaMensualEfectiva
     };
 };
 

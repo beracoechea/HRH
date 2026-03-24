@@ -1,13 +1,11 @@
 import React, { useState, useCallback } from 'react';
 // Componentes de Admin
 import { UserCard } from '../../components/Admin/UserCard';
-import { RoleAssignment } from '../../components/Admin/RoleAssignment';
 import { PendingCitasList } from '../../components/Admin/PendingCitasList';
 import { PendingCreditosList } from '../../components/Admin/PendingCreditosList';
 import { AdminStats } from '../../components/Admin/AdminStats'; 
 import { DocumentTracking } from '../../components/Admin/DocumentTracking';
 // Modales y Common
-import { CreditPaymentModal } from '../../components/Modals/CreditPaymentModal';
 import { ConfirmModal } from '../../components/Common/ConfirmModal';
 import { StatusModal } from '../../components/Common/StatusModal'; 
 
@@ -37,8 +35,6 @@ export const UserManagement = () => {
   // --- ESTADOS ---
   const [view, setView] = useState(permissions.views[0] || '');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedCredit, setSelectedCredit] = useState(null);
   const [confirmReject, setConfirmReject] = useState({ open: false, id: null });
   
   const [statusConfig, setStatusConfig] = useState({ 
@@ -182,7 +178,7 @@ export const UserManagement = () => {
                 <UserCard 
                   key={u.id} 
                   user={u} 
-                  onEditRole={currentUser.rol === 'admin' ? () => setSelectedUser(u) : null} 
+                  onUpdateRole={currentUser.rol === 'admin' ? refreshData : null} 
                 />
               ))}
               {filteredUsers.length === 0 && <p className="empty-msg">No se encontraron usuarios.</p>}
@@ -200,7 +196,6 @@ export const UserManagement = () => {
             onlyPayments={currentUser.rol === 'tesorero'}
             onAction={handleCreditAction}
             onUpdateSuccess={refreshData}
-            onManagePayments={(cre) => setSelectedCredit(cre)}
           />
         )}
 
@@ -218,33 +213,7 @@ export const UserManagement = () => {
         )}
 
         {/* --- MODALES --- */}
-        
-        {selectedUser && (
-          <RoleAssignment 
-            user={selectedUser} 
-            onClose={() => setSelectedUser(null)} 
-            onUpdate={() => {
-                refreshData();
-                showAlert('Rol actualizado correctamente');
-            }} 
-          />
-        )}
 
-        {selectedCredit && (
-          <CreditPaymentModal 
-            credito={selectedCredit}
-            onClose={() => setSelectedCredit(null)}
-            onUpdate={async (data) => {
-              try {
-                await updateCreditStatus(data);
-                showAlert('Operación realizada con éxito');
-                setSelectedCredit(null);
-              } catch (error) {
-                showAlert('Error al procesar el pago', 'error');
-              }
-            }}
-          />
-        )}
 
         <ConfirmModal 
           isOpen={confirmReject.open}
