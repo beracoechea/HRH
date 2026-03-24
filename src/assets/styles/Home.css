@@ -1,0 +1,20 @@
+/* src/assets/styles/Home.css */
+
+/* Este archivo ahora solo controla el contenedor principal.
+   Los estilos específicos de cada sección (Hero, Info, FAQ) 
+   deben estar en sus propios archivos CSS dentro de 'components/'.
+*/
+
+.home-wrapper {
+  display: flex;
+  flex-direction: column; /* Apila los componentes verticalmente */
+  width: 100%;            /* Fuerza el ancho completo para las franjas de color */
+  min-height: 100vh;      /* Asegura que cubra al menos toda la pantalla */
+  overflow-x: hidden;     /* Vital: Evita que aparezca scroll horizontal si una imagen se sale */
+  margin: 0;
+  padding: 0;
+  
+  /* Fuente base para la Landing Page */
+  font-family: 'Segoe UI', sans-serif; 
+  background-color: white;
+}

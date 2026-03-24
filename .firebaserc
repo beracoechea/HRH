@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "default": "stratego-firma",
+    "produccion": "stratego-firma"
+  },
+  "targets": {
+    "stratego-firma": {
+      "hosting": {
+        "portal-nuevo": [
+          "hrh2022"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

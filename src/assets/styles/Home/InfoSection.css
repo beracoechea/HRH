@@ -1,0 +1,160 @@
+/* src/pages/Dashboard/components/InfoSection/InfoSection.css */
+
+.info-section {
+  padding: 80px 20px;
+  background: white;
+  overflow: hidden; /* Evita scrollbars durante la animación */
+}
+
+/* --- CONTENEDOR DE FILA (ROW) --- */
+.info-row {
+  max-width: 1100px;
+  margin: 0 auto 80px auto; /* Espacio entre el bloque 1 y 2 */
+  display: flex;
+  align-items: center;
+  gap: 60px;
+}
+
+/* --- CLASE PARA INVERTIR (ZIGZAG) --- */
+.info-row.reverse {
+  flex-direction: row-reverse; /* Esto pone la imagen a la izq y texto a la der */
+}
+
+/* Quitamos el margen inferior al último elemento */
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+/* --- TEXTOS --- */
+.info-text {
+  flex: 1; /* Ocupa 50% */
+}
+
+.section-title {
+  font-size: 2.5rem;
+  color: var(--dark-bg);
+  margin-bottom: 20px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.section-subtitle {
+  font-size: 2rem;
+  color: var(--dark-bg); /* O puedes usar el Coral: var(--secondary-color) */
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.text-teal {
+  color: var(--primary-color);
+}
+
+.info-text p {
+  font-size: 1.05rem;
+  color: #475569;
+  line-height: 1.7;
+  margin-bottom: 15px;
+}
+
+/* --- LISTA DE CARACTERÍSTICAS --- */
+.info-features {
+  list-style: none;
+  margin: 25px 0;
+  padding: 0;
+}
+
+.info-features li {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: var(--dark-bg);
+  font-size: 1rem;
+}
+
+.icon-check {
+  color: var(--primary-color); /* Teal */
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.highlight-text {
+  font-weight: 700;
+  color: var(--secondary-color); /* Coral */
+  border-left: 4px solid var(--secondary-color);
+  padding-left: 15px;
+  background: #fff1f2; /* Fondo muy suave rojizo */
+  padding: 10px 15px;
+  border-radius: 0 8px 8px 0;
+}
+
+/* --- IMÁGENES --- */
+.info-image-wrapper {
+  flex: 1; /* Ocupa 50% */
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.img-fluid {
+  width: 100%;
+  max-width: 500px; /* Evita que se haga gigante en pantallas ultra wide */
+  height: auto;
+  border-radius: 20px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Efecto hover en la imagen */
+.shadow-hover:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+/* --- ANIMACIONES --- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-section {
+  animation: fadeInUp 1s ease-out forwards;
+  opacity: 0; /* Inicialmente invisible hasta que corre la animación */
+}
+
+/* Retraso para el segundo bloque para que se vea escalonado */
+.delay-200 {
+  animation-delay: 0.3s;
+}
+
+/* --- RESPONSIVE (MÓVIL) --- */
+@media (max-width: 900px) {
+  .info-row {
+    flex-direction: column; /* Apilar verticalmente */
+    text-align: center;
+    gap: 30px;
+    margin-bottom: 50px;
+  }
+
+  /* En móvil, queremos que la imagen SIEMPRE vaya después del texto o antes, 
+     según prefieras. Aquí forzamos el orden natural: Texto arriba, Imagen abajo */
+  .info-row.reverse {
+    flex-direction: column; 
+  }
+
+  .info-features li {
+    justify-content: center; /* Centrar items de lista */
+    text-align: left;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+}

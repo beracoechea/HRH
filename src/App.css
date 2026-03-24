@@ -1,0 +1,82 @@
+/* src/App.css */
+
+/* LAYOUT PRINCIPAL */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* Ya no definimos el background aquí porque lo hereda del body en index.css */
+}
+
+/* CONTENIDO PRINCIPAL */
+.main-content {
+  flex: 1;
+  width: 100%;
+  max-width: var(--max-content-width); /* Usando variable */
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ESTILOS DE PÁGINAS (Contenedores Blancos) */
+.page-content {
+  background: var(--card-bg);
+  padding: 40px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.page-content h1 {
+  font-size: 1.8rem;
+  color: var(--dark-bg); /* Usando el color oscuro de marca */
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.page-content p {
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+}
+
+/* TARJETAS DEL DASHBOARD */
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.card-demo {
+  background: var(--card-bg);
+  padding: 25px;
+  border-radius: var(--border-radius);
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-demo:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: #cbd5e1;
+}
+
+.card-demo h3 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  margin-bottom: 15px;
+}
+
+.card-demo .number {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--primary-color); /* Usando variable azul */
+  line-height: 1;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

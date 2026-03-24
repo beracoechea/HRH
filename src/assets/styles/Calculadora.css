@@ -1,0 +1,216 @@
+/* src/components/Formulario/Calculadora.css */
+
+:root {
+  --primary-color: #159082;   /* Tu Verde Esmeralda */
+  --secondary-color: #ff7e67; /* Tu Coral para acentos */
+  --dark-bg: #094c5b;        /* Teal Oscuro */
+  --text-main: #1e293b;
+  --text-secondary: #64748b;
+  --bg-light: #f8fafc;
+}
+
+.calculadora-wrapper {
+  max-width: 600px;
+  margin: 2rem auto;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  padding: 0 20px;
+}
+
+.calc-card {
+  background: white;
+  padding: 40px;
+  border-radius: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f1f5f9;
+}
+
+/* --- CABECERA --- */
+.calc-header {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.calc-header h2 {
+  color: var(--dark-bg);
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.calc-header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* --- SELECTOR DE TIPO (CÁPSULA) --- */
+.tipo-credito-selector {
+  display: flex;
+  background-color: #f1f5f9;
+  padding: 6px;
+  border-radius: 16px;
+  margin: 25px auto 0;
+  gap: 8px;
+  max-width: 320px;
+  border: 1px solid #e2e8f0;
+}
+
+.tipo-credito-selector button {
+  flex: 1;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.tipo-credito-selector button.active {
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: 0 4px 12px rgba(21, 144, 130, 0.25);
+}
+
+/* --- INPUTS Y RANGOS --- */
+.range-container {
+  margin-bottom: 35px;
+}
+
+.calc-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.calc-amount-display {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  letter-spacing: -1px;
+}
+
+.calc-amount-display span {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  margin-left: 8px;
+}
+
+/* Estilo del Slider */
+.styled-range {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  margin: 15px 0;
+}
+
+.styled-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  background: white;
+  border: 4px solid var(--primary-color);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.styled-range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* --- RESULTADOS --- */
+.calc-results {
+  background-color: #f8fafc;
+  padding: 24px;
+  border-radius: 20px;
+  margin-top: 30px;
+  border: 1px solid #e2e8f0;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px dashed #cbd5e1;
+}
+
+.result-row:last-of-type {
+  border-bottom: none;
+}
+
+.total-row {
+  margin-top: 10px;
+  padding-top: 20px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.res-label {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.res-value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--dark-bg);
+}
+
+.res-value.total {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+}
+
+/* --- BOTÓN --- */
+.btn-solicitar {
+  width: 100%;
+  padding: 20px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-solicitar:hover {
+  background: var(--dark-bg);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(9, 76, 91, 0.2);
+}
+
+/* --- RESPONSIVO --- */
+@media (max-width: 480px) {
+  .calc-card {
+    padding: 25px 20px;
+  }
+  
+  .calc-amount-display {
+    font-size: 2.2rem;
+  }
+  
+  .result-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .res-value {
+    align-self: flex-end;
+  }
+}

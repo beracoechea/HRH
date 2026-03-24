@@ -1,0 +1,78 @@
+/* src/index.css */
+:root {
+  /* --- 1. PALETA DE COLORES (HRH Brand Identity) --- */
+  
+  /* Colores Primarios (Logotipo) */
+  --primary-color: #159082;       /* Teal Principal (Botones, Enlaces, Iconos activos) */
+  --secondary-color: #eb6e5d;     /* Coral Suave (Detalles, Subtítulos destacados) */
+
+  /* Colores Complementarios (Publicitarios) */
+  --dark-bg: #094c5b;             /* Teal Oscuro (Navbar, Textos fuertes) */
+  --accent-color: #e5491f;        /* Naranja Rojizo (Botones de acción fuerte, Alertas) */
+  --highlight: #a8ddd3;           /* Teal Claro (Fondos de selección, Bordes suaves) */
+
+  /* Estados Interactivos (Hover/Active) */
+  --primary-hover: #094c5b;       /* Al pasar mouse sobre el primario, oscurece al tono Dark */
+  --dark-bg-hover: #159082;       /* Al pasar mouse sobre el menú oscuro, aclara al tono Primary */
+  
+  /* Fondos y Textos Neutros */
+  --app-bg: #f0f4f5;              /* Gris muy claro con tinte cyan para fondo de pantalla */
+  --card-bg: #ffffff;             /* Blanco absoluto para tarjetas */
+  
+  --text-main: #094c5b;           /* Usamos el Teal Oscuro como "Negro" para textos principales */
+  --text-secondary: #546e7a;      /* Gris azulado para textos secundarios */
+  --text-light: #ffffff;          /* Blanco para textos sobre fondos oscuros */
+  
+  /* Semánticos (Ajustados a la marca) */
+  --danger: #e5491f;              /* El rojo de la marca sirve perfecto para errores/salir */
+  --success: #159082;             /* El verde de la marca sirve para éxito */
+  --warning: #eb6e5d;             /* El coral sirve para advertencias */
+
+  /* --- 2. MEDIDAS Y ESPACIADO --- */
+  --navbar-height: 80px;
+  --max-content-width: 1200px;
+  --border-radius: 12px;
+  
+  /* Sombras */
+  --shadow-sm: 0 1px 2px 0 rgba(9, 76, 91, 0.1); /* Sombra con tinte de la marca */
+  --shadow-md: 0 4px 6px -1px rgba(9, 76, 91, 0.15);
+
+  /* --- 3. CONFIGURACIÓN GLOBAL --- */
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* --- 4. RESET BÁSICO --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--app-bg);
+  color: var(--text-main);
+  min-height: 100vh;
+  width: 100%;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Scrollbar personalizada (Opcional, para que combine) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--app-bg); 
+}
+::-webkit-scrollbar-thumb {
+  background: var(--highlight); 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color); 
+}

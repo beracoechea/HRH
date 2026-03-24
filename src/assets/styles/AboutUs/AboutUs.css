@@ -1,0 +1,137 @@
+/* src/assets/styles/AboutUs/AboutUs.css */
+
+:root {
+  --primary-teal: #159082;
+  --dark-teal: #094c5b;
+  --coral-credi: #eb6e5d;
+  --bg-subtle: #f8fafc;
+}
+
+.about-page {
+  background-color: var(--bg-subtle);
+}
+
+/* --- HEADER ULTRA COMPACTO --- */
+.about-compact-header {
+  padding: 30px 20px;
+  background-color: white;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.header-content {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.breadcrumb {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #64748b;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.about-compact-header h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--dark-teal);
+  margin: 0;
+}
+
+/* --- CONTENEDOR PRINCIPAL --- */
+.about-main-content {
+  padding: 30px 20px;
+}
+
+.about-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* --- FILAS TIPO "SLIM BANNER" (Control de Altura) --- */
+.about-row {
+  display: flex;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-bottom: 25px;
+  
+  /* Altura reducida para evitar scrolls infinitos */
+  height: 320px; 
+  contain: layout;
+}
+
+.about-row.reverse {
+  flex-direction: row-reverse;
+}
+
+/* --- IMAGEN --- */
+.about-image {
+  flex: 0.8; /* Menos ancho para la imagen */
+  height: 100%;
+}
+
+.img-optimized {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --- TEXTO --- */
+.about-text {
+  flex: 1.2;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+}
+
+.card-coral { background-color: var(--coral-credi); }
+.card-teal { background-color: var(--primary-teal); }
+
+.about-text h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.about-text p {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* --- ANIMACIÓN DE ENTRADA --- */
+.fade-in-view {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .about-row, .about-row.reverse {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .about-image {
+    height: 180px;
+  }
+
+  .about-text {
+    padding: 30px 20px;
+  }
+
+  .about-compact-header {
+    text-align: center;
+  }
+}

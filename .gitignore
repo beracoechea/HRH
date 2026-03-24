@@ -1,0 +1,44 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+/functions
+functions/
+google-keys.json
+firebase-debug.log
+firebase-debug.*.log
+firebase-debug.*.log.*
+firebase-debug.*.log.*.gz
+firebase-debug.*.log.*.zip
+firebase-debug.*.log.*.tar.gz
+firebase-debug.*.log.*.tar
+firebase-debug.*.log.*.tar.bz2
+firebase-debug.*.log.*.tar.xz
+firebase-debug.*.log.*.tar.lz
+firebase-debug.*.log.*.tar.lzma
+firebase-debug.*.log.*.tar.lzo
+firebase-debug.*.log.*.tar.zst
+# Secret keys
+functions/config/google-keys.json
+functions/test/key.json
+*.json

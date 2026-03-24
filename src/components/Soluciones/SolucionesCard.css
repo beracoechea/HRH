@@ -1,0 +1,46 @@
+/* src/components/Soluciones/SolucionesCard.css */
+.soluciones-container {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background-color: var(--app-bg);
+}
+
+.soluciones-card-main {
+  background-color: var(--secondary-color); /* Coral de tu paleta */
+  border-radius: var(--border-radius);
+  max-width: var(--max-content-width);
+  display: flex;
+  align-items: center;
+  padding: 3rem;
+  color: white;
+  gap: 2rem;
+  box-shadow: var(--shadow-md);
+}
+
+.soluciones-text {
+  flex: 1;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.soluciones-text strong {
+  color: var(--dark-bg); /* Teal oscuro para resaltar */
+}
+
+.soluciones-visual img {
+  max-width: 400px;
+  height: auto;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .soluciones-card-main {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+  }
+  .soluciones-visual img {
+    max-width: 100%;
+  }
+}

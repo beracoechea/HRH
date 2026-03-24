@@ -1,0 +1,51 @@
+/* src/components/Common/StatusModal.css */
+
+.status-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  /* Eliminamos el background oscuro para que sea una notificación limpia */
+  background: transparent !important; 
+  /* Z-index masivo para ganar a cualquier modal */
+  z-index: 999999 !important; 
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  padding-bottom: 30px !important;
+  pointer-events: none; /* Permite hacer clic a través del overlay al login */
+  animation: fadeIn 0.3s ease;
+}
+
+.status-modal-content {
+  pointer-events: auto; /* IMPORTANTE: El contenido sí recibe clics */
+  background: white !important;
+  padding: 15px 25px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 380px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  /* Sombra más pesada para resaltar sobre el modal de login */
+  box-shadow: 0 15px 50px rgba(0,0,0,0.3); 
+  border-left: 6px solid transparent;
+  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Colores */
+.status-modal-content.error { border-left-color: #ef4444; }
+.status-modal-content.success { border-left-color: #10b981; }
+
+.status-icon { font-size: 1.5rem; display: flex; align-items: center; }
+.status-text-container h3 { margin: 0; font-size: 0.9rem; color: #1a1a1a; }
+.status-text-container p { margin: 0; font-size: 0.8rem; color: #666; }
+
+.status-confirm-btn {
+  background: #f3f4f6;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.75rem;
+  margin-left: auto;
+}

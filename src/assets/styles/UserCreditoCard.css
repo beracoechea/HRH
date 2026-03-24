@@ -1,0 +1,164 @@
+/* --- ESTILOS VINCULADOS A index.css --- */
+
+.user-credit-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--highlight);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Header decorativo */
+.credit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed var(--highlight);
+}
+
+.amount-group .label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.amount-group .amount {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--dark-bg); /* Uso de color de marca */
+    margin: 0;
+}
+
+/* Badges dinámicos */
+.badge-status {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+.badge-status.pendiente { background: #fff5f2; color: var(--warning); border: 1px solid var(--secondary-color); }
+.badge-status.aprobado, .badge-status.activo { background: #e8f5f3; color: var(--primary-color); border: 1px solid var(--highlight); }
+
+/* Trazabilidad de Pagos */
+.payment-tracking-section {
+    background: var(--app-bg);
+    padding: 1.2rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+}
+
+.tracking-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: 700;
+    color: var(--dark-bg);
+}
+
+.progress-bar-container {
+    height: 8px;
+    background: var(--highlight);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--dark-bg));
+    transition: width 1s ease-in-out;
+}
+
+.tracking-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    text-align: center;
+}
+
+.track-item small { font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; }
+.track-item p { font-weight: 700; margin-top: 4px; font-size: 0.9rem; }
+.text-success { color: var(--primary-color); }
+.text-coral { color: var(--secondary-color); }
+
+/* Tabla de Amortización */
+.btn-toggle-amortization {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--highlight);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: 5px;
+}
+
+.btn-toggle-amortization:hover { background: var(--app-bg); border-color: var(--primary-color); }
+.btn-label { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--dark-bg); }
+
+.amortization-table-wrapper {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--highlight);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.user-amort-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.user-amort-table th { position: sticky; top: 0; background: var(--highlight); padding: 8px; text-align: left; color: var(--dark-bg); }
+.user-amort-table td { padding: 8px; border-bottom: 1px solid var(--app-bg); }
+
+.badge-cuota.ordinaria { color: var(--text-secondary); font-weight: bold; }
+.badge-cuota.fidelidad { color: var(--primary-color); font-weight: 800; }
+.row-fidelidad { background: #f0fdfa; }
+
+/* Documentos */
+.docs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+}
+
+.doc-box {
+    background: var(--card-bg);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1.5px solid var(--highlight);
+    text-align: center;
+    transition: 0.2s;
+}
+
+.doc-box.revision { border-color: var(--warning); background: #fffcfb; }
+.doc-box.aprobado { border-color: var(--primary-color); background: #f7fdfc; }
+
+.doc-name { font-size: 0.7rem; font-weight: 700; color: var(--text-main); display: block; margin-bottom: 8px; }
+
+.upload-btn {
+    width: 35px;
+    height: 35px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+
+.upload-btn.retry { background: var(--danger); }
+.st-icon { font-size: 1.2rem; }
+
+@media (max-width: 480px) {
+    .docs-grid { grid-template-columns: 1fr 1fr; }
+    .tracking-grid { grid-template-columns: 1fr; }
+}

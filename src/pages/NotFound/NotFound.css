@@ -1,0 +1,70 @@
+/* src/pages/NotFound/NotFound.css */
+
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh; /* Ocupa casi toda la altura de la pantalla */
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #f8fafc; /* Fondo gris muy suave opcional */
+}
+
+.not-found-title {
+  font-size: 6rem;
+  font-weight: 900;
+  color: var(--primary-color); /* Tu color Teal */
+  margin: 0;
+  line-height: 1;
+  opacity: 0.2; /* Un poco transparente para que no sea agresivo */
+}
+
+.not-found-subtitle {
+  font-size: 2rem;
+  color: var(--dark-bg);
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+/* --- ESTILOS DEL GIF --- */
+.gif-container {
+  margin: 20px 0;
+}
+
+.not-found-gif {
+  width: 100%;
+  max-width: 400px; /* Ajusta este tamaño según tu GIF */
+  height: auto;
+  border-radius: 12px; /* Opcional: bordes redondeados */
+  /* Si el GIF tiene fondo blanco y quieres sombra: */
+  /* box-shadow: 0 10px 30px rgba(0,0,0,0.1); */
+}
+
+.not-found-text {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+  max-width: 500px;
+}
+
+/* --- BOTÓN --- */
+.btn-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 12px 30px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-home:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  background-color: var(--secondary-color); /* Efecto hover con color secundario */
+}

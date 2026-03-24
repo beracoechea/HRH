@@ -1,0 +1,236 @@
+/* src/assets/styles/ChatBot.css */
+
+/* --- CONTENEDOR FLOTANTE --- */
+.chatbot-container {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 10000;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* --- VENTANA DE CHAT --- */
+.chat-window {
+  width: 350px;
+  height: 500px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* --- HEADER --- */
+.chat-header {
+  background-color: #094c5b; /* Teal Oscuro */
+  color: white;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.header-logo-mini {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: brightness(0) invert(1); /* Pone el logo en blanco */
+}
+
+.close-btn-minimal {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.close-btn-minimal:hover {
+  color: white;
+  transform: scale(1.1);
+}
+
+/* --- CUERPO DEL CHAT --- */
+.chat-body {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar personalizado */
+.chat-body::-webkit-scrollbar {
+  width: 5px;
+}
+.chat-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* --- MENSAJES --- */
+.message-wrapper {
+  display: flex;
+  width: 100%;
+  animation: messageSlide 0.3s ease-out;
+}
+
+.message-wrapper.user { justify-content: flex-end; }
+.message-wrapper.bot { justify-content: flex-start; }
+
+.message {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.bot-msg {
+  background: white;
+  color: #334155;
+  border-bottom-left-radius: 4px;
+}
+
+.user-msg {
+  background: #eb6e5d; /* Coral Credigo */
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+/* --- INDICADOR DE ESCRITURA (LOS 3 PUNTOS) --- */
+.typing-indicator {
+  display: flex;
+  gap: 5px;
+  padding: 15px 20px !important;
+  background: white;
+  width: fit-content;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background-color: #cbd5e1;
+  border-radius: 50%;
+  display: inline-block;
+  animation: bounce 1.3s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-7px); }
+}
+
+/* --- FOOTER / INPUT --- */
+.chat-footer {
+  padding: 15px;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.chat-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 0.95rem;
+  padding: 8px;
+  color: #1e293b;
+}
+
+.chat-send-btn {
+  background: #159082; /* Teal */
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chat-send-btn:hover {
+  background: #094c5b;
+  transform: scale(1.05);
+}
+
+/* --- BOTÓN BURBUJA FLOTANTE --- */
+.chat-bubble-btn {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: #094c5b;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 25px rgba(9, 76, 91, 0.4);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.chat-bubble-btn:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.chat-logo-img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.close-icon-bubble {
+  color: white;
+  font-size: 1.8rem;
+}
+
+/* --- ANIMACIONES DE ENTRADA --- */
+.fade-in-bot {
+  animation: chatAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes chatAppear {
+  from { opacity: 0; transform: translateY(40px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes messageSlide {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 480px) {
+  .chat-window {
+    width: calc(100vw - 40px);
+    height: 70vh;
+    bottom: 20px;
+    right: 20px;
+  }
+}

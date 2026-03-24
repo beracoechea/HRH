@@ -1,0 +1,145 @@
+/* Overlay con desenfoque para centrar la atención */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.7); /* Azul oscuro translúcido */
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    padding: 20px;
+}
+
+/* Caja del Modal */
+.role-modal {
+    background: #ffffff;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 20px;
+    padding: 35px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    animation: modalSlideUp 0.3s ease-out;
+}
+
+@keyframes modalSlideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Encabezado del Modal */
+.role-modal-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.role-modal-header h3 {
+    color: #0f172a;
+    font-size: 1.5rem;
+    margin: 15px 0 8px;
+    font-weight: 700;
+}
+
+.role-modal-header p {
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.role-modal-header strong {
+    color: #3b82f6; /* Azul para resaltar el email */
+    word-break: break-all;
+}
+
+/* Sección de selección */
+.role-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.role-selection label {
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.9rem;
+    padding-left: 5px;
+}
+
+.role-selection select {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    background-color: #f8fafc;
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.role-selection select:focus {
+    border-color: #3b82f6;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.role-selection select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Acciones (Botones) */
+.modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.modal-actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.cancel-btn {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.cancel-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.save-btn {
+    background: #3b82f6;
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.save-btn:hover:not(:disabled) {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+}
+
+.save-btn:disabled {
+    background: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Soporte para modo carga del botón */
+.save-btn:active:not(:disabled) {
+    transform: translateY(0);
+}

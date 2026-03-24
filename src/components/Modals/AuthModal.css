@@ -1,0 +1,225 @@
+/* --- AuthModal.css --- */
+
+/* 1. Overlay (Fondo desenfocado) */
+.modal-overlay {
+  background: rgba(9, 76, 91, 0.6); /* Tono Teal Oscuro con transparencia */
+  backdrop-filter: blur(6px);
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 2. Contenedor del Modal */
+.modal-content {
+  background: var(--card-bg);
+  width: 100%;
+  max-width: 420px;
+  border-radius: var(--border-radius);
+  padding: 40px;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(9, 76, 91, 0.25);
+  animation: slideUp 0.4s ease-out;
+}
+
+/* 3. Header */
+.modal-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.modal-header h2 {
+  font-size: 1.8rem;
+  color: var(--dark-bg);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.modal-header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* 4. Selector de Pestañas (Tabs) */
+.auth-toggle-container {
+  display: flex;
+  background: var(--app-bg);
+  padding: 5px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.toggle-tab {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  color: var(--text-secondary);
+}
+
+.toggle-tab.active {
+  background: white;
+  color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 5. Grupos de Input (Corrección de encimado de texto) */
+.input-group {
+  position: relative;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 16px;
+  color: #9ca3af;
+  font-size: 1.2rem;
+  z-index: 10;
+  pointer-events: none; /* El icono no bloquea el clic */
+  transition: color 0.3s ease;
+}
+
+.input-group input {
+  width: 100%;
+  /* Padding-left de 48px para dejar espacio total al icono */
+  padding: 14px 16px 14px 48px !important;
+  border: 2px solid #eef2f3;
+  border-radius: 10px;
+  outline: none;
+  font-size: 1rem;
+  font-family: inherit;
+  background: #fcfdfe;
+  color: var(--text-main);
+  transition: all 0.3s ease;
+}
+
+.input-group input::placeholder {
+  color: #a0aec0;
+}
+
+/* Estado de Foco */
+.input-group input:focus {
+  border-color: var(--primary-color);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(21, 144, 130, 0.1);
+}
+
+.input-group:focus-within .input-icon {
+  color: var(--primary-color);
+}
+
+/* 6. Botón de Envío */
+.auth-submit-btn {
+  width: 100%;
+  background: var(--primary-color);
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+  background: var(--dark-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(21, 144, 130, 0.3);
+}
+
+.auth-submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.auth-submit-btn:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 7. Footer del Modal */
+.modal-footer {
+  margin-top: 25px;
+  text-align: center;
+}
+
+.toggle-auth-link {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.toggle-auth-link:hover {
+  color: var(--secondary-color);
+  font-weight: 600;
+}
+
+/* 8. Botón Cerrar (X) */
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--app-bg);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: var(--secondary-color);
+  color: white;
+  transform: rotate(90deg);
+}
+
+/* 9. Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Adaptabilidad Móvil */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 30px 20px;
+  }
+}
