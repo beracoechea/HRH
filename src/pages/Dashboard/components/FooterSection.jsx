@@ -68,14 +68,17 @@ export const FooterSection = () => {
               <p><b>{ENTIDAD_CONFIG.NOMBRE_RAZON_SOCIAL}</b></p>
               <p>Titular: {ENTIDAD_CONFIG.UNE_TITULAR}</p>
               <p>Domicilio: {ENTIDAD_CONFIG.DOMICILIO_FISCAL}</p>
-              <p>Tel: {ENTIDAD_CONFIG.CONTACTO_TEL_VUE} | <a href={`mailto:${ENTIDAD_CONFIG.UNE_CORREO}`}>{ENTIDAD_CONFIG.UNE_CORREO}</a></p>
-              <p>Horario: {ENTIDAD_CONFIG.UNE_HORARIO}</p>
+              <p>Tel: {ENTIDAD_CONFIG.UNE_TELEFONO} | <a href={`mailto:${ENTIDAD_CONFIG.UNE_CORREO}`}>{ENTIDAD_CONFIG.UNE_CORREO}</a></p>
+              
             </div>
 
             {/* CONDUSEF */}
             <div className="legal-box">
-              <h4>CONDUSEF</h4>
+               <h4>CONDUSEF</h4>
+               <div className="buro-link-footer">
+              <img src={ENTIDAD_CONFIG.LOGOS.CONDUSEF} alt="CONDUSEF" className="buro-logo-small" />
               <p>Atención: 55 5340 0999 y 800 999 8080</p>
+               </div>
               <p><a href={ENTIDAD_CONFIG.LINK_CONDUSEF} target="_blank" rel="noreferrer">www.condusef.gob.mx</a></p>
               <div className="buro-link-footer">
                 <img src={ENTIDAD_CONFIG.LOGOS.BURO} alt="Buró" className="buro-logo-small" />

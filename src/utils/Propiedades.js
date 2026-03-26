@@ -2,25 +2,27 @@
 
 export const ENTIDAD_CONFIG = {
   // --- DATOS FISCALES Y LEGALES ---
-  NOMBRE_RAZON_SOCIAL: "CrediGo S.A. de C.V., SOFOM, E.N.R.",
-  DOMICILIO_FISCAL: "Av. Interlomas 100, Col. Centro, CP 44100, Guadalajara, Jal.",
+  NOMBRE_RAZON_SOCIAL: "HRH 2022, S.A.P.I DE C.V., SOFOM, E.N.R.",
+  // --- DATOS FISCALES Y LEGALES ---
+DOMICILIO_FISCAL: "AVENIDA DE LA CALMA 3483 - E, COL. LA CALMA, C.P. 45070, ZAPOPAN, JALISCO.\nREFERENCIA: FRENTE AL PARQUE LA CALMA, ENTRE CALLE GEMELOS Y CALLE CARNERO",
   
   // --- UNIDAD ESPECIALIZADA (UNE) ---
-  UNE_TITULAR: "Lic. Juan Pérez García",
-  UNE_CORREO: "une@credigo.com",
-  UNE_TELEFONO: "3312345678",
-  UNE_HORARIO: "Lunes a Viernes de 09:00 a 18:00 hrs.",
+  UNE_TITULAR: "HUMBERTO HERNNADEZ SERUR",
+  UNE_CORREO: "HRH_2022@outlook.es",
+  UNE_TELEFONO: "3334572113",
+  // UNE_HORARIO: "Lunes a Viernes de 09:00 a 18:00 hrs.",
 
   // --- CONTACTO PÚBLICO ---
   CONTACTO_CORREO: "contacto@credigo.com",
-  CONTACTO_WHATSAPP: "523312345678", // Sin espacios ni símbolos para el link
-  CONTACTO_TEL_VUE: "33 1234 5678",   // Formato estético para el usuario
+  CONTACTO_WHATSAPP: "523312345678",
+  CONTACTO_TEL_VUE: "33 1234 5678",
 
   // --- RECURSOS Y LOGOS (Rutas relativas a /public) ---
   LOGOS: {
-    SIPRES: "/logos/sipres.png",
-    CNBV: "/logos/cnbv.png",
-    BURO: "/logos/buro.png",
+    SIPRES: "/src/assets/images/SIPRES.svg",
+    CONDUSEF: "/src/assets/images/CONDUSEF.svg",
+    CNBV: "/src/assets/images/CNBV.svg",
+    BURO: "/src/assets/images/BANCO DE MÉXICO.svg",
   },
 
   // --- REGISTROS Y LINKS OFICIALES ---

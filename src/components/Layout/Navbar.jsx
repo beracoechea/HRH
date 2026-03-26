@@ -115,7 +115,7 @@ export const Navbar = () => {
               {isAuthenticated ? (
                 <div className="nav-user-info">
                   <button className="nav-auth-btn logout" onClick={() => { logout(); closeMobileMenu(); }}>
-                    <FiLogOut className="nav-icon" /> Salir
+                    <FiLogOut className="nav-icon" />
                   </button>
                 </div>
               ) : (
