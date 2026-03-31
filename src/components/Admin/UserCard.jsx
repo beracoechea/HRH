@@ -4,21 +4,22 @@ import { useAuthActions } from '../../pages/hooks/useAuthActions';
 import { StatusModal } from '../Common/StatusModal';
 import '../../assets/styles/UserCard.css';
 
-export const UserCard = ({ user, onUpdateRole, isPriority }) => {
+export const UserCard = ({ user, onUpdateRole, isPriority, onClick }) => {
   const { updateUserRole, loading, status, closeStatus } = useAuthActions(onUpdateRole);
+  
   const getRoleClass = (rol) => {
     const roles = {
       admin: 'role-admin',
-      aprobador: 'role-aprobador', // Nuevo
-      tesorero: 'role-tesorero',   // Nuevo
-      marketing: 'role-marketing', // Nuevo
+      aprobador: 'role-aprobador',
+      tesorero: 'role-tesorero',
+      marketing: 'role-marketing',
       cliente: 'role-cliente'
     };
     return roles[rol?.toLowerCase()] || 'role-cliente';
   };
 
   return (
-    <div className={`user-card ${isPriority ? 'priority-card' : ''}`}>
+    <div className={`user-card ${isPriority ? 'priority-card' : ''}`} onClick={onClick} style={{ cursor: 'pointer' }}>
       {isPriority && (
         <div className="priority-badge-floating">
           <FiAlertCircle /> <span>Revisión Pendiente</span>
@@ -41,11 +42,13 @@ export const UserCard = ({ user, onUpdateRole, isPriority }) => {
                       style={{ cursor: 'pointer', appearance: 'none', border: 'none', outline: 'none' }}
                       value={user.rol || 'cliente'} 
                       onChange={async (e) => {
+                          e.stopPropagation(); // Evitar abrir sidebar
                           const newRole = e.target.value;
                           if (newRole !== user.rol) {
                               await updateUserRole(user.id, user.email, newRole);
                           }
                       }}
+                      onClick={(e) => e.stopPropagation()} // Evitar abrir sidebar
                       disabled={loading}
                       title="Cambiar permisos del usuario"
                   >

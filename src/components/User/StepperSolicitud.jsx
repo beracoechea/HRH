@@ -3,24 +3,14 @@ import {
   FiUserCheck, FiSearch, FiUploadCloud, FiActivity, 
   FiFileText, FiEdit3, FiShield, FiCheckCircle
 } from 'react-icons/fi';
+import { CREDIT_STEPS } from '../../constants/creditSteps';
 import '../../assets/styles/StepperSolicitud.css';
-
-const FASES = [
-  { id: 1, label: 'KYC', icon: <FiUserCheck /> },
-  { id: 2, label: 'Buró', icon: <FiSearch /> },
-  { id: 3, label: 'Docs', icon: <FiUploadCloud /> },
-  { id: 4, label: 'Análisis', icon: <FiActivity /> },
-  { id: 5, label: 'Oferta', icon: <FiFileText /> },
-  { id: 6, label: 'Firma', icon: <FiEdit3 /> },
-  { id: 7, label: 'Validación', icon: <FiShield /> },
-  { id: 8, label: 'Fondos', icon: <FiCheckCircle /> }
-];
 
 export const StepperSolicitud = ({ faseActual = 1 }) => {
   return (
     <div className="stepper-main-container">
       <div className="stepper-track">
-        {FASES.map((fase, index) => {
+        {CREDIT_STEPS.map((fase, index) => {
           const isCompleted = faseActual > fase.id;
           const isActive = faseActual === fase.id;
 
@@ -42,7 +32,7 @@ export const StepperSolicitud = ({ faseActual = 1 }) => {
                 {isActive && <span className="current-dot">●</span>}
               </div>
 
-              {index < FASES.length - 1 && (
+              {index < CREDIT_STEPS.length - 1 && (
                 <div className={`step-line ${faseActual > fase.id ? 'line-filled' : ''}`} />
               )}
             </div>

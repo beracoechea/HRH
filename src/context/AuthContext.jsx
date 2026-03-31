@@ -20,7 +20,13 @@ export const AuthProvider = ({ children }) => {
                 try {
                     // Sincronización con la colección "usuarios" (en español)
                     const userRef = doc(db, "usuarios", firebaseUser.uid);
-                    const userSnap = await getDoc(userRef);
+                    let userSnap = await getDoc(userRef);
+
+                    // Reintento breve por si la creación del doc es lenta (race condition en signup)
+                    if (!userSnap.exists()) {
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+                        userSnap = await getDoc(userRef);
+                    }
 
                     if (userSnap.exists()) {
                         const userData = {
@@ -30,7 +36,7 @@ export const AuthProvider = ({ children }) => {
                         setUser(userData);
                         setIsAuthenticated(true); // Ahora sí funcionará
                     } else {
-                        console.error("El documento no existe en la colección 'usuarios'");
+                        console.warn("El documento no existe en la colección 'usuarios' tras reintento");
                         setUser(null);
                         setIsAuthenticated(false);
                     }

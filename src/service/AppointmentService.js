@@ -29,6 +29,17 @@ export class AppointmentService {
         }
     }
 
+    async getAllCitas() {
+        try {
+            const q = query(collection(db, this.collectionName), orderBy('createdAt', 'desc'));
+            const snapshot = await getDocs(q);
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (error) {
+            console.error("Error al obtener todas las citas:", error);
+            return [];
+        }
+    }
+
     async crearCita(appointmentData) {
         try {
             const nuevaCita = {

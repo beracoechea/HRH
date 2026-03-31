@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
     FiClock, FiCheckCircle, FiUploadCloud, 
-    FiLoader, FiTrendingUp, FiFileText, FiChevronDown, FiChevronUp 
+    FiLoader, FiTrendingUp, FiFileText, FiChevronDown, FiChevronUp, FiPenTool 
 } from 'react-icons/fi';
 import { db, storage } from '../../firebase/config'; 
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -46,6 +46,46 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
             );
         }
         return filas;
+    };
+
+    const handleSignDocument = async (nombreDocumento) => {
+        setUploading(nombreDocumento);
+        try {
+            const creditoRef = doc(db, "creditos", credito.id);
+            const creditoSnap = await getDoc(creditoRef);
+
+            if (creditoSnap.exists()) {
+                const nuevoExpediente = creditoSnap.data().expediente.map(docExp => 
+                    docExp.nombre === nombreDocumento ? { 
+                        ...docExp, 
+                        estatus: 'firmado', 
+                        fecha_firma: new Date().toISOString() 
+                    } : docExp
+                );
+                await updateDoc(creditoRef, { expediente: nuevoExpediente, lastUpdate: new Date() });
+                
+                // También actualizar en el expediente del usuario
+                const userRef = doc(db, "usuarios", credito.usuario_id);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    const userExp = userSnap.data().expediente.map(docExp => 
+                        docExp.nombre === nombreDocumento ? { 
+                            ...docExp, 
+                            estatus: 'firmado', 
+                            fecha_firma: new Date().toISOString() 
+                        } : docExp
+                    );
+                    await updateDoc(userRef, { expediente: userExp });
+                }
+            }
+            setStatus({ open: true, type: 'success', message: `¡Documento "${nombreDocumento}" firmado correctamente!` });
+            if (onUploadSuccess) await onUploadSuccess();
+        } catch (error) {
+            console.error("Error signing:", error);
+            setStatus({ open: true, type: 'error', message: "Error al firmar documento." });
+        } finally {
+            setUploading(null);
+        }
     };
 
     const handleFileChange = async (e, nombreDocumento) => {
@@ -141,12 +181,23 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
                             <div key={idx} className={`doc-box ${est}`}>
                                 <span className="doc-name">{doc.nombre}</span>
                                 <div className="doc-action">
-                                    {est === 'aprobado' || est === 'validado' ? <FiCheckCircle className="st-icon text-success" /> :
+                                    {est === 'aprobado' || est === 'validado' || est === 'firmado' ? <FiCheckCircle className="st-icon text-success" /> :
                                      est === 'revision' ? <FiClock className="st-icon text-warning pulse" /> :
+                                     est === 'pendiente_firma' ? (
+                                         <button 
+                                            className="btn-sign-doc" 
+                                            onClick={() => handleSignDocument(doc.nombre)}
+                                            disabled={!!uploading}
+                                         >
+                                             {uploading === doc.nombre ? <FiLoader className="spinner" /> : <FiPenTool />} 
+                                             <span>Firmar</span>
+                                         </button>
+                                     ) : (
                                      <label className={`upload-btn ${uploading === doc.nombre ? 'loading' : ''} ${est === 'rechazado' ? 'retry' : ''}`}>
                                          {uploading === doc.nombre ? <FiLoader className="spinner" /> : <FiUploadCloud />}
                                          <input type="file" hidden onChange={(e) => handleFileChange(e, doc.nombre)} disabled={!!uploading} accept=".pdf,.jpg,.jpeg,.png" />
-                                     </label>}
+                                     </label>
+                                     )}
                                 </div>
                             </div>
                         );

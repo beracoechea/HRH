@@ -11,20 +11,30 @@ export const useKYC = () => {
         setError(null);
 
         try {
-            // 1. Guardar o actualizar los datos en el perfil del usuario (Colección Permanente)
-            // Esto permite que si el usuario entra a otra solicitud mañana, sus datos ya estén ahí.
+            // 1. Guardar en la subcolección perfil/kyc (fuente de verdad)
             const userKycRef = doc(db, "usuarios", userId, "perfil", "kyc");
             await setDoc(userKycRef, {
                 ...formData,
                 updatedAt: serverTimestamp()
             }, { merge: true });
 
-            // 2. Actualizar el crédito específico para avanzar a la FASE 2
+            // 2. DENORMALIZAR en el documento principal para que el admin lo vea sin
+            //    necesidad de hacer lecturas adicionales de la subcolección.
+            const mainUserRef = doc(db, "usuarios", userId);
+            await updateDoc(mainUserRef, {
+                kyc: formData,
+                // También guardamos el teléfono a nivel raíz para acceso rápido
+                telefono: formData.telefono || '',
+                nombre: formData.nombreCompleto || '',
+                updatedAt: serverTimestamp()
+            });
+
+            // 3. Actualizar el crédito específico para avanzar a la FASE 2
             if (creditoId) {
                 const creditoRef = doc(db, "creditos", creditoId);
                 await updateDoc(creditoRef, {
-                    fase: 2, // <--- ESTO ES LO QUE MUEVE EL STEPPER
-                    datosKYC: formData, // Guardamos una copia en el crédito por auditoría
+                    fase: 2,
+                    datosKYC: formData,
                     statusKYC: 'completado',
                     lastUpdate: serverTimestamp()
                 });

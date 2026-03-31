@@ -45,6 +45,7 @@ export class CreditService extends FirestoreService {
                 estado: 'pendiente',
                 frecuencia_pago: 'quincenal',
                 pagado: 0,
+                fase: 1, // <--- Nueva propiedad para el ciclo de 8 pasos
                 expediente: expedienteInicial,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()

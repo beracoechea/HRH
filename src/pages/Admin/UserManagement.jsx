@@ -9,7 +9,8 @@ import { PendingCitasList } from '../../components/Admin/PendingCitasList';
 import { PendingCreditosList } from '../../components/Admin/PendingCreditosList';
 import { AdminStats } from '../../components/Admin/AdminStats'; 
 import { DocumentTracking } from '../../components/Admin/DocumentTracking';
-import { RejectCreditSidebar } from '../../components/Common/RejectCreditSidebar'; // IMPORTACIÓN NUEVA
+import { RejectCreditSidebar } from '../../components/Common/RejectCreditSidebar'; 
+import { UserDetailsModal } from '../../components/Admin/UserDetailsModal';
 
 // Modales y Common
 import { StatusModal } from '../../components/Common/StatusModal'; 
@@ -49,6 +50,10 @@ export const UserManagement = () => {
     type: 'success', 
     message: '' 
   });
+
+  // Estado para el detalle de usuario (Sidebar)
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [userSidebarOpen, setUserSidebarOpen] = useState(false);
 
   const { 
     users, 
@@ -109,6 +114,11 @@ export const UserManagement = () => {
       showAlert('Error al procesar el rechazo.', 'error');
     }
   };
+
+  const handleUserClick = useCallback((user) => {
+    setSelectedUser(user);
+    setUserSidebarOpen(true);
+  }, []);
 
   // --- LÓGICA DE CONTADORES Y FILTROS ---
   const docsPendientesCount = creditosDocs?.filter(cre => 
@@ -191,6 +201,7 @@ export const UserManagement = () => {
                   key={u.id} 
                   user={u} 
                   onUpdateRole={currentUser.rol === 'admin' ? refreshData : null} 
+                  onClick={() => handleUserClick(u)}
                 />
               ))}
             </div>
@@ -229,6 +240,15 @@ export const UserManagement = () => {
           creditId={rejectSidebar.id}
           onConfirm={handleFinalRejection}
           onCancel={() => setRejectSidebar({ open: false, id: null })}
+        />
+
+        <UserDetailsModal 
+          isOpen={userSidebarOpen}
+          user={selectedUser}
+          creditos={creditos}
+          citas={pendingCitas} 
+          onClose={() => setUserSidebarOpen(false)}
+          onUpdateRole={refreshData}
         />
 
         <StatusModal 

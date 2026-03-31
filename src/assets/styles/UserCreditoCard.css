@@ -158,6 +158,68 @@
 .upload-btn.retry { background: var(--danger); }
 .st-icon { font-size: 1.2rem; }
 
+.btn-sign-doc {
+    background: #f59e0b;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0 auto;
+    transition: background 0.2s;
+}
+
+.btn-sign-doc:hover {
+    background: #d97706;
+}
+
+.tab-mi-credito-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.credits-selector-history {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.history-item {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    min-width: 150px;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.history-item.active {
+    border-color: var(--primary-color);
+    background: #f0fdfa;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.history-item .type {
+    display: block;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--dark-bg);
+}
+
+.history-item .date {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
 @media (max-width: 480px) {
     .docs-grid { grid-template-columns: 1fr 1fr; }
     .tracking-grid { grid-template-columns: 1fr; }

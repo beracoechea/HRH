@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 // AGREGAMOS FiCalendar A LA LISTA DE ABAJO
 import { FiCheck, FiX, FiClock, FiInfo, FiLoader, FiFilter, FiCalendar } from 'react-icons/fi';
 import { usePendingCitas } from '../../pages/hooks/usePendingCitas';
-import '../../assets/styles/AdminAppointments.css';
+import '../../assets/styles/AdminCredits.css';
 
 export const PendingCitasList = ({ citas, onActionComplete }) => {
     const [filtro, setFiltro] = useState('solicitada');

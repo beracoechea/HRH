@@ -20,7 +20,7 @@ import '../../assets/styles/MiPerfil.css';
 export const MiPerfil = () => {
     const { user, loading: authLoading } = useAuth();
     const { data, loading: perfilLoading, error, refreshData } = usePerfil(user);
-    const [activeTab, setActiveTab] = useState('mi-credito');
+    const [activeTab, setActiveTab] = useState('kyc');
 
     // Buscamos el crédito activo para determinar la fase global en el Stepper
     const creditoActivo = data.creditos?.find(c => 
