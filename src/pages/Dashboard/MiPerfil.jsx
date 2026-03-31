@@ -1,111 +1,99 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { usePerfil } from '../hooks/usePerfil';
-import { FiUser, FiCalendar, FiDollarSign, FiAlertCircle, FiLoader } from 'react-icons/fi';
-import { UserCitaCard } from '../../components/User/UserCitaCard';
-import { UserCreditoCard } from '../../components/User/UserCreditoCard';
-import { PaymentProgressCard } from '../../components/User/PaymentProgressCard';
+import { 
+    FiUser, FiDollarSign, FiCalendar, FiFileText, 
+    FiLoader, FiAlertCircle
+} from 'react-icons/fi';
+
+// Componentes Globales de Perfil
+import { StepperSolicitud } from '../../components/User/StepperSolicitud';
+
+// Componentes de Pestañas
+import { TabMiCredito } from '../../components/User/tabs/TabMiCredito';
+import { TabCitas } from '../../components/User/tabs/TabCitas';
+import { TabEstadosCuenta } from '../../components/User/tabs/TabEstadosCuenta';
+import { TabInformacionKYC } from '../../components/User/tabs/TabInformacionKYC';
+
 import '../../assets/styles/MiPerfil.css';
 
 export const MiPerfil = () => {
     const { user, loading: authLoading } = useAuth();
-    const { activeTab, setActiveTab, data, loading: perfilLoading, error, refreshData } = usePerfil(user);
+    const { data, loading: perfilLoading, error, refreshData } = usePerfil(user);
+    const [activeTab, setActiveTab] = useState('mi-credito');
 
-    // Estado de carga inicial (Auth + Perfil)
-    if (authLoading || (perfilLoading && data.citas.length === 0)) {
-        return (
-            <div className="loader-container">
-                <FiLoader className="spinner" />
-                <p>Sincronizando con CrediGO...</p>
-            </div>
-        );
+    // Buscamos el crédito activo para determinar la fase global en el Stepper
+    const creditoActivo = data.creditos?.find(c => 
+        !['finalizado', 'rechazado'].includes(c.estado?.toLowerCase())
+    );
+
+    // --- ESTADOS DE CARGA Y ERROR ---
+    if (authLoading || (perfilLoading && (!data || !data.creditos))) {
+        return <div className="loader-container-full"><FiLoader className="spinner" /><p>Sincronizando...</p></div>;
     }
 
     if (error) {
-        return (
-            <div className="error-state">
-                <FiAlertCircle /> 
-                <p>{error}</p>
-                <button onClick={refreshData}>Reintentar</button>
-            </div>
-        );
+        return <div className="error-state-container"><FiAlertCircle size={40} /><p>{error}</p><button onClick={refreshData} className="btn-retry">Reintentar</button></div>;
     }
 
     return (
-        <div className="perfil-container animate-fade">
-            <header className="perfil-header">
-                <div className="user-welcome">
-                    <div className="avatar-large">
-                        {/* Priorizar nombre, luego email, luego fallback */}
-                        {user?.nombre?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "?"}
-                    </div>
-                    <div className="welcome-text">
-                        <h1>Hola, {user?.nombre || user?.email?.split('@')[0] || 'Usuario'}</h1>
-                        <p><FiUser /> {user?.email ? 'Miembro CrediGO' : 'No es miembro'}</p>
+        <div className="perfil-layout-wrapper animate-fade">
+            {/* --- CABECERA --- */}
+            <header className="perfil-top-bar">
+                <div className="user-profile-summary">
+                    <div className="avatar-circle">{user?.nombre?.charAt(0).toUpperCase() || "U"}</div>
+                    <div className="profile-info">
+                        <h1>Hola, {user?.nombre?.split(' ')[0] || 'Usuario'}</h1>
+                        <span className="membership-badge">Miembro CrediGO</span>
                     </div>
                 </div>
+
+                <nav className="perfil-main-nav">
+                    <TabNavItem active={activeTab === 'mi-credito'} onClick={() => setActiveTab('mi-credito')} icon={<FiDollarSign />} label="Mi Crédito" />
+                    <TabNavItem active={activeTab === 'kyc'} onClick={() => setActiveTab('kyc')} icon={<FiUser />} label="Mi Información" />
+                    <TabNavItem active={activeTab === 'citas'} onClick={() => setActiveTab('citas')} icon={<FiCalendar />} label="Mis Citas" />
+                    <TabNavItem active={activeTab === 'historial'} onClick={() => setActiveTab('historial')} icon={<FiFileText />} label="Estados de Cuenta" />
+                </nav>
             </header>
 
-            <nav className="perfil-tabs">
-                <button 
-                    className={activeTab === 'citas' ? 'active' : ''} 
-                    onClick={() => setActiveTab('citas')}
-                >
-                    <FiCalendar /> Mis Citas
-                </button>
-                <button 
-                    className={activeTab === 'creditos' ? 'active' : ''} 
-                    onClick={() => setActiveTab('creditos')}
-                >
-                    <FiDollarSign /> Mis Créditos
-                </button>
-            </nav>
+            {/* --- STEPPER GLOBAL (Indica el progreso del usuario en la plataforma) --- */}
+            <section className="perfil-stepper-section">
+                <div className="stepper-container-box">
+                    <StepperSolicitud faseActual={creditoActivo?.fase || 1} />
+                </div>
+            </section>
 
-            <main className="perfil-content">
-                {activeTab === 'citas' ? (
-                    <section className="section-container">
-                        <h2>Seguimiento de Asesorías</h2>
-                        {data.citas && data.citas.length > 0 ? (
-                            <div className="citas-grid">
-                                {data.citas.map(cita => (
-                                    <UserCitaCard key={cita.id} cita={cita} />
-                                ))}
-                            </div>
-                        ) : (
-                            <EmptyState icon={<FiCalendar />} text="No tienes citas agendadas todavía." />
-                        )}
-                    </section>
-                ) : (
-                    <section className="section-container">
-                        <h2>Estado de Cuenta Actual</h2>
-                        {data.creditos && data.creditos.length > 0 ? (
-                            <div className="creditos-list-perfil">
-                                {data.creditos.map(c => (
-                                    <div key={c.id} className="credito-container-full">
-                                        <UserCreditoCard 
-                                            credito={c} 
-                                            expediente={c.expediente} 
-                                            onUploadSuccess={refreshData} 
-                                        />
-                                        {['activo', 'pagado'].includes(c.estado?.toLowerCase()) && (
-                                            <PaymentProgressCard credito={c} />
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <EmptyState icon={<FiDollarSign />} text="No hay créditos registrados a tu nombre." />
-                        )}
-                    </section>
+            {/* --- ÁREA DE CONTENIDO DINÁMICO --- */}
+            <main className="perfil-main-content">
+                {activeTab === 'mi-credito' && (
+                    <TabMiCredito 
+                        creditos={data.creditos} 
+                        user={user} 
+                        onRefresh={refreshData} 
+                    />
+                )}
+
+                {activeTab === 'kyc' && (
+                    <TabInformacionKYC 
+                        user={user} 
+                        onComplete={() => { refreshData(); setActiveTab('mi-credito'); }} 
+                    />
+                )}
+
+                {activeTab === 'citas' && (
+                    <TabCitas citas={data.citas} />
+                )}
+
+                {activeTab === 'historial' && (
+                    <TabEstadosCuenta creditos={data.creditos} />
                 )}
             </main>
         </div>
     );
 };
 
-const EmptyState = ({ icon, text }) => (
-    <div className="empty-state-perfil">
-        <div className="empty-icon">{icon}</div>
-        <p>{text}</p>
-    </div>
+const TabNavItem = ({ active, onClick, icon, label }) => (
+    <button className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}>
+        {icon} {label}
+    </button>
 );

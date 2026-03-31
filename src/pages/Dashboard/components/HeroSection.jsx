@@ -10,8 +10,8 @@ export const HeroSection = () => {
       <HeroBackground backgroundImage={bgHero} />
 
       <div className="hero-content">
-        <span className="hero-badge">¡CrediGo, El crédito que avanza contigo!</span>
-        <h1>Descubre nuestras opciones de crédito pensadas para acompañarte.</h1>
+        <span className="hero-badge">Soluciones financieras a tu medida</span>
+        <h1>Obten el respaldo que necesitas de forma rápida, segura y transparente.</h1>
       </div>
     </section>
   );

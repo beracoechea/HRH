@@ -1,0 +1,82 @@
+/* --- UserCitaCard.css --- */
+
+.user-cita-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-left: 5px solid #cbd5e1;
+    transition: transform 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.user-cita-card:hover {
+    transform: translateY(-3px);
+}
+
+.user-cita-card.solicitada { border-left-color: #1976d2; }
+.user-cita-card.confirmada { border-left-color: #159082; }
+.user-cita-card.rechazada { border-left-color: #dc3545; }
+
+.cita-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.status-badge.solicitada { background: #e3f2fd; color: #1976d2; }
+.status-badge.confirmada { background: #e8f5e9; color: #159082; }
+.status-badge.rechazada { background: #fee2e2; color: #dc3545; }
+
+.cita-id {
+    color: #94a3b8;
+    font-size: 0.7rem;
+    font-family: monospace;
+}
+
+.cita-motivo {
+    font-size: 1rem;
+    color: #1e293b;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cita-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.detail-item svg {
+    color: #159082;
+}
+
+.cita-sync-tag {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+    color: #159082;
+    font-weight: 600;
+}

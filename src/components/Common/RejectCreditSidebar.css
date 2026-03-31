@@ -1,0 +1,123 @@
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 9998;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.reject-sidebar {
+    position: fixed;
+    top: 0;
+    right: -450px;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    z-index: 9999;
+    transition: right 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+}
+
+.reject-sidebar.open {
+    right: 0;
+}
+
+.sidebar-header {
+    padding: 25px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+}
+
+.btn-close-sidebar {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+}
+
+.sidebar-body {
+    padding: 30px;
+    flex: 1;
+}
+
+.warning-box {
+    background: #fff5f5;
+    border-left: 4px solid #dc3545;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 4px;
+}
+
+.credit-id-display {
+    display: block;
+    margin-top: 10px;
+    font-family: monospace;
+    color: #c53030;
+}
+
+.info-note {
+    display: flex;
+    gap: 12px;
+    background: #f7fafc;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #4a5568;
+    line-height: 1.4;
+    margin-bottom: 20px;
+}
+
+.sidebar-footer {
+    padding: 25px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 12px;
+}
+
+.btn-confirm-reject {
+    flex: 1.5;
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-cancel-sidebar {
+    flex: 1;
+    background: #edf2f7;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}

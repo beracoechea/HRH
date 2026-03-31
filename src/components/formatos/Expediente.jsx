@@ -1,14 +1,36 @@
 import React from 'react';
-import { FiArrowRight } from 'react-icons/fi';
+import { FiArrowRight, FiCheckCircle, FiInfo } from 'react-icons/fi';
 import styles from './Expedientes.module.css';
 
 export const Expedientes = () => {
-  const requisitos = [
-    { titulo: "Identificación Oficial:", detalle: "INE o Pasaporte vigente (por ambos lados)." },
-    { titulo: "Comprobante de domicilio:", detalle: "Recibo de luz, agua o teléfono (no mayor a 3 meses)." },
-    { titulo: "CURP:", detalle: "Formato actualizado." },
-    { titulo: "Constancia de Situación Fiscal:", detalle: "Documento vigente emitido por el SAT." },
-    { titulo: "Documentación adicional:", detalle: "Solo si aplica en tu empresa, el Acuse de firma electrónica." },
+  const creditos = [
+    {
+      tipo: "Crédito Personal",
+      items: [
+        "Identificación oficial vigente.",
+        "Comprobante de ingresos reciente.",
+        "Comprobante de domicilio.",
+        "Constancia de situación fiscal.",
+        "Comprobante de nómina o estados de cuenta.*",
+        "Solicitud de crédito.",
+        "Aceptación de Consulta en Buró de Crédito."
+      ]
+    },
+    {
+      tipo: "Crédito Automotriz",
+      items: [
+        "Identificación oficial vigente.",
+        "Comprobante de ingresos reciente.",
+        "Comprobante de domicilio.",
+        "Constancia de situación fiscal.",
+        "Comprobante de nómina o estados de cuenta.*",
+        "Factura del automóvil.",
+        "Fotografías del automóvil.",
+        "Tarjeta de circulación del automóvil.",
+        "Solicitud de crédito.",
+        "Aceptación de Consulta en Buró de Crédito."
+      ]
+    }
   ];
 
   return (
@@ -16,22 +38,34 @@ export const Expedientes = () => {
       <div className={styles.bubbleIntro}>
         <p>
           Para completar tu expediente y recibir una respuesta en <strong>48 horas</strong>, 
-          asegúrate de tener digitalizados los siguientes documentos junto con tus formatos firmados:
+          asegúrate de tener digitalizados los siguientes documentos:
         </p>
       </div>
 
-      <ul className={styles.requisitosList}>
-        {requisitos.map((item, index) => (
-          <li key={index} className={styles.requisitoItem}>
-            <FiArrowRight className={styles.arrowIcon} />
-            <p>
-              <strong>{item.titulo}</strong> {item.detalle}
-            </p>
-          </li>
+      <div className={styles.creditosGrid}>
+        {creditos.map((credito, idx) => (
+          <div key={idx} className={styles.creditoCard}>
+            <h3 className={styles.creditoTitle}>
+              <FiCheckCircle className={styles.titleIcon} /> {credito.tipo}
+            </h3>
+            <ul className={styles.requisitosList}>
+              {credito.items.map((item, index) => (
+                <li key={index} className={styles.requisitoItem}>
+                  <FiArrowRight className={styles.arrowIcon} />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
+      </div>
 
-      <div className={styles.divider}></div>
+      <div className={styles.notaConvenio}>
+        <FiInfo className={styles.infoIcon} />
+        <p>
+          *Si eres colaborador de empresas con convenio <strong>no requieren</strong> entregar esta documentación (nómina o estados de cuenta).
+        </p>
+      </div>
 
       <div className={styles.tipBox}>
         <FiArrowRight className={styles.tipArrow} />

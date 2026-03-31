@@ -1,134 +1,173 @@
-/* src/components/Formulario/TimelineProceso.css */
+:root {
+  --card-padding: 1.5rem;
+  --line-color: rgba(9, 76, 91, 0.1);
+  --dot-size: 14px;
+}
+
 .proceso-premium {
-  background-color: var(--secondary-color); /* Cambiado a fondo claro para resaltar las cards */
-  padding: 120px 20px;
-  display: flex;
-  justify-content: center;
+  padding: 4rem 1.5rem;
+  background-color: #f8fafb; /* Fondo gris muy ligero para que resalten las tarjetas */
 }
 
 .proceso-container {
-  max-width: var(--max-content-width);
-  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
+/* --- HEADER COMPACTO --- */
 .proceso-header {
   text-align: center;
-  margin-bottom: 80px;
+  margin-bottom: 3rem; /* Reducido */
+}
+
+.proceso-tag {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  background: rgba(21, 144, 130, 0.1);
+  color: var(--primary-color);
+  border-radius: 50px;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 1rem;
 }
 
 .proceso-header h1 {
-  font-size: 3.5rem;
+  font-size: 2.5rem; /* Ligeramente más pequeño */
   color: var(--dark-bg);
-  font-weight: 900;
+  margin-bottom: 0.8rem;
 }
 
-/* --- Layout en Escalera --- */
+.proceso-header h1 span {
+  color: var(--primary-color);
+}
+
+.proceso-header p {
+  color: #64748b;
+  font-size: 1rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* --- GRID HORIZONTAL (3x2) --- */
 .proceso-layout {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  align-items: end; /* Alinea todas las cards a la base */
-  padding-bottom: 50px;
+  grid-template-columns: repeat(3, 1fr); /* 3 columnas fijas */
+  gap: 2rem; /* Espaciado ajustado */
 }
 
-/* Base común para todas las cards */
-.proceso-card {
-  background: var(--card-bg);
-  padding: 30px;
-  border-radius: 24px;
+/* La línea conectora (Horizontal en Escritorio) */
+.proceso-layout::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%; /* Centrada verticalmente en el grid */
+  height: 2px;
+  background: var(--line-color);
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+/* --- CARDS WRAPPER --- */
+.proceso-card-wrapper {
   position: relative;
-  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  z-index: 2; /* Por encima de la línea */
+}
+
+/* --- LA TARJETA CON MÁS COLOR --- */
+.proceso-card {
+  background: white;
+  padding: var(--card-padding);
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+  border: 1px solid #edf2f7;
+  border-top: 4px solid var(--primary-color); /* Borde de color Teal superior */
+  position: relative;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 320px; /* Ancho máximo para que no se estiren */
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-md);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: 1px solid rgba(21, 144, 130, 0.1);
+  justify-content: center;
+  min-height: 160px; /* Altura uniforme */
 }
 
-/* --- Jerarquía Progresiva (Escalera) --- */
-/* Paso 1: El inicio */
-.step-1 .proceso-card { min-height: 280px; background-color: #fcfdfe; }
-
-/* Paso 2: Creciendo */
-.step-2 .proceso-card { min-height: 340px; background-color: #f8fafb; }
-
-/* Paso 3: Casi en la cima */
-.step-3 .proceso-card { min-height: 400px; background-color: #f0f7f6; }
-
-/* Paso 4: La meta (Más grande y con color de énfasis sutil) */
-.step-4 .proceso-card { 
-  min-height: 460px; 
-  background-color: var(--card-bg);
-  border: 2px solid var(--primary-color);
+/* Alternancia de color en los bordes superiores (Teal y Coral) */
+.proceso-card-wrapper:nth-child(even) .proceso-card {
+  border-top-color: var(--secondary-color);
 }
 
-/* Hover effect individual */
 .proceso-card:hover {
-  transform: translateY(-15px);
-  box-shadow: 0 40px 80px rgba(9, 76, 91, 0.15);
+  transform: translateY(-5px);
   border-color: var(--primary-color);
+  box-shadow: 0 15px 30px rgba(9, 76, 91, 0.08);
 }
 
-/* Número de fondo gigante que también sube en la escalera */
+/* Número de fondo más visible pero suave */
 .card-number-bg {
   position: absolute;
-  bottom: -10px;
-  right: -10px;
-  font-size: 10rem;
+  top: 0.5rem;
+  right: 1rem;
+  font-size: 3rem;
   font-weight: 900;
-  color: var(--primary-color);
-  opacity: 0.03;
+  color: rgba(9, 76, 91, 0.05); /* Ligeramente más opaco */
   line-height: 1;
+  pointer-events: none;
+  user-select: none;
 }
 
 .step-label {
-  color: var(--primary-color);
-  font-weight: 800;
-  font-size: 0.85rem;
-  letter-spacing: 1px;
+  display: none; /* Eliminado para compresión máxima */
 }
 
 .card-content h3 {
+  font-size: 1.1rem;
   color: var(--dark-bg);
-  font-size: 1.4rem;
-  margin: 15px 0;
-  line-height: 1.2;
+  margin-bottom: 0.6rem;
+  font-weight: 700;
 }
 
 .card-content p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.6;
+  color: #64748b;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
 }
 
-/* Indicador de progreso que se llena al final */
-.card-indicator {
-  width: 30px;
-  height: 6px;
-  background: var(--highlight);
-  border-radius: 10px;
-  margin-top: auto;
-  transition: all 0.5s ease;
-}
-
-.proceso-card:hover .card-indicator {
-  width: 100%;
-  background: var(--primary-color);
-}
-
-/* --- Responsive --- */
-@media (max-width: 1100px) {
+/* --- RESPONSIVE (Móvil vuelve a Vertical) --- */
+@media (max-width: 850px) {
   .proceso-layout {
-    grid-template-columns: repeat(2, 1fr);
-    align-items: stretch; /* En tablet quitamos el efecto escalera para legibilidad */
+    grid-template-columns: 1fr; /* Una columna */
+    gap: 2.5rem;
   }
-  .proceso-card-wrapper .proceso-card {
-    min-height: 300px !important;
-  }
-}
 
-@media (max-width: 600px) {
-  .proceso-layout {
-    grid-template-columns: 1fr;
+  /* Línea vuelve a Vertical */
+  .proceso-layout::before {
+    left: 15px;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    height: 100%;
+    transform: none;
+  }
+
+  .proceso-card-wrapper {
+    justify-content: flex-start;
+    padding-left: 45px;
+  }
+
+  .card-indicator {
+    left: 15px;
+    transform: translate(-50%, -50%);
+  }
+
+  .proceso-card {
+    max-width: 100%;
+    min-height: auto;
+    padding: 1.5rem;
   }
 }

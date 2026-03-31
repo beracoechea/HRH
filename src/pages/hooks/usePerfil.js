@@ -7,18 +7,15 @@ const appointmentService = new AppointmentService();
 const creditService = new CreditService();
 
 export const usePerfil = (user) => {
-    const [activeTab, setActiveTab] = useState('citas');
     const [perfilData, setPerfilData] = useState({ citas: [], creditos: [] });
     const { loading, error, execute } = useFirestoreOperation();
-
-    // Extraemos el ID sin importar si viene como 'uid' o 'id'
     const userId = user?.uid || user?.id;
 
     const fetchAllData = useCallback(async () => {
         if (!userId) return;
 
         await execute(async () => {
-            // Ejecución en paralelo para mayor velocidad
+            // Ejecución paralela para evitar bloqueos
             const [citas, creditos] = await Promise.all([
                 appointmentService.getByUsuario(userId),
                 creditService.getByUsuario(userId)
@@ -29,17 +26,15 @@ export const usePerfil = (user) => {
                 creditos: creditos || [] 
             });
             
-            return "Datos de perfil cargados";
+            return "Perfil sincronizado";
         });
-    }, [userId, execute]);
+    }, [userId]);
 
     useEffect(() => {
         fetchAllData();
     }, [fetchAllData]);
 
     return {
-        activeTab,
-        setActiveTab,
         data: perfilData,
         loading,
         error,

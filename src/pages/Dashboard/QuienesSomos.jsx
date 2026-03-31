@@ -36,14 +36,19 @@ export const AboutUs = () => {
         <div className="about-container">
           <InfoBlock 
             title="Financiamiento claro, diseñado para ti"
-            text="Somos una SOFOM ENR que brinda préstamos personales a colaboradores bajo un modelo simple, seguro y transparente. Faciilitamos el acceso al credito con tasas competitivas y plazos accesibles, priorizando tu tranquilidad financiera"
+            text="Somos una plataforma financiera dedicada a brindar soluciones de crédito accesibles. Nos enfocamos en la agilidad y la transparencia para que puedas alcanzar tus objetivos con la tranquilidad de un respaldo sólido."
             type="card-coral"
             image={teamImg}
           />
 
-          <InfoBlock 
-            title="Servicios"
-            text="Ofrecemos atención personalizada a los colaboradores, con acompañamiento durante todo el proceso del préstamo, desde la solicitud hasta la liquidación garantizando claridad, confianza y un servicio cercano."
+         <InfoBlock 
+            text={
+              <>
+                <strong>Misión:</strong> Facilitar el acceso a servicios financieros mediante procesos simplificados y atención personalizada.
+                <br /><br />
+                <strong>Valores:</strong> Confianza, claridad y compromiso con el bienestar financiero de nuestros usuarios.
+              </>
+            }
             type="card-teal"
             image={aboutImg2}
             reverse={true}

@@ -6,23 +6,33 @@ export const TimelineProceso = () => {
   const pasosProceso = [
     {
       id: "01",
-      titulo: "Proyecta tu Crédito",
-      descripcion: "Personaliza tu préstamo en segundos. Elige el monto ideal para visualizar un plan de pagos transparente y a tu medida."
+      titulo: "Simula y Personaliza",
+      descripcion: "Define el monto y el plazo ideal para tu presupuesto. Visualiza tu cuota proyectada al instante, sin compromisos."
     },
     {
       id: "02",
-      titulo: "Trámite Simplificado",
-      descripcion: "¡Sin filas! Entrega tu solicitud y documentos básicos directamente en Recursos Humanos. Nosotros nos encargamos del resto."
+      titulo: "Inicia la Solicitud",
+      descripcion: "Completa un breve formulario y autoriza la consulta de historial crediticio para ofrecerte la mejor opción disponible."
     },
     {
       id: "03",
-      titulo: "Aprobación Express",
-      descripcion: "Tu tiempo vale. En menos de 48 horas hábiles validamos tu información y recibes tu contrato listo para firmar."
+      titulo: "Carga tu documentación.",
+      descripcion: "Sube tus documentos de forma digital y 100% segura."
     },
     {
       id: "04",
-      titulo: "Liquidez Inmediata",
-      descripcion: "¡Meta cumplida! Dispersamos los fondos directamente a tu cuenta de nómina para que dispongas de tu dinero hoy mismo."
+      titulo: "Revisa tu plan de pagos",
+      descripcion: " Valida tu tabla de amortización. Queremos que tengas claridad total sobre tus fechas y montos antes de continuar."
+    },
+    {
+      id: "05",
+      titulo: "Firma con confianza",
+      descripcion: "Formaliza tu contrato mediante firma electrónica o física, según lo que te resulte más cómodo. "
+    },
+    {
+      id: "06",
+      titulo: "¡Recibe tu dinero!",
+      descripcion: "Tras la aprobación y firma, transferimos los fondos directo a tu cuenta bancaria. ¡El impulso que necesitas, listo para usarse!"
     }
   ];
 
@@ -32,7 +42,7 @@ export const TimelineProceso = () => {
         
         <header className="proceso-header">
           <span className="proceso-tag">El proceso con <strong>CrediGo </strong> es Simple • Rápido • Seguro</span>
-          <h1>Tu crédito en <span>4 pasos</span></h1>
+          <h1>Tu crédito en <span>6 pasos</span></h1>
           <p>
             Obtén liquidez inmediata sin filas y sin complicaciones bancarias.
             <strong> Diseñamos un camino directo hacia tus metas.</strong>

@@ -1,84 +1,184 @@
 .expedientesContainer {
-  background-color: var(--warning); /* Coral/Naranja de la marca */
-  width: 100%;
-  padding: 80px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-sizing: border-box;
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #333;
 }
 
+/* --- INTRO BUBBLE --- */
 .bubbleIntro {
-  background-color: var(--highlight); /* Teal muy claro */
-  padding: 30px 50px;
-  border-radius: 60px;
-  max-width: 900px;
-  text-align: center;
-  margin-bottom: 50px;
-  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, var(--dark-bg) 0%, #1a5a6a 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  border-radius: 20px;
+  margin-bottom: 3rem;
+  box-shadow: 0 10px 20px rgba(9, 76, 91, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.bubbleIntro::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
 }
 
 .bubbleIntro p {
-  color: var(--dark-bg);
-  font-size: 1.2rem;
-  line-height: 1.4;
   margin: 0;
-  font-weight: 600;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  z-index: 1;
+  position: relative;
 }
 
+.bubbleIntro strong {
+  color: var(--secondary-color); /* El Coral de CrediGO */
+  font-weight: 700;
+}
+
+/* --- GRID DE CRÉDITOS --- */
+.creditosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 2.5rem;
+  margin-bottom: 3rem;
+}
+
+.creditoCard {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 24px;
+  border: 1px solid #edf2f7;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+}
+
+.creditoCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(9, 76, 91, 0.1);
+  border-color: var(--primary-color);
+}
+
+.creditoTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--dark-bg);
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f7fafc;
+}
+
+.titleIcon {
+  color: var(--primary-color);
+  font-size: 1.6rem;
+}
+
+/* --- LISTA DE REQUISITOS --- */
 .requisitosList {
   list-style: none;
   padding: 0;
-  max-width: 900px;
-  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .requisitoItem {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
   align-items: flex-start;
-  margin-bottom: 25px;
-  color: var(--text-light);
+  font-size: 0.95rem;
+  color: #4a5568;
+  line-height: 1.5;
+  transition: color 0.2s;
+}
+
+.requisitoItem:hover {
+  color: var(--dark-bg);
 }
 
 .arrowIcon {
-  color: var(--accent-color);
-  background: var(--card-bg);
-  border-radius: 6px;
-  margin-right: 18px;
-  font-size: 1.6rem;
-  flex-shrink: 0;
-  padding: 3px;
-  box-shadow: var(--shadow-sm);
+  margin-top: 3px;
+  color: var(--primary-color);
+  font-size: 1rem;
+  transition: transform 0.3s;
 }
 
-.requisitoItem p {
-  font-size: 1.15rem;
+.requisitoItem:hover .arrowIcon {
+  transform: translateX(4px);
+}
+
+/* --- NOTA CONVENIO (ESTILO BANNER) --- */
+.notaConvenio {
+  background-color: #f0f9f9;
+  border-radius: 16px;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border: 1px solid rgba(21, 144, 130, 0.2);
+  margin-bottom: 2rem;
+}
+
+.infoIcon {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.notaConvenio p {
   margin: 0;
+  font-size: 0.9rem;
+  color: #2c5282;
   line-height: 1.5;
 }
 
-.divider {
-  width: 100%;
-  max-width: 900px;
-  border-bottom: 2px dashed rgba(255, 255, 255, 0.4);
-  margin: 40px 0;
-}
-
+/* --- TIP BOX (ESTILO FLOATING) --- */
 .tipBox {
+  background: white;
+  border-left: 5px solid var(--secondary-color);
+  padding: 1.2rem 1.5rem;
+  border-radius: 8px 16px 16px 8px;
   display: flex;
   align-items: center;
-  max-width: 900px;
-  width: 100%;
-  color: var(--text-light);
+  gap: 15px;
+  box-shadow: var(--shadow-sm);
 }
 
 .tipArrow {
-  color: var(--text-light);
-  font-size: 1.8rem;
-  margin-right: 15px;
+  color: var(--secondary-color);
+  font-size: 1.2rem;
 }
 
-@media (max-width: 768px) {
-  .bubbleIntro { border-radius: 30px; padding: 25px; }
-  .requisitoItem p { font-size: 1.05rem; }
+.tipBox p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #4a5568;
+}
+
+.tipBox strong {
+  color: var(--secondary-color);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 640px) {
+  .creditosGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .bubbleIntro {
+    padding: 1.5rem;
+  }
 }

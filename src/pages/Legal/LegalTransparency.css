@@ -1,156 +1,165 @@
-/* src/pages/Legal/LegalTransparency.css */
-
 .legal-container {
-  max-width: 1000px; /* Un poco más ancho para mejor balance */
-  margin: 140px auto 80px; /* Espacio extra para el Navbar fixed */
-  padding: 0 24px;
+  max-width: 1200px;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+}
+
+.legal-header {
   text-align: center;
-  animation: fadeIn 0.6s ease-out;
+  margin-bottom: 3rem;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.legal-container h1 {
-  color: var(--text-main);
+.legal-header h1 {
+  color: var(--dark-bg);
   font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 16px;
-  letter-spacing: -0.5px;
+  margin-bottom: 0.5rem;
 }
 
-.legal-intro {
-  color: var(--text-secondary);
-  font-size: 1.15rem;
-  max-width: 700px;
-  margin: 0 auto 50px;
-  line-height: 1.6;
-}
-
-/* --- GRID DE TARJETAS --- */
-.legal-grid {
+.legal-layout {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-  margin-bottom: 60px;
+  grid-template-columns: 320px 1fr;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
 }
 
-.legal-card {
-  background: var(--card-bg);
-  padding: 40px 30px;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--highlight); /* Borde sutil Teal claro */
+.legal-nav {
+  background: #f8fafc;
+  padding: 2.5rem 1.5rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+  gap: 0.8rem;
+  border-right: 1px solid #e2e8f0;
 }
 
-.legal-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(9, 76, 91, 0.12);
-  border-color: var(--primary-color);
-}
-
-/* Icono con fondo circular sutil */
-.legal-icon {
-  font-size: 2.8rem;
-  color: var(--primary-color);
-  margin-bottom: 20px;
-  background: var(--app-bg);
-  padding: 15px;
-  border-radius: 50%;
-  transition: transform 0.3s ease;
-}
-
-.legal-card:hover .legal-icon {
-  transform: scale(1.1);
-  color: var(--secondary-color);
-}
-
-.legal-card h3 {
-  color: var(--text-main);
-  font-size: 1.25rem;
-  margin-bottom: 12px;
-  font-weight: 700;
-}
-
-/* Estilo para el número de RECA */
-.reca-number {
-  background: var(--dark-bg);
-  color: var(--text-light);
-  font-size: 0.7rem;
-  padding: 6px 14px;
-  border-radius: 30px;
-  margin-bottom: 15px;
-  font-family: monospace; /* Se ve más técnico/oficial */
-  letter-spacing: 0.5px;
-}
-
-.legal-card p {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin-bottom: 25px;
-}
-
-/* --- BOTÓN DE DESCARGA --- */
-.btn-download {
-  margin-top: auto; /* Empuja el botón siempre al fondo */
-  background: var(--primary-color);
-  color: white;
-  text-decoration: none;
-  padding: 12px 24px;
-  border-radius: 8px;
+.legal-nav button {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  width: 100%;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.btn-download:hover {
-  background: var(--primary-hover);
-  box-shadow: 0 4px 12px rgba(21, 144, 130, 0.3);
-}
-
-/* --- BADGE DE CUMPLIMIENTO (FOOTER DE PÁGINA) --- */
-.compliance-badge {
-  display: inline-flex;
-  align-items: center;
   gap: 12px;
-  background: var(--highlight);
-  color: var(--text-main);
-  padding: 16px 32px;
-  border-radius: 50px;
+  padding: 1.1rem;
+  border: none;
+  background: transparent;
+  color: #64748b;
   font-weight: 600;
-  font-size: 0.95rem;
-  border: 1px solid var(--primary-color);
-  margin-top: 20px;
+  text-align: left;
+  border-radius: 12px;
+  transition: 0.3s;
+  cursor: pointer;
 }
 
-.compliance-badge svg {
+.legal-nav button.active {
+  background: white;
   color: var(--primary-color);
-  font-size: 1.4rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
 }
+
+.legal-nav button .arrow { margin-left: auto; opacity: 0; }
+.legal-nav button.active .arrow { opacity: 1; transform: translateX(3px); }
+
+.legal-viewer { padding: 3.5rem; max-height: 850px; overflow-y: auto; }
+
+.viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.btn-print {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-print:disabled { background: #94a3b8; cursor: wait; }
+
+/* Estilos de Contenido Legal */
+.legal-text-body h4 { color: var(--dark-bg); margin: 2rem 0 0.8rem 0; font-size: 1.1rem; }
+.legal-text-body p { line-height: 1.7; color: #475569; margin-bottom: 1rem; }
+
+.legal-quote-box {
+  background: #f0fdfa;
+  border-left: 4px solid var(--primary-color);
+  padding: 1.5rem;
+  font-style: italic;
+  margin: 1.5rem 0;
+}
+
+.une-box, .arco-box {
+  background: #f1f5f9;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 4px solid var(--secondary-color);
+}
+
+.legal-table {
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+}
+
+.legal-table th, .legal-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.legal-table th { background: #f8fafc; font-size: 0.85rem; color: var(--dark-bg); }
 
 /* --- RESPONSIVE --- */
-@media (max-width: 600px) {
-  .legal-container {
-    margin-top: 100px;
-  }
-  
-  .legal-container h1 {
-    font-size: 1.8rem;
-  }
-  
-  .legal-grid {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 900px) {
+  .legal-layout { grid-template-columns: 1fr; }
+  .legal-nav { flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid #e2e8f0; }
+  .legal-nav button .arrow { display: none; }
+  .legal-viewer { padding: 2rem; }
+}
+.legal-container { max-width: 1200px; margin: 4rem auto; padding: 0 1.5rem; }
+.legal-header { text-align: center; margin-bottom: 3rem; }
+.legal-header h1 { color: var(--dark-bg); font-size: 2.5rem; }
+
+.legal-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.legal-nav { background: #f8fafc; padding: 2.5rem 1.5rem; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 0.8rem; }
+.legal-nav button { display: flex; align-items: center; gap: 12px; padding: 1.1rem; border: none; background: transparent; color: #64748b; font-weight: 600; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+.legal-nav button.active { background: white; color: var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.04); }
+
+.legal-viewer { padding: 3.5rem; max-height: 850px; overflow-y: auto; }
+.viewer-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 1.5rem; margin-bottom: 2rem; }
+
+.btn-download-pdf { background: var(--primary-color); color: white; border: none; padding: 0.8rem 1.2rem; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+.btn-download-pdf:disabled { background: #94a3b8; }
+
+.legal-quote-box { background: #f0fdfa; border-left: 4px solid var(--primary-color); padding: 1.5rem; font-style: italic; margin: 1.5rem 0; }
+.une-box, .arco-box { background: #f1f5f9; padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--primary-color); }
+.legal-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+.legal-table th { background: #f8fafc; padding: 12px; text-align: left; }
+.legal-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+
+/* Configuración PDF */
+.pdf-only-header, .pdf-only-footer { display: none; }
+
+@media print {
+  .pdf-only-header { display: block !important; margin-bottom: 20px; }
+  .pdf-brand { color: #094c5b; font-size: 22px; font-weight: 800; }
+  .pdf-only-footer { display: block !important; margin-top: 40px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #eee; padding-top: 10px; }
 }

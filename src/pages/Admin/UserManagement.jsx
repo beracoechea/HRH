@@ -1,12 +1,17 @@
 import React, { useState, useCallback } from 'react';
+// Firebase
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../../firebase/config'; 
+
 // Componentes de Admin
 import { UserCard } from '../../components/Admin/UserCard';
 import { PendingCitasList } from '../../components/Admin/PendingCitasList';
 import { PendingCreditosList } from '../../components/Admin/PendingCreditosList';
 import { AdminStats } from '../../components/Admin/AdminStats'; 
 import { DocumentTracking } from '../../components/Admin/DocumentTracking';
+import { RejectCreditSidebar } from '../../components/Common/RejectCreditSidebar'; // IMPORTACIÓN NUEVA
+
 // Modales y Common
-import { ConfirmModal } from '../../components/Common/ConfirmModal';
 import { StatusModal } from '../../components/Common/StatusModal'; 
 
 import { 
@@ -35,7 +40,9 @@ export const UserManagement = () => {
   // --- ESTADOS ---
   const [view, setView] = useState(permissions.views[0] || '');
   const [searchTerm, setSearchTerm] = useState('');
-  const [confirmReject, setConfirmReject] = useState({ open: false, id: null });
+  
+  // Estado para la barra lateral de rechazo
+  const [rejectSidebar, setRejectSidebar] = useState({ open: false, id: null });
   
   const [statusConfig, setStatusConfig] = useState({ 
     isOpen: false, 
@@ -49,7 +56,6 @@ export const UserManagement = () => {
     creditos, 
     loading: loadingUsers, 
     refreshData, 
-    updateCreditStatus, 
     ingresosReales = 0,
   } = useUserManager();
 
@@ -63,36 +69,48 @@ export const UserManagement = () => {
   }, []);
 
   // --- HANDLERS ---
+
   const handleCreditAction = useCallback(async (id, status) => {
     if (status === 'rechazado') {
-      setConfirmReject({ open: true, id });
+      // Abrimos la barra lateral de rechazo
+      setRejectSidebar({ open: true, id: id });
     } else {
       try {
-        await updateCreditStatus({ creditoId: id, estado: status });
-        showAlert(`Crédito ${status} exitosamente.`, 'success');
+        const docRef = doc(db, "creditos", id);
+        await updateDoc(docRef, { 
+          estado: status,
+          ultimaActualizacion: serverTimestamp() 
+        });
+        await refreshData();
+        showAlert(`Crédito marcado como ${status} exitosamente.`, 'success');
       } catch (error) {
+        console.error("Error al aprobar crédito:", error);
         showAlert('Error al actualizar el crédito.', 'error');
       }
     }
-  }, [updateCreditStatus, showAlert]);
+  }, [refreshData, showAlert]);
 
   const handleFinalRejection = async () => {
-    const targetId = confirmReject.id;
+    const targetId = rejectSidebar.id;
     if (!targetId) return;
 
     try {
-      await updateCreditStatus({ 
-        creditoId: targetId, 
-        estado: 'rechazado' 
+      const docRef = doc(db, "creditos", targetId);
+      await updateDoc(docRef, { 
+        estado: 'rechazado',
+        ultimaActualizacion: serverTimestamp()
       });
       
-      setConfirmReject({ open: false, id: null });
+      setRejectSidebar({ open: false, id: null });
+      await refreshData();
       showAlert('Solicitud rechazada correctamente.', 'success');
     } catch (error) {
+      console.error("Error en el proceso de rechazo:", error);
       showAlert('Error al procesar el rechazo.', 'error');
     }
   };
 
+  // --- LÓGICA DE CONTADORES Y FILTROS ---
   const docsPendientesCount = creditosDocs?.filter(cre => 
     cre.expediente?.some(doc => doc.estatus?.toLowerCase().trim() === 'pendiente')
   ).length || 0;
@@ -119,55 +137,49 @@ export const UserManagement = () => {
         </div>
         
         <div className="admin-nav-tabs">
-          {canSee('usuarios') && (
-            <button className={`nav-tab ${view === 'usuarios' ? 'active' : ''}`} onClick={() => setView('usuarios')}>
-              <FiUsers /> Usuarios
-            </button>
-          )}
-          
-          {canSee('pendientes') && (
-            <button className={`nav-tab ${view === 'pendientes' ? 'active' : ''}`} onClick={() => setView('pendientes')}>
-              <FiCheckSquare /> Citas
-              {pendingCitas?.length > 0 && <span className="tab-badge">{pendingCitas.length}</span>}
-            </button>
-          )}
+  {canSee('usuarios') && (
+    <button className={`nav-tab ${view === 'usuarios' ? 'active' : ''}`} onClick={() => setView('usuarios')}>
+      <FiUsers /> Usuarios
+    </button>
+  )}
+  
+  {canSee('pendientes') && (
+    <button className={`nav-tab ${view === 'pendientes' ? 'active' : ''}`} onClick={() => setView('pendientes')}>
+      <FiCheckSquare /> Citas
+      {pendingCitas?.length > 0 && (
+        <span className="tab-badge">{pendingCitas.length}</span>
+      )}
+    </button>
+  )}
 
-          {canSee('creditos') && (
-            <button className={`nav-tab ${view === 'creditos' ? 'active' : ''}`} onClick={() => setView('creditos')}>
-              <FiDollarSign /> Créditos
-              {creditos?.filter(c => c.estado === 'pendiente').length > 0 && (
-                <span className="tab-badge danger">
-                  {creditos.filter(c => c.estado === 'pendiente').length}
-                </span>
-              )}
-            </button>
-          )}
+  {canSee('creditos') && (
+    <button className={`nav-tab ${view === 'creditos' ? 'active' : ''}`} onClick={() => setView('creditos')}>
+      <FiDollarSign /> Créditos
+      {/* Badge rojo para créditos que necesitan aprobación urgente */}
+      {creditos?.filter(c => c.estado === 'pendiente').length > 0 && (
+        <span className="tab-badge danger">
+          {creditos.filter(c => c.estado === 'pendiente').length}
+        </span>
+      )}
+    </button>
+  )}
 
-          {canSee('documentos') && (
-            <button className={`nav-tab ${view === 'documentos' ? 'active' : ''}`} onClick={() => setView('documentos')}>
-              <FiFileText /> Documentos
-              {docsPendientesCount > 0 && <span className="tab-badge warning">{docsPendientesCount}</span>}
-            </button>
-          )}
+  {canSee('documentos') && (
+    <button className={`nav-tab ${view === 'documentos' ? 'active' : ''}`} onClick={() => setView('documentos')}>
+      <FiFileText /> Documentos
+      {/* Badge naranja para documentos pendientes de validar */}
+      {docsPendientesCount > 0 && (
+        <span className="tab-badge warning">{docsPendientesCount}</span>
+      )}
+    </button>
+  )}
 
-          {canSee('stats') && (
-            <button className={`nav-tab ${view === 'stats' ? 'active' : ''}`} onClick={() => setView('stats')}>
-              <FiPieChart /> Estadísticas
-            </button>
-          )}
-        </div>
-
-        {view === 'usuarios' && (
-          <div className="search-bar animate-fade">
-            <FiSearch />
-            <input 
-              type="text" 
-              placeholder="Buscar por nombre o email..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        )}
+  {canSee('stats') && (
+    <button className={`nav-tab ${view === 'stats' ? 'active' : ''}`} onClick={() => setView('stats')}>
+      <FiPieChart /> Estadísticas
+    </button>
+  )}
+</div>
       </header>
 
       <div className="admin-content">
@@ -181,7 +193,6 @@ export const UserManagement = () => {
                   onUpdateRole={currentUser.rol === 'admin' ? refreshData : null} 
                 />
               ))}
-              {filteredUsers.length === 0 && <p className="empty-msg">No se encontraron usuarios.</p>}
             </div>
           </section>
         )}
@@ -193,7 +204,7 @@ export const UserManagement = () => {
         {view === 'creditos' && canSee('creditos') && (
           <PendingCreditosList 
             creditos={creditos} 
-            onlyPayments={currentUser.rol === 'tesorero'}
+            onlyPayments={currentUser?.rol === 'tesorero'}
             onAction={handleCreditAction}
             onUpdateSuccess={refreshData}
           />
@@ -212,15 +223,12 @@ export const UserManagement = () => {
           />
         )}
 
-        {/* --- MODALES --- */}
-
-
-        <ConfirmModal 
-          isOpen={confirmReject.open}
-          title="¿Rechazar solicitud de crédito?"
-          message="Esta acción notificará al usuario y no se puede deshacer."
+        {/* --- NUEVA BARRA LATERAL DE RECHAZO --- */}
+        <RejectCreditSidebar 
+          isOpen={rejectSidebar.open}
+          creditId={rejectSidebar.id}
           onConfirm={handleFinalRejection}
-          onCancel={() => setConfirmReject({ open: false, id: null })}
+          onCancel={() => setRejectSidebar({ open: false, id: null })}
         />
 
         <StatusModal 

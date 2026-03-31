@@ -1,106 +1,105 @@
-/* src/components/Soluciones/InfoCredito.css */
 .info-credito {
-  padding: 60px 20px;
-  background-color: #e0f2f1; /* Un tono muy claro del primary para el fondo */
-  color: var(--text-main);
+  padding: 4rem 1.5rem;
+  background-color: #f8fafb;
 }
 
-.info-container {
-  max-width: var(--max-content-width);
+.product-section {
+  margin-bottom: 5rem;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-header h2 {
+  font-size: 2.2rem;
+  color: var(--dark-bg);
+  margin-bottom: 0.5rem;
+}
+
+.section-header p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
-/* Header Estilo */
-.info-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 50px;
-  gap: 40px;
+.product-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  border: 1px solid #eef2f6;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
 }
 
-.info-header-text h2 {
-  font-size: 2.5rem;
+.product-card.featured {
+  border: 2px solid var(--primary-color);
+  background: linear-gradient(to bottom, #ffffff, #f0f9f9);
+}
+
+.badge-convenio {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary-color);
+  color: white;
+  padding: 4px 15px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.reca-tag {
+  font-size: 0.65rem;
+  color: #a0aec0;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.card-top h3 {
+  font-size: 1.6rem;
   color: var(--dark-bg);
+  margin-bottom: 4px;
+}
+
+.card-top .sub {
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  font-weight: 600;
   margin-bottom: 1.5rem;
 }
 
-.info-header-text h2 span {
-  color: var(--primary-color);
-}
-
-.info-header-text p {
-  font-size: 1.2rem;
-  line-height: 1.6;
-  max-width: 600px;
-}
-
-.info-header-image img {
-  max-width: 450px;
-  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
-}
-
-/* Grid de beneficios */
-.info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-}
-
-.info-badge-title {
-  background-color: var(--secondary-color);
-  color: var(--text-main);
-  padding: 15px 30px;
-  border-radius: 50px;
-  display: inline-block;
-  font-weight: bold;
-  font-size: 1.4rem;
-  margin-bottom: 25px;
-  box-shadow: var(--shadow-sm);
-}
-
-.info-badge-title.secondary {
-  /* Puedes variar el color si gustas, pero la imagen usa el mismo coral */
-  background-color: var(--secondary-color);
-}
-
-.column-intro {
-  margin-bottom: 20px;
-  font-size: 1.05rem;
-  font-weight: 500;
-}
-
-.info-list {
-  list-style: none;
-}
-
-.info-list li {
+.specs-list {
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-  align-items: flex-start;
-  font-size: 1rem;
-  line-height: 1.5;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.check-icon {
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.spec-item svg {
   color: var(--primary-color);
-  font-size: 1.5rem;
   flex-shrink: 0;
-  margin-top: 3px;
 }
 
-/* Responsivo */
-@media (max-width: 968px) {
-  .info-header {
-    flex-direction: column;
-    text-align: center;
-  }
-  .info-grid {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-  .info-header-text p {
-    margin: 0 auto;
-  }
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(9, 76, 91, 0.1);
 }

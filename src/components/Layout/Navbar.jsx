@@ -28,28 +28,27 @@ export const Navbar = () => {
   const [adminDropdown, setAdminDropdown] = useState(false);
   
   const { user, logout, isAuthenticated } = useAuth();
+  
+  // Determinar permisos y tipo de usuario
   const permissions = ROLE_PERMISSIONS[user?.rol] || ROLE_PERMISSIONS.cliente;
+  const isStaff = permissions.accessAdminPanel;
 
   const handleClick = () => setClick(!click);
+  
   const closeMobileMenu = () => {
     setClick(false);
     setAdminDropdown(false);
   };
 
-  // Ítems base de la navegación
+  // Ítems base de la navegación (Públicos)
   const navItems = [
     { name: 'Inicio', path: '/', icon: <FiHome /> },
     { name: 'Quiénes Somos', path: '/quienes-somos', icon: <FiUsers /> },
-    { name: 'Formatos', path: '/formatos', icon: <FiFileText /> },
+    { name: 'Requerimientos', path: '/formatos', icon: <FiFileText /> },
     { name: 'Soluciones', path: '/soluciones-financieras', icon: <FiTrendingUp /> },
     { name: 'Simula Crédito', path: '/simulacion', icon: <FiCpu /> },
     { name: 'Noticias', path: '/condusef', icon: <FiShield /> },
   ];
-
-  // Agregar Mi Perfil a todos los usuarios autenticados
-  if (isAuthenticated) {
-    navItems.push({ name: 'Mi Perfil', path: '/mi-perfil', icon: <FiBriefcase /> });
-  }
 
   return (
     <>
@@ -65,6 +64,7 @@ export const Navbar = () => {
           </div>
 
           <ul className={click ? 'nav-menu active' : 'nav-menu'}>
+            {/* Renderizado de ítems públicos */}
             {navItems.map((item, index) => (
               <li className="nav-item" key={index}>
                 <NavLink 
@@ -78,46 +78,70 @@ export const Navbar = () => {
               </li>
             ))}
 
-            {/* --- SECCIÓN ADMINISTRATIVA DINÁMICA --- */}
-            {isAuthenticated && permissions.accessAdminPanel && (
-              <li 
-                className="nav-item dropdown-container"
-                onMouseEnter={() => window.innerWidth > 960 && setAdminDropdown(true)}
-                onMouseLeave={() => window.innerWidth > 960 && setAdminDropdown(false)}
-              >
-                <div className="nav-links admin-trigger" onClick={() => setAdminDropdown(!adminDropdown)}>
-                  <FiShield className="nav-icon" /> Panel Control <FiChevronDown className={`arrow ${adminDropdown ? 'open' : ''}`} />
-                </div>
-                
-                <ul className={`admin-dropdown ${adminDropdown ? 'show' : ''}`}>
-                  {/* Vista para Admin, Aprobador y Tesorero */}
-                  {permissions.canManageUsers && (
-                    <li>
-                      <Link to="/admin/users" onClick={closeMobileMenu}>
-                        <FiUsers /> Gestión Operativa
-                      </Link>
-                    </li>
-                  )}
-                  
-                  {/* Vista para Admin y Marketing */}
-                  {permissions.canManageNews && (
-                    <li>
-                      <Link to="/admin/config" onClick={closeMobileMenu}>
-                        <FiSettings /> NewsLetter
-                      </Link>
-                    </li>
-                  )}
-                </ul>
-              </li>
+            {/* --- SECCIÓN DE USUARIO AUTENTICADO --- */}
+            {isAuthenticated && (
+              <>
+                {/* 1. VISTA PARA CLIENTE: Botón Mi Perfil Directo */}
+                {!isStaff ? (
+                  <li className="nav-item">
+                    <NavLink 
+                      to="/mi-perfil" 
+                      className={({ isActive }) => "nav-links" + (isActive ? " activated" : "")}
+                      onClick={closeMobileMenu}
+                    >
+                      <FiBriefcase className="nav-icon" /> Mi Perfil
+                    </NavLink>
+                  </li>
+                ) : (
+                  /* 2. VISTA PARA STAFF (Admin, etc): Menú Encapsulado */
+                  <li 
+                    className="nav-item dropdown-container"
+                    onMouseEnter={() => window.innerWidth > 960 && setAdminDropdown(true)}
+                    onMouseLeave={() => window.innerWidth > 960 && setAdminDropdown(false)}
+                  >
+                    <div className="nav-links admin-trigger" onClick={() => setAdminDropdown(!adminDropdown)}>
+                      <FiSettings className="nav-icon" /> Gestionar <FiChevronDown className={`arrow ${adminDropdown ? 'open' : ''}`} />
+                    </div>
+                    
+                    <ul className={`admin-dropdown ${adminDropdown ? 'show' : ''}`}>
+                      {/* Mi Perfil movido aquí para Staff */}
+                      <li>
+                        <Link to="/mi-perfil" onClick={closeMobileMenu}>
+                          <FiBriefcase className="nav-icon-drop" /> Mi Perfil
+                        </Link>
+                      </li>
+
+                      {/* Divisor visual */}
+                      <li className="dropdown-divider"></li>
+
+                      {/* Opciones Administrativas según permisos */}
+                      {permissions.canManageUsers && (
+                        <li>
+                          <Link to="/admin/users" onClick={closeMobileMenu}>
+                            <FiUsers className="nav-icon-drop" /> Gestión Operativa
+                          </Link>
+                        </li>
+                      )}
+                      
+                      {permissions.canManageNews && (
+                        <li>
+                          <Link to="/admin/config" onClick={closeMobileMenu}>
+                            <FiSettings className="nav-icon-drop" /> NewsLetter
+                          </Link>
+                        </li>
+                      )}
+                    </ul>
+                  </li>
+                )}
+              </>
             )}
 
+            {/* Botón de Auth (Login/Logout) */}
             <li className="nav-item">
               {isAuthenticated ? (
-                <div className="nav-user-info">
-                  <button className="nav-auth-btn logout" onClick={() => { logout(); closeMobileMenu(); }}>
-                    <FiLogOut className="nav-icon" />
-                  </button>
-                </div>
+                <button className="nav-auth-btn logout" onClick={() => { logout(); closeMobileMenu(); }}>
+                  <FiLogOut className="nav-icon" /> Salir
+                </button>
               ) : (
                 <button className="nav-auth-btn login" onClick={() => { setModalOpen(true); closeMobileMenu(); }}>
                   <FiLogIn className="nav-icon" /> Ingresar
@@ -127,6 +151,8 @@ export const Navbar = () => {
           </ul>
         </div>
       </nav>
+
+      {/* Modal de Autenticación */}
       <AuthModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   );

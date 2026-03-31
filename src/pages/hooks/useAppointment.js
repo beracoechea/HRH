@@ -1,4 +1,3 @@
-// src/hooks/useAppointment.js
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { AppointmentService } from '../../service/AppointmentService';
@@ -13,17 +12,16 @@ export const useAppointment = (onClose) => {
     const [formData, setFormData] = useState({
         nombre: '',
         email: '',
-        telefono: '',
+        motivo: '',
         fecha: '',
         horario: ''
     });
 
-    // Sincronizar datos si el usuario está logueado
     useEffect(() => {
         if (user) {
             setFormData(prev => ({
                 ...prev,
-                nombre: user.nombre || user.displayName || '',
+                nombre: user.nombre || '',
                 email: user.email || ''
             }));
         }
@@ -36,35 +34,20 @@ export const useAppointment = (onClose) => {
 
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
-
-       await execute(async () => {
-        const appointmentData = {
-            ...formData,
-            user_id: user?.uid || null,
-            user_email: user?.email || 'Invitado',
-            estatus: 'pendiente', // <--- IMPORTANTE
-            createdAt: new Date()
-        };
+        
+        await execute(async () => {
+            const appointmentData = {
+                ...formData,
+                user_id: user?.uid, // Se mapeará a usuario_id en el servicio
+                user_email: user?.email
+            };
 
             await appointmentService.crearCita(appointmentData);
 
-            // Éxito: Esperar un poco y cerrar modal
-            setTimeout(() => {
-                if (onClose) onClose();
-            }, 2000);
-
-            return "¡Cita agendada con éxito! Revisaremos la disponibilidad.";
+            setTimeout(() => { if (onClose) onClose(); }, 2000);
+            return "¡Cita solicitada con éxito!";
         });
     };
-    
 
-    return {
-        formData,
-        loading,
-        status,
-        setStatus,
-        handleChange,
-        handleSubmit,
-        isAuthenticated: !!user
-    };
+    return { formData, loading, status, handleChange, handleSubmit, isAuthenticated: !!user };
 };

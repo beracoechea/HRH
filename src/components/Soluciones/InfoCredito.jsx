@@ -1,87 +1,116 @@
-/* src/components/Soluciones/InfoCredito.jsx */
 import React from 'react';
-import { FiCheckCircle } from 'react-icons/fi';
+import { FiTag, FiCalendar, FiDollarSign, FiPercent, FiClock, FiBriefcase,FiUser,FiCheckCircle } from 'react-icons/fi';
 import './InfoCredito.css';
-import handCoinsImg from '../../assets/images/6.jpg'; 
 
 export const InfoCredito = () => {
+  const productos = [
+    {
+      categoria: "Crédito Personal",
+      descripcion: "Ideal para gastos imprevistos, viajes o consolidación de deudas.",
+      opciones: [
+        {
+          nombre: "Go Personal",
+          subtitulo: "Crédito Abierto",
+          reca: "PENDIENTE",
+          plazo: "12 a 48 meses",
+          monto: "$5,000 - $50,000",
+          tasa: "3% al 8% anual",
+          gracia: "1er año pago de capital",
+          comision: "0%",
+          frecuencia: "Mensual",
+          icon: <FiUser className="prod-icon" />
+        },
+        {
+          nombre: "Go Nómina",
+          subtitulo: "Con Convenio",
+          reca: "PENDIENTE",
+          plazo: "12 a 48 meses",
+          monto: "$5,000 - $50,000",
+          tasa: "3% al 8% anual",
+          gracia: "1er año pago de capital",
+          comision: "0%",
+          frecuencia: "Semanal o Quincenal (Vía Nómina)",
+          icon: <FiBriefcase className="prod-icon" />,
+          destacado: true
+        }
+      ]
+    },
+    {
+      categoria: "Crédito Automotriz",
+      descripcion: "Financiamiento para adquirir el vehículo que necesitas con plazos cómodos.",
+      opciones: [
+        {
+          nombre: "Go Auto",
+          subtitulo: "Crédito Abierto",
+          reca: "PENDIENTE",
+          plazo: "12 a 72 meses",
+          monto: "$50,000 - $500,000",
+          tasa: "1.25% a 6%",
+          gracia: "1er año pago de capital",
+          comision: "0%",
+          frecuencia: "Mensual"
+        },
+        {
+          nombre: "Go Auto (Convenio)",
+          subtitulo: "Beneficios Exclusivos Colaboradores",
+          reca: "PENDIENTE",
+          plazo: "12 a 72 meses",
+          monto: "$50,000 - $500,000",
+          tasa: "0.9% al 5%",
+          gracia: "1er año pago de capital",
+          comision: "0%",
+          frecuencia: "Semanal o Quincenal (Vía Nómina)",
+          destacado: true
+        }
+      ]
+    }
+  ];
+
   return (
     <section className="info-credito">
       <div className="info-container">
-        
-        <div className="info-header">
-          <div className="info-header-text">
-            <h2>Crédito de Nómina <span>CrediGO</span></h2>
-            <p>
-              Diseñado exclusivamente para colaboradores de empresas afiliadas. 
-              Olvídate de las filas en el banco y los trámites interminables. 
-              Te ofrecemos un financiamiento personal con descuento automático 
-              <strong> vía nómina, brindándote seguridad y comodidad.</strong>
-            </p>
-          </div>
-          <div className="info-header-image">
-            <img src={handCoinsImg} alt="Crédito de Nómina" />
-          </div>
-        </div>
+        {productos.map((seccion, idx) => (
+          <div key={idx} className="product-section">
+            <div className="section-header">
+              <h2>{seccion.categoria}</h2>
+              <p>{seccion.descripcion}</p>
+            </div>
 
-        {/* --- SECCIÓN DE COLUMNAS --- */}
-        <div className="info-grid">
-          
-          {/* Columna Izquierda: Diferenciadores */}
-          <div className="info-column">
-            <div className="info-badge-title">¿Qué nos hace diferentes?</div>
-            <p className="column-intro">
-              A diferencia de un crédito tradicional, en CrediGO pensamos en tu flujo de efectivo. 
-              Nuestro modelo financiero te ofrece flexibilidad inicial:
-            </p>
-            <ul className="info-list">
-              <li>
-                <FiCheckCircle className="check-icon" />
-                <div>
-                  <strong>Primer año ligero:</strong> Durante los primeros 12 meses, tus pagos se enfocan únicamente en los intereses, permitiéndote tener cuotas mensuales más bajas y cómodas.
+            <div className="product-grid">
+              {seccion.opciones.map((prod, pIdx) => (
+                <div key={pIdx} className={`product-card ${prod.destacado ? 'featured' : ''}`}>
+                  {prod.destacado && <span className="badge-convenio">Convenio</span>}
+                  <div className="card-top">
+                    <span className="reca-tag">RECA: {prod.reca}</span>
+                    <h3>{prod.nombre}</h3>
+                    <p className="sub">{prod.subtitulo}</p>
+                  </div>
+                  
+                  <div className="specs-list">
+                    <div className="spec-item">
+                      <FiCalendar /> <span><strong>Plazo:</strong> {prod.plazo}</span>
+                    </div>
+                    <div className="spec-item">
+                      <FiDollarSign /> <span><strong>Monto:</strong> {prod.monto}</span>
+                    </div>
+                    <div className="spec-item">
+                      <FiPercent /> <span><strong>Tasa:</strong> {prod.tasa}</span>
+                    </div>
+                    <div className="spec-item">
+                      <FiClock /> <span><strong>Gracia:</strong> {prod.gracia}</span>
+                    </div>
+                    <div className="spec-item">
+                      <FiTag /> <span><strong>Apertura:</strong> {prod.comision}</span>
+                    </div>
+                    <div className="spec-item">
+                      <FiCheckCircle /> <span><strong>Pago:</strong> {prod.frecuencia}</span>
+                    </div>
+                  </div>
                 </div>
-              </li>
-              <li>
-                <FiCheckCircle className="check-icon" />
-                <div>
-                  <strong>Beneficio por lealtad:</strong> A partir del segundo año, al comenzar a pagar el capital, te recompensamos con un descuento del 50% en la tasa de interés.
-                </div>
-              </li>
-            </ul>
+              ))}
+            </div>
           </div>
-
-          {/* Columna Derecha: Beneficios */}
-          <div className="info-column">
-            <div className="info-badge-title secondary">Tus beneficios:</div>
-            <ul className="info-list no-intro">
-              <li>
-                <FiCheckCircle className="check-icon" />
-                <div>
-                  <strong>Respuesta rápida:</strong> Sabemos que la velocidad importa. Recibe tu aprobación y notificación en un plazo de 48 horas hábiles tras completar tu expediente.
-                </div>
-              </li>
-              <li>
-                <FiCheckCircle className="check-icon" />
-                <div>
-                  <strong>Sin sorpresas:</strong> 0% de comisión por apertura y sin penalizaciones por pagos anticipados. Tú tienes el control de tu deuda.
-                </div>
-              </li>
-              <li>
-                <FiCheckCircle className="check-icon" />
-                <div>
-                  <strong>Montos adaptables:</strong> Préstamos desde $2,000 hasta $50,000 pesos, con tasas competitivas ajustadas según el monto solicitado.
-                </div>
-              </li>
-              <li>
-                <FiCheckCircle className="check-icon" />
-                <div>
-                  <strong>Comodidad total:</strong> Los pagos se descuentan automáticamente de tu nómina, evitando olvidos e intereses moratorios.
-                </div>
-              </li>
-            </ul>
-          </div>
-
-        </div>
+        ))}
       </div>
     </section>
   );

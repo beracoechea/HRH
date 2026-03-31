@@ -1,4 +1,8 @@
 // src/utils/Propiedades.js
+import SIPRES from '../assets/images/SIPRES.svg';
+import CONDUSEF from '../assets/images/CONDUSEF.svg';
+import CNBV from '../assets/images/CNBV.svg';
+import BURO from '../assets/images/BANCO DE MÉXICO.svg';
 
 export const ENTIDAD_CONFIG = {
   // --- DATOS FISCALES Y LEGALES ---
@@ -19,10 +23,10 @@ DOMICILIO_FISCAL: "AVENIDA DE LA CALMA 3483 - E, COL. LA CALMA, C.P. 45070, ZAPO
 
   // --- RECURSOS Y LOGOS (Rutas relativas a /public) ---
   LOGOS: {
-    SIPRES: "/src/assets/images/SIPRES.svg",
-    CONDUSEF: "/src/assets/images/CONDUSEF.svg",
-    CNBV: "/src/assets/images/CNBV.svg",
-    BURO: "/src/assets/images/BANCO DE MÉXICO.svg",
+    SIPRES: SIPRES,
+    CONDUSEF: CONDUSEF,
+    CNBV: CNBV,
+    BURO: BURO,
   },
 
   // --- REGISTROS Y LINKS OFICIALES ---

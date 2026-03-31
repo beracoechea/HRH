@@ -2,7 +2,6 @@
 import React from 'react';
 import { SolucionesCard } from '../../components/Soluciones/SolucionesCard';
 import { InfoCredito } from '../../components/Soluciones/InfoCredito';
-import { ComoFunciona } from '../../components/Soluciones/ComoFunciona';
 import { FooterSection } from './components/FooterSection';
 
 const SolucionesFinancieras = () => {
@@ -12,7 +11,6 @@ const SolucionesFinancieras = () => {
 
       <SolucionesCard />
       <InfoCredito />
-      <ComoFunciona />
       <FooterSection />
     </div>
   );

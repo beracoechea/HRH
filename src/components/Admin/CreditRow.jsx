@@ -141,9 +141,14 @@ export const CreditRow = ({ cre, onAction, onManagePayments }) => {
                             >
                                 <FiCheck /> {docsListos ? 'Aprobar' : 'Incompleto'}
                             </button>
-                            <button 
+                         <button 
                                 className="btn-icon-reject" 
-                                onClick={() => onAction(cre.id, 'rechazado')}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation(); 
+                                    // Solo avisamos al padre que queremos rechazar este ID
+                                    onAction(cre.id, 'rechazado');
+                                }} 
                                 title="Rechazar solicitud"
                             >
                                 <FiX />

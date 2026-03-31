@@ -1,7 +1,7 @@
 /* src/assets/styles/Navbar.css */
 
 /* =========================================
-   1. VARIABLES Y ESTRUCTURA BASE
+   1. ESTRUCTURA Y CONTENEDOR (Optimizado para espacio)
    ========================================= */
 .navbar {
   background: var(--dark-bg);
@@ -9,22 +9,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1rem;
   position: sticky;
   top: 0;
-  z-index: 999;
+  z-index: 9999;
   width: 100%;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
 
 .navbar-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: var(--navbar-height);
+  height: 100%;
   width: 100%;
-  max-width: var(--max-content-width);
-  padding: 0 2rem;
+  /* Aumentamos el ancho máximo para dar más aire en pantallas grandes */
+  max-width: 1400px; 
+  padding: 0 1rem; /* Reducido para ganar espacio en los bordes */
 }
 
 /* --- LOGOTIPO --- */
@@ -33,11 +33,12 @@
   display: flex;
   align-items: center;
   text-decoration: none;
+  flex-shrink: 0; /* Evita que el logo se aplaste */
 }
 
 .logo-desktop {
   display: block;
-  height: 60px; /* Ajustado para no romper el layout */
+  height: 42px; /* Reducido ligeramente para optimizar vertical y horizontal */
   width: auto;
 }
 
@@ -46,17 +47,16 @@
 }
 
 /* =========================================
-   2. MENÚ DE NAVEGACIÓN (ESCRITORIO)
+   2. MENÚ DE NAVEGACIÓN (Compresión Horizontal)
    ========================================= */
 .nav-menu {
   display: flex;
-  gap: 10px;
+  gap: 4px; /* Espacio mínimo entre botones para que quepan todos */
   list-style: none;
   align-items: center;
 }
 
 .nav-item {
-  height: var(--navbar-height);
   display: flex;
   align-items: center;
 }
@@ -66,12 +66,14 @@
   display: flex;
   align-items: center;
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  /* Padding comprimido: 0.5rem arriba/abajo, 0.7rem lados */
+  padding: 0.5rem 0.7rem; 
+  border-radius: var(--border-radius);
   transition: all 0.2s ease-out;
-  gap: 8px;
+  gap: 6px; /* Espacio entre icono y texto reducido */
   font-weight: 500;
-  white-space: nowrap;
+  font-size: 0.88rem; /* Fuente optimizada para 100% de zoom */
+  white-space: nowrap; /* Evita que el texto salte a dos líneas */
 }
 
 .nav-links:hover {
@@ -85,7 +87,7 @@
 }
 
 .nav-icon {
-  font-size: 1.1rem;
+  font-size: 1rem; /* Iconos sutilmente más pequeños */
 }
 
 /* =========================================
@@ -102,7 +104,7 @@
 .arrow {
   transition: transform 0.3s ease;
   font-size: 0.8rem;
-  margin-left: 5px;
+  margin-left: 4px;
 }
 
 .arrow.open {
@@ -111,66 +113,61 @@
 
 .admin-dropdown {
   position: absolute;
-  top: 80%; /* Un poco arriba para que el mouse no pierda el foco */
-  left: 0;
+  top: 85%;
+  right: 0;
   background: var(--dark-bg);
-  min-width: 210px;
+  min-width: 200px;
   list-style: none;
-  border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  display: none; /* Se controla con la clase .show */
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 25px rgba(9, 76, 91, 0.4);
+  display: none;
   flex-direction: column;
-  padding: 10px 0;
-  z-index: 1000;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 0;
+  z-index: 10000;
+  border: 1px solid var(--highlight);
 }
 
 .admin-dropdown.show {
   display: flex;
-  animation: slideInDown 0.2s ease-out;
-}
-
-.admin-dropdown li {
-  width: 100%;
+  animation: navFadeIn 0.2s ease-out;
 }
 
 .admin-dropdown li a {
   color: var(--text-light);
   text-decoration: none;
-  padding: 12px 20px;
+  padding: 10px 18px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.9rem;
-  transition: background 0.2s;
+  gap: 10px;
+  font-size: 0.85rem;
 }
 
 .admin-dropdown li a:hover {
   background: var(--primary-color);
-  color: white;
 }
 
-@keyframes slideInDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+.dropdown-divider {
+  height: 1px;
+  background: var(--highlight);
+  margin: 6px 12px;
+  opacity: 0.2;
 }
 
 /* =========================================
-   4. BOTONES DE AUTENTICACIÓN
+   4. BOTONES DE AUTENTICACIÓN (Compactos)
    ========================================= */
 .nav-auth-btn {
   background: transparent;
   border: none;
   cursor: pointer;
   font-family: inherit;
-  font-size: 1rem;
-  color: var(--text-light);
+  font-size: 0.88rem;
   display: flex;
   align-items: center;
-  padding: 0.5rem 1.2rem;
-  border-radius: 6px;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--border-radius);
   transition: all 0.2s;
-  gap: 8px;
+  gap: 6px;
   font-weight: 600;
 }
 
@@ -179,9 +176,14 @@
   color: white;
 }
 
+.nav-auth-btn.login:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
 .nav-auth-btn.logout {
   color: var(--danger);
-  border: 1px solid var(--danger);
+  border: 1.5px solid var(--danger);
 }
 
 .nav-auth-btn.logout:hover {
@@ -190,15 +192,16 @@
 }
 
 /* =========================================
-   5. DISEÑO RESPONSIVO (MÓVIL)
+   5. DISEÑO RESPONSIVO (Punto de Quiebre Alto)
    ========================================= */
 .menu-icon {
   display: none;
 }
 
-@media screen and (max-width: 960px) {
+/* Subimos el breakpoint a 1300px para que el menú no se encime en Laptops */
+@media screen and (max-width: 1300px) {
   .logo-desktop { display: none; }
-  .logo-mobile { display: block; height: 40px; }
+  .logo-mobile { display: block; height: 38px; }
 
   .menu-icon {
     display: block;
@@ -208,17 +211,18 @@
   }
 
   .nav-menu {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 90vh;
-    position: absolute;
+    position: fixed;
     top: var(--navbar-height);
     left: -100%;
-    opacity: 0;
-    transition: all 0.5s ease;
+    width: 100%;
+    height: calc(100vh - var(--navbar-height));
+    flex-direction: column;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     background: var(--dark-bg);
-    padding: 2rem 0;
+    padding: 1.5rem 0;
+    opacity: 0;
+    align-items: stretch;
+    overflow-y: auto;
   }
 
   .nav-menu.active {
@@ -226,41 +230,40 @@
     opacity: 1;
   }
 
-  .nav-item {
-    width: 100%;
-    height: auto;
-  }
-
   .nav-links {
     width: 100%;
-    padding: 1.5rem;
-    justify-content: center;
+    padding: 1.2rem 2rem;
+    font-size: 1.1rem;
     border-radius: 0;
+    border-bottom: 1px solid rgba(168, 221, 211, 0.1);
   }
 
-  /* Dropdown en móvil */
   .admin-dropdown {
     position: static;
     display: none;
     width: 100%;
     box-shadow: none;
     background: rgba(255, 255, 255, 0.05);
-    padding-left: 0;
+    border: none;
+    padding: 0;
   }
 
-  .admin-dropdown.show {
-    display: flex;
-  }
+  .admin-dropdown.show { display: flex; }
 
   .admin-dropdown li a {
-    justify-content: center;
-    padding: 1rem;
+    padding: 1rem 3rem;
+    font-size: 1rem;
   }
 
   .nav-auth-btn {
-    width: 100%;
+    width: 90%;
+    margin: 1.5rem auto;
     justify-content: center;
-    padding: 1.5rem;
-    border-radius: 0;
+    padding: 1rem;
   }
+}
+
+@keyframes navFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

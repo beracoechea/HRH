@@ -1,0 +1,113 @@
+.kyc-form-container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.kyc-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #159082;
+    margin-bottom: 5px;
+}
+
+.kyc-form {
+    margin-top: 25px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.input-group input, .input-group select, .input-group textarea {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline-color: #159082;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+    margin-top: 15px;
+}
+
+.btn-submit-kyc {
+    margin-top: 30px;
+    width: 100%;
+    padding: 15px;
+    background: #159082;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.3s;
+}
+
+.btn-submit-kyc:hover { background: #0e6d62; }
+.btn-submit-kyc:disabled { background: #ccc; }
+.kyc-form.readonly input, 
+.kyc-form.readonly select, 
+.kyc-form.readonly textarea {
+    background-color: #f8fafc;
+    border-color: #e2e8f0;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+.header-text-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.btn-edit-mode {
+    background: #f1f5f9;
+    color: #475569;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: 0.3s;
+}
+
+.btn-edit-mode:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.verified-msg {
+    color: #159082;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+} 

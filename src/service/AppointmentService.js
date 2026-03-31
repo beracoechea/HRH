@@ -1,7 +1,7 @@
 import { db } from '../firebase/config';
 import { 
     collection, addDoc, serverTimestamp, query, getDocs, 
-    orderBy, doc, updateDoc, deleteField, where // <--- Asegúrate de incluir 'where'
+    orderBy, doc, updateDoc, where 
 } from 'firebase/firestore';
 
 export class AppointmentService {
@@ -9,13 +9,9 @@ export class AppointmentService {
         this.collectionName = 'citas';
     }
 
-    /**
-     * Obtiene las citas de un usuario específico
-     * @param {string} userId - El ID del usuario (uid)
-     */
     async getByUsuario(userId) {
         try {
-            // Creamos la consulta buscando donde 'usuario_id' sea igual al ID del usuario
+            // Consulta unificada con tus reglas de seguridad
             const q = query(
                 collection(db, this.collectionName), 
                 where("usuario_id", "==", userId),
@@ -28,9 +24,7 @@ export class AppointmentService {
                 ...doc.data() 
             }));
         } catch (error) {
-            console.error("Error al obtener citas por usuario:", error);
-            // Si el error es por falta de un índice compuesto en Firebase, 
-            // intenta quitar el orderBy temporalmente.
+            console.error("Error al obtener citas. ¿Ya creaste el índice en Firebase?:", error);
             return [];
         }
     }
@@ -39,42 +33,17 @@ export class AppointmentService {
         try {
             const nuevaCita = {
                 ...appointmentData,
-                estatus: 'pendiente', 
+                usuario_id: appointmentData.user_id, // Mapeo para consistencia
+                estatus: 'solicitada', 
                 createdAt: serverTimestamp(),
             };
-
-            if (nuevaCita.estado) delete nuevaCita.estado;
+            // Limpieza de campos duplicados
+            delete nuevaCita.user_id; 
 
             const docRef = await addDoc(collection(db, this.collectionName), nuevaCita);
             return docRef.id;
         } catch (error) {
             console.error("Error al crear cita:", error);
-            throw error;
-        }
-    }
-
-    async getAllCitas() {
-        try {
-            const q = query(collection(db, this.collectionName), orderBy('createdAt', 'desc'));
-            const snapshot = await getDocs(q);
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        } catch (error) {
-            console.error("Error al obtener citas:", error);
-            return [];
-        }
-    }
-
-    async actualizarEstadoCita(citaId, nuevoEstado) {
-        try {
-            const citaRef = doc(db, this.collectionName, citaId);
-            await updateDoc(citaRef, {
-                estatus: nuevoEstado,
-                updatedAt: serverTimestamp(),
-                estado: deleteField() 
-            });
-            return true;
-        } catch (error) {
-            console.error("Error al actualizar estado:", error);
             throw error;
         }
     }
