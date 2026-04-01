@@ -3,9 +3,10 @@ import {
     FiClock, FiCheckCircle, FiUploadCloud, 
     FiLoader, FiTrendingUp, FiFileText, FiChevronDown, FiChevronUp, FiPenTool 
 } from 'react-icons/fi';
-import { db, storage } from '../../firebase/config'; 
+import { db, storage, functions } from '../../firebase/config'; 
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
 
 import { StatusModal } from '../Common/StatusModal';
 import '../../assets/styles/UserCreditoCard.css';
@@ -111,6 +112,27 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
                     docExp.nombre === nombreDocumento ? { ...docExp, url: downloadURL, estatus: 'revision', fecha_subida: new Date().toISOString() } : docExp
                 );
                 await updateDoc(creditoRef, { expediente: nuevoExpediente, lastUpdate: new Date() });
+                
+                // OCR y Auto-KYC: Revisa si todos los docs de la Fase 1 fueron subidos
+                const todosSubidos = nuevoExpediente.every(d => d.url && d.url.trim() !== '');
+                if (todosSubidos && (credito.fase === 1 || !credito.fase)) {
+                    setStatus({ open: true, type: 'info', message: 'Autocompletando tu Perfil (KYC). Leyendo documentos con IA, por favor espere unos segundos...' });
+                    try {
+                        const urls = nuevoExpediente.map(d => d.url).filter(Boolean);
+                        const analizarFunc = httpsCallable(functions, 'analizarDocumentosGenerales');
+                        const res = await analizarFunc({ creditoId: credito.id, documentUrls: urls });
+                        
+                        // NOTA: Si success === true, la nube (backend) ya avanza la fase a 2 y guarda kycData.
+                        setStatus({ open: true, type: 'success', message: '¡Análisis completo! Verifica la información extraída.' });
+                        if (onUploadSuccess) await onUploadSuccess();
+                        return; // Evitar el toast nativo normal
+                    } catch (ocrError) {
+                        console.error('Error con OCR Gemini:', ocrError);
+                        setStatus({ open: true, type: 'error', message: 'Hubo un error analizando los documentos. Por favor procede o vuelve a intentar.' });
+                        if (onUploadSuccess) await onUploadSuccess();
+                        return;
+                    }
+                }
             }
             setStatus({ open: true, type: 'success', message: `¡${nombreDocumento} subido!` });
             if (onUploadSuccess) await onUploadSuccess();

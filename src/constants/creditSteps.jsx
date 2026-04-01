@@ -7,21 +7,21 @@ import {
 export const CREDIT_STEPS = [
   { 
     id: 1, 
-    label: 'Perfil y preferencias (KYC)', 
-    icon: <FiUserCheck />,
-    description: "Comencemos con lo básico. Completa tu información personal y cuéntanos qué tipo de crédito necesitas para ofrecerte una solución a tu medida."
+    label: 'Carga de Documentación', 
+    icon: <FiUploadCloud />,
+    description: "Para comenzar, necesitamos que subas tus documentos de identidad, comprobante de domicilio e ingresos. Nuestra IA analizará esta información para ahorrarte tiempo."
   },
   { 
     id: 2, 
-    label: 'Evaluación de Historial', 
-    icon: <FiSearch />,
-    description: "Autoriza la consulta de tu historial crediticio. Esto nos permite conocer tu perfil para asignarte la tasa y el plazo más competitivos."
+    label: 'Perfil y Preferencias (KYC)', 
+    icon: <FiUserCheck />,
+    description: "Verifica y completa tu información personal pre-cargada. Asegúrate de que los datos extraídos de tus documentos sean correctos."
   },
   { 
     id: 3, 
-    label: 'Carga de Documentación', 
-    icon: <FiUploadCloud />,
-    description: "Sube tus documentos de identidad, ingresos y domicilio. El sistema te guiará según el crédito que hayas elegido."
+    label: 'Evaluación de Historial', 
+    icon: <FiSearch />,
+    description: "Autoriza la consulta de tu historial crediticio. Esto nos permite conocer tu perfil para asignarte la tasa y el plazo más competitivos."
   },
   { 
     id: 4, 
@@ -51,6 +51,6 @@ export const CREDIT_STEPS = [
     id: 8, 
     label: '¡Desembolso Exitoso!', 
     icon: <FiCheckCircle />,
-    description: "Tu solicitud ha sido enviada a tesorería. ¡Gracias por confiar en CrediGo!"
+    description: "Tu solicitud ha sido enviada a tesorería. ¡Gracias por confiar en nuestra plataforma!"
   }
 ];

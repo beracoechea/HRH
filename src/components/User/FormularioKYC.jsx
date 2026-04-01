@@ -8,7 +8,7 @@ import { db } from '../../firebase/config';
 import { useKYC } from '../../pages/hooks/useKYC';
 import '../../assets/styles/User/FormularioKYC.css';
 
-export const FormularioKYC = ({ user, creditoId, onComplete }) => {
+export const FormularioKYC = ({ user, creditoId, kycData, onComplete }) => {
     const { saveKYC, loading, error } = useKYC();
     const [isEditing, setIsEditing] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
@@ -34,9 +34,21 @@ export const FormularioKYC = ({ user, creditoId, onComplete }) => {
 
                 if (docSnap.exists()) {
                     setFormData(docSnap.data());
-                    setIsEditing(false); // Si existen datos, mostrar vista de lectura
+                    setIsEditing(false); // Si existen datos ya validados, mostrar vista de lectura
+                } else if (kycData) {
+                    // Pre-llenar con los datos extraídos por Gemini
+                    setFormData(prev => ({
+                        ...prev,
+                        nombreCompleto: kycData.nombreCompleto || kycData.nombres ? `${kycData.nombres} ${kycData.apellidos}`.trim() : user?.nombre || prev.nombreCompleto,
+                        curp: kycData.curp || prev.curp,
+                        rfc: kycData.rfc || prev.rfc,
+                        fechaNacimiento: kycData.fechaNacimiento || prev.fechaNacimiento,
+                        genero: kycData.genero || prev.genero,
+                        domicilio: kycData.direccionCompleta || `${kycData.calleYNumero || ''} ${kycData.colonia || ''} ${kycData.ciudad || ''}`.trim() || prev.domicilio
+                    }));
+                    setIsEditing(true); // Para que el usuario pueda confirmar/editar lo leído por la IA
                 } else {
-                    setIsEditing(true); // Si no hay datos, habilitar edición
+                    setIsEditing(true); // Si no hay datos, habilitar edición vacía
                 }
             } catch (err) {
                 console.error("Error cargando KYC:", err);
@@ -84,8 +96,8 @@ export const FormularioKYC = ({ user, creditoId, onComplete }) => {
                 <FiUser className="main-icon" />
                 <div className="header-text-btn">
                     <div>
-                        <h3>Fase 1: Perfilamiento y KYC</h3>
-                        <p>{isEditing ? "Completa o actualiza tu información legal." : "Verifica que tu información sea correcta para continuar."}</p>
+                        <h3>Paso 2: Perfil y Preferencias (KYC)</h3>
+                        <p>{isEditing ? "Verifica y completa tu información extraída automáticamente." : "Verifica que tu información sea correcta para continuar."}</p>
                     </div>
                     {!isEditing && (
                         <button className="btn-edit-mode" onClick={() => setIsEditing(true)}>

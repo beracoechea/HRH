@@ -29,11 +29,11 @@ export const useKYC = () => {
                 updatedAt: serverTimestamp()
             });
 
-            // 3. Actualizar el crédito específico para avanzar a la FASE 2
+            // 3. Actualizar el crédito específico para avanzar a la FASE 3
             if (creditoId) {
                 const creditoRef = doc(db, "creditos", creditoId);
                 await updateDoc(creditoRef, {
-                    fase: 2,
+                    fase: 3,
                     datosKYC: formData,
                     statusKYC: 'completado',
                     lastUpdate: serverTimestamp()

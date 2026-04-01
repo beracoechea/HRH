@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiDollarSign, FiArrowRight, FiInfo, FiCheckCircle } from 'react-icons/fi';
+import { FiDollarSign, FiArrowRight, FiInfo, FiCheckCircle, FiUploadCloud } from 'react-icons/fi';
 import { UserCreditoCard } from '../../../components/User/UserCreditoCard';
 import { FormularioKYC } from '../../../components/User/FormularioKYC';
 import { NuevaSolicitudModal } from '../../Modals/NuevaSolicitudModal';
@@ -46,13 +46,22 @@ export const TabMiCredito = ({ creditos, user, onRefresh }) => {
         switch (fase) {
             case 1:
                 return (
+                    <div className="action-info-state" style={{ padding: '20px', textAlign: 'center', background: 'white', borderRadius: '12px', marginTop: '15px' }}>
+                        <FiUploadCloud size={40} color="#3b82f6" style={{ marginBottom: '10px' }} />
+                        <h4 style={{ color: '#0f172a' }}>Carga de Documentación Inicial</h4>
+                        <p style={{ color: '#64748b' }}>Por favor, sube todos los documentos listados en la sección "DOCUMENTACIÓN" arriba. Una vez cargados todos, la inteligencia artificial extraerá tus datos automáticamente.</p>
+                    </div>
+                );
+            case 2:
+                return (
                     <FormularioKYC 
                         user={user} 
                         creditoId={currentCredito.id} 
+                        kycData={currentCredito.kycData} 
                         onComplete={onRefresh} 
                     />
                 );
-            case 2:
+            case 3:
                 return (
                     <StepBuro 
                         user={user} 
@@ -65,7 +74,7 @@ export const TabMiCredito = ({ creditos, user, onRefresh }) => {
                     <div className="action-success-state" style={{ padding: '20px', textAlign: 'center', background: 'white', borderRadius: '12px', marginTop: '15px' }}>
                         <FiCheckCircle size={40} color="#10b981" style={{ marginBottom: '10px' }} />
                         <h4 style={{ color: '#0f172a' }}>Paso Completado</h4>
-                        <p style={{ color: '#64748b' }}>Tu solicitud está siendo procesada en esta etapa. Revisa frecuentemente.</p>
+                        <p style={{ color: '#64748b' }}>Tu solicitud está procesándose en esta etapa. Mantente pendiente de las actualizaciones.</p>
                     </div>
                 );
         }

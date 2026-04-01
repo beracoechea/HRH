@@ -2,6 +2,7 @@ import { initializeApp, getApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getFunctions } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBZBUxKn2uaj1lakn8WvwWtVGVjS5tAyec",
@@ -25,5 +26,8 @@ export const db = getFirestore(app, "credigo");
 
 // 3. Exportar Storage si lo usas
 export const storage = getStorage(app);
+
+// 4. Exportar Functions
+export const functions = getFunctions(app);
 
 export default app;

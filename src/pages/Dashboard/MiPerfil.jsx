@@ -7,7 +7,6 @@ import {
 } from 'react-icons/fi';
 
 // Componentes Globales de Perfil
-import { StepperSolicitud } from '../../components/User/StepperSolicitud';
 
 // Componentes de Pestañas
 import { TabMiCredito } from '../../components/User/tabs/TabMiCredito';
@@ -55,13 +54,6 @@ export const MiPerfil = () => {
                     <TabNavItem active={activeTab === 'historial'} onClick={() => setActiveTab('historial')} icon={<FiFileText />} label="Estados de Cuenta" />
                 </nav>
             </header>
-
-            {/* --- STEPPER GLOBAL (Indica el progreso del usuario en la plataforma) --- */}
-            <section className="perfil-stepper-section">
-                <div className="stepper-container-box">
-                    <StepperSolicitud faseActual={creditoActivo?.fase || 1} />
-                </div>
-            </section>
 
             {/* --- ÁREA DE CONTENIDO DINÁMICO --- */}
             <main className="perfil-main-content">
