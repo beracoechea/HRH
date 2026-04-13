@@ -4,22 +4,19 @@ import {
     FiCheck, FiX, FiTrendingUp, FiEdit, 
     FiClock, FiCheckCircle, FiAlertTriangle 
 } from 'react-icons/fi';
-// Eliminamos la importación del hook que causaba el error 404
 import { formatMoney } from '../../utils/creditCalculations';
+import { StatusPill } from '../Common/StatusPill';
 
-export const CreditRow = ({ cre, onAction, onManagePayments }) => {
+export const CreditRow = ({ cre, onAction }) => {
     const navigate = useNavigate();
     
-    // --- LÓGICA DE CÁLCULO INTEGRADA (Reemplaza al hook) ---
+    // --- LÓGICA DE CÁLCULO INTEGRADA ---
     const calculos = useMemo(() => {
         const pagado = cre.pagado || 0;
         const total = cre.total_estimado || 0;
-        const cuota = cre.montoAbono || 1; // Evitar división por cero
+        const cuota = cre.montoAbono || 1; 
 
-        // Calcular progreso basado en monto monetario real
         const porcentaje = total > 0 ? Math.round((pagado / total) * 100) : 0;
-        
-        // Estimar quincenas liquidadas basadas en el monto pagado
         const qLiquidadas = Math.floor(pagado / cuota);
         const qTotales = cre.plazo_meses ? cre.plazo_meses * 2 : 0;
 
@@ -31,12 +28,10 @@ export const CreditRow = ({ cre, onAction, onManagePayments }) => {
     }, [cre.pagado, cre.total_estimado, cre.montoAbono, cre.plazo_meses]);
 
     const { porcentajeProgreso, quincenasLiquidadas, quincenasTotales } = calculos;
-    const totalConInteres = cre.total_estimado || 0;
 
     // Validación de documentos
     const docsListos = useMemo(() => {
         if (!cre.expediente || !Array.isArray(cre.expediente)) return false;
-        // Solo está listo si hay documentos y TODOS están aprobados o validados
         return cre.expediente.length > 0 && cre.expediente.every(doc => {
             const status = doc?.estatus?.toLowerCase().trim();
             return status === 'aprobado' || status === 'validado';
@@ -47,14 +42,13 @@ export const CreditRow = ({ cre, onAction, onManagePayments }) => {
         if (!dateField) return 'Sin fecha';
         const date = dateField.toDate ? dateField.toDate() : new Date(dateField);
         return date.toLocaleDateString('es-MX', { 
-            day: '2-digit', 
-            month: '2-digit', 
-            year: 'numeric' 
+            day: '2-digit', month: '2-digit', year: 'numeric' 
         });
     };
 
     return (
         <tr className={`animate-fade ${!docsListos && cre.estado === 'pendiente' ? 'row-warning' : ''}`}>
+            {/* COLUMNA 1: CLIENTE */}
             <td>
                 <div className="admin-user-info">
                     <strong>{cre.usuario_nombre || 'Sin nombre'}</strong>
@@ -65,18 +59,21 @@ export const CreditRow = ({ cre, onAction, onManagePayments }) => {
                 </div>
             </td>
             
+            {/* COLUMNA 2: MONTO SOLICITADO */}
             <td>{formatMoney(cre.monto_solicitado)}</td>
             
+            {/* COLUMNA 3: TOTAL ESTIMADO */}
             <td>
                 <strong className="text-total-interes">
-                    {formatMoney(totalConInteres)}
+                    {formatMoney(cre.total_estimado || 0)}
                 </strong>
             </td>
             
+            {/* COLUMNA 4: ABONOS */}
             <td>
                 <div className="admin-payment-info">
                     <span className="payment-tag">
-                        Q1: {formatMoney(cre.pago_quincenal_ano1 || cre.pago_quincenal_ano1)}
+                        Q1: {formatMoney(cre.pago_quincenal_ano1)}
                     </span>
                     {Number(cre.plazo_meses) > 12 && (
                         <span className="payment-tag second">
@@ -86,6 +83,7 @@ export const CreditRow = ({ cre, onAction, onManagePayments }) => {
                 </div>
             </td>
             
+            {/* COLUMNA 5: PROGRESO */}
             <td>
                 <div className="credit-progress-detailed">
                     <div className="progress-meta">
@@ -106,12 +104,12 @@ export const CreditRow = ({ cre, onAction, onManagePayments }) => {
                 </div>
             </td>
             
+            {/* COLUMNA 6: ESTADO (Aquí estaba el error de <td> y de función) */}
             <td>
-                <span className={`status-badge ${(cre.estado || 'pendiente').toLowerCase()}`}>
-                    {(cre.estado || 'PENDIENTE').toUpperCase()}
-                </span>
+                <StatusPill status={cre.estado} />
             </td>
             
+            {/* COLUMNA 7: ACCIONES */}
             <td>
                 <div className="credit-actions">
                     {cre.estado === 'pendiente' ? (
@@ -119,55 +117,35 @@ export const CreditRow = ({ cre, onAction, onManagePayments }) => {
                             {!docsListos && (
                                 <FiAlertTriangle 
                                     className="alert-blink" 
-                                    title="Documentación incompleta o sin validar" 
+                                    title="Documentación incompleta" 
                                 />
                             )}
                             <button 
                                 type="button"
-                                className="btn-icon-edit" 
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    navigate(`/admin/editar-credito/${cre.id}`);
-                                }} 
-                                title="Editar montos"
+                                className="btn-icon-manage" 
+                                onClick={() => onAction(cre.id)} 
+                                title="Gestionar Crédito"
                             >
                                 <FiEdit />
                             </button>
-                            <button 
-                                className={`btn-approve-credit ${!docsListos ? 'disabled' : ''}`} 
-                                onClick={() => docsListos && onAction(cre.id, 'activo')}
-                                disabled={!docsListos}
-                            >
-                                <FiCheck /> {docsListos ? 'Aprobar' : 'Incompleto'}
-                            </button>
-                         <button 
-                                className="btn-icon-reject" 
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation(); 
-                                    // Solo avisamos al padre que queremos rechazar este ID
-                                    onAction(cre.id, 'rechazado');
-                                }} 
-                                title="Rechazar solicitud"
-                            >
-                                <FiX />
-                            </button>
+                            {/* Eliminamos el botón de aprobación directa para forzar revisión en el modal */}
                         </div>
                     ) : (cre.estado === 'activo' || cre.estado === 'atrasado') ? (
                         <button 
                             type="button"
                             className="btn-manage-credit" 
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                navigate(`/admin/pagos-credito/${cre.id}`);
-                            }}
+                            onClick={() => onAction(cre.id)}
                         >
-                            <FiTrendingUp /> Gestionar Pago
+                            <FiTrendingUp /> Gestionar
                         </button>
                     ) : (
-                        <span className="text-muted"><FiCheckCircle /> Finalizado</span>
+                        <button 
+                            type="button"
+                            className="btn-icon-view" 
+                            onClick={() => onAction(cre.id)}
+                        >
+                            <FiCheckCircle /> Ver Detalle
+                        </button>
                     )}
                 </div>
             </td>

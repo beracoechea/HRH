@@ -2,7 +2,7 @@ import React from 'react';
 import { FiUser, FiInfo } from 'react-icons/fi';
 import { FormularioKYC } from '../../../components/User/FormularioKYC';
 
-export const TabInformacionKYC = ({ user, onComplete }) => {
+export const TabInformacionKYC = ({ user, creditoActivo, onComplete }) => {
     return (
         <section className="kyc-standalone-container animate-fade">
             <div className="section-header-inline">
@@ -20,7 +20,10 @@ export const TabInformacionKYC = ({ user, onComplete }) => {
             <div className="kyc-form-wrapper">
                 <FormularioKYC 
                     user={user} 
+                    creditoId={creditoActivo?.id}
+                    kycMaster={creditoActivo?.kycMaster}
                     onComplete={onComplete} 
+                    isUserView={true}
                 />
             </div>
         </section>

@@ -17,7 +17,7 @@ export const useCreditActions = () => {
      * @param {Object} data - Objeto con ID y campos a actualizar
      */
     const updateCreditConditions = async (data) => {
-        const { creditoId, id, nuevoMonto, nuevoPlazo, pagoQ1, pagoQ2, totalEstimado } = data;
+        const { creditoId, id, nuevoMonto, nuevoPlazo, pagoQ1, pagoQ2, totalEstimado, tasaMensual } = data;
         const targetId = creditoId || id;
         
         if (!targetId) {

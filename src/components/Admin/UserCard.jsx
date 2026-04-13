@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiAlertCircle, FiUserCheck, FiRefreshCw } from 'react-icons/fi';
+import { FiAlertCircle, FiUserCheck, FiRefreshCw, FiLayers } from 'react-icons/fi';
 import { useAuthActions } from '../../pages/hooks/useAuthActions';
 import { StatusModal } from '../Common/StatusModal';
 import '../../assets/styles/UserCard.css';
@@ -10,6 +10,8 @@ export const UserCard = ({ user, onUpdateRole, isPriority, onClick }) => {
   const getRoleClass = (rol) => {
     const roles = {
       admin: 'role-admin',
+      analista: 'role-analista',
+      rh: 'role-rh',
       aprobador: 'role-aprobador',
       tesorero: 'role-tesorero',
       marketing: 'role-marketing',
@@ -35,38 +37,39 @@ export const UserCard = ({ user, onUpdateRole, isPriority, onClick }) => {
           <div className="user-text">
             <h3>{user.nombre || 'Sin nombre configurado'}</h3>
             <p className="user-email-sub">{user.email}</p>
-            <div className="role-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {onUpdateRole ? (
-                  <select 
-                      className={`role-badge ${getRoleClass(user.rol)}`} 
-                      style={{ cursor: 'pointer', appearance: 'none', border: 'none', outline: 'none' }}
-                      value={user.rol || 'cliente'} 
-                      onChange={async (e) => {
-                          e.stopPropagation(); // Evitar abrir sidebar
-                          const newRole = e.target.value;
-                          if (newRole !== user.rol) {
-                              await updateUserRole(user.id, user.email, newRole);
-                          }
-                      }}
-                      onClick={(e) => e.stopPropagation()} // Evitar abrir sidebar
-                      disabled={loading}
-                      title="Cambiar permisos del usuario"
-                  >
-                      <option value="cliente">Cliente</option>
-                      <option value="marketing">Marketing</option>
-                      <option value="tesorero">Tesorero</option>
-                      <option value="aprobador">Aprobador</option>
-                      <option value="admin">Administrador</option>
-                  </select>
-              ) : (
-                  <span className={`role-badge ${getRoleClass(user.rol)}`}>
+            
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+                <span className={`role-badge ${getRoleClass(user.rol)}`}>
                     {user.rol || 'cliente'}
-                  </span>
-              )}
-              {loading && <FiRefreshCw className="spinner" style={{ color: '#64748b', fontSize: '0.9rem' }} />}
+                </span>
+                
+                {user.grupo && (
+                    <div className="group-indicator">
+                        <FiLayers /> <span>{user.grupo}</span>
+                    </div>
+                )}
             </div>
           </div>
         </div>
+
+        {onUpdateRole && (
+            <div className="user-actions">
+                {loading ? (
+                    <FiRefreshCw className="spinner" style={{ color: '#159082' }} />
+                ) : (
+                    <button 
+                        className="btn-edit-premium" 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onClick(); // Abrir el modal para edición detallada
+                        }}
+                        title="Gestionar Rol y Grupo"
+                    >
+                        <FiRefreshCw /> Gestionar
+                    </button>
+                )}
+            </div>
+        )}
       </div>
       
       <StatusModal 

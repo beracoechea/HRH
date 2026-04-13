@@ -47,6 +47,7 @@ export class CreditService extends FirestoreService {
                 pagado: 0,
                 fase: 1, // <--- Nueva propiedad para el ciclo de 8 pasos
                 expediente: expedienteInicial,
+                usuario_grupo: userData.grupo || null,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             };
@@ -58,9 +59,17 @@ export class CreditService extends FirestoreService {
         }
     }
 
-    getAll = async () => {
+    getAll = async (grupo = null) => {
         try {
-            const q = query(collection(db, this.collectionName), orderBy('createdAt', 'desc'));
+            let q = collection(db, this.collectionName);
+            
+            if (grupo) {
+                // Filtramos por el campo que identifica el grupo de la solicitud
+                q = query(q, where('usuario_grupo', '==', grupo), orderBy('createdAt', 'desc'));
+            } else {
+                q = query(q, orderBy('createdAt', 'desc'));
+            }
+
             const snapshot = await getDocs(q);
             return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (error) {

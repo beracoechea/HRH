@@ -11,6 +11,7 @@ import { AdminStats } from '../../components/Admin/AdminStats';
 import { DocumentTracking } from '../../components/Admin/DocumentTracking';
 import { RejectCreditSidebar } from '../../components/Common/RejectCreditSidebar'; 
 import { UserDetailsModal } from '../../components/Admin/UserDetailsModal';
+import { ProcessTimeline } from '../../components/Admin/ProcessTimeline';
 
 // Modales y Common
 import { StatusModal } from '../../components/Common/StatusModal'; 
@@ -26,21 +27,28 @@ import { useAuth } from '../../context/AuthContext';
 
 import '../../assets/styles/UserManagement.css';
 
-const ROLE_PERMISSIONS = {
-  admin: { views: ['usuarios', 'pendientes', 'creditos', 'documentos', 'stats'] },
-  aprobador: { views: ['pendientes', 'creditos', 'documentos'] },
-  tesorero: { views: ['creditos'] },
-  marketing: { views: ['stats'] },
-  cliente: { views: [] }
-};
+import { ROLE_PERMISSIONS } from '../../helpers/permissions';
 
 export const UserManagement = () => {
   const { user: currentUser } = useAuth();
   const permissions = ROLE_PERMISSIONS[currentUser?.rol] || ROLE_PERMISSIONS.cliente;
 
   // --- ESTADOS ---
-  const [view, setView] = useState(permissions.views[0] || '');
+  const [view, setView] = useState('');
+  
+  // Efecto para inicializar la vista permitida solo si no hay una vista seleccionada
+  React.useEffect(() => {
+    if (!view && permissions?.views?.length > 0) {
+      if (permissions.views.includes('usuarios')) {
+        setView('usuarios');
+      } else {
+        setView(permissions.views[0]);
+      }
+    }
+  }, [permissions, view]);
+
   const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('todos');
   
   // Estado para la barra lateral de rechazo
   const [rejectSidebar, setRejectSidebar] = useState({ open: false, id: null });
@@ -62,9 +70,9 @@ export const UserManagement = () => {
     loading: loadingUsers, 
     refreshData, 
     ingresosReales = 0,
-  } = useUserManager();
+  } = useUserManager(currentUser);
 
-  const { creditosDocs, loading: loadingDocs } = useDocumentTracking();
+  const { creditosDocs, loading: loadingDocs } = useDocumentTracking(currentUser);
 
   // --- HELPERS ---
   const canSee = useCallback((viewName) => permissions.views.includes(viewName), [permissions]);
@@ -125,10 +133,35 @@ export const UserManagement = () => {
     cre.expediente?.some(doc => doc.estatus?.toLowerCase().trim() === 'pendiente')
   ).length || 0;
 
-  const filteredUsers = users?.filter(u => 
-    u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.nombre?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredUsers = users?.filter(u => {
+    const matchesSearch = u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          u.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          u.rfc?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesRole = roleFilter === 'todos' || u.rol === roleFilter;
+
+    // Filtro por grupo para RRHH
+    if (permissions.mustFilterByGroup && currentUser?.grupo) {
+        return matchesSearch && matchesRole && u.grupo === currentUser.grupo;
+    }
+    return matchesSearch && matchesRole;
+  }) || [];
+
+  const solicitudesCreditos = creditos?.filter(c => {
+    const isPending = c.estado === 'pendiente';
+    if (permissions.mustFilterByGroup && currentUser?.grupo) {
+        return isPending && (c.usuario_grupo === currentUser.grupo || c.grupo === currentUser.grupo);
+    }
+    return isPending;
+  }) || [];
+
+  const activosCreditos = creditos?.filter(c => {
+    const isActive = c.estado === 'activo' || c.estado === 'atrasado';
+    if (permissions.mustFilterByGroup && currentUser?.grupo) {
+        return isActive && (c.usuario_grupo === currentUser.grupo || c.grupo === currentUser.grupo);
+    }
+    return isActive;
+  }) || [];
 
   const loading = loadingUsers || loadingDocs;
 
@@ -137,11 +170,12 @@ export const UserManagement = () => {
       <header className="admin-header">
         <div className="header-title">
           <h1>
-            {view === 'usuarios' && <><FiUsers /> Gestión de Usuarios</>}
-            {view === 'pendientes' && <><FiCheckSquare /> Citas por Aprobar</>}
-            {view === 'creditos' && <><FiDollarSign /> {currentUser?.rol === 'tesorero' ? 'Cobranza y Pagos' : 'Gestión de Créditos'}</>}
-            {view === 'stats' && <><FiPieChart /> Estadísticas Generales</>}
-            {view === 'documentos' && <><FiFileText /> Seguimiento de Documentos</>}
+            {view === 'usuarios' && <><FiUsers /> Usuarios y Roles</>}
+            {view === 'pendientes' && <><FiCheckSquare /> Gestión de Citas</>}
+            {view === 'solicitudes' && <><FiDollarSign /> Solicitudes por Aprobar</>}
+            {view === 'activos' && <><FiDollarSign /> Créditos Activos</>}
+            {view === 'expedientes' && <><FiFileText /> Expedientes Digitales</>}
+            {view === 'stats' && <><FiPieChart /> Dashboard General</>}
             {loading && <FiLoader className="spinner" />}
           </h1>
         </div>
@@ -162,22 +196,27 @@ export const UserManagement = () => {
     </button>
   )}
 
-  {canSee('creditos') && (
-    <button className={`nav-tab ${view === 'creditos' ? 'active' : ''}`} onClick={() => setView('creditos')}>
-      <FiDollarSign /> Créditos
-      {/* Badge rojo para créditos que necesitan aprobación urgente */}
-      {creditos?.filter(c => c.estado === 'pendiente').length > 0 && (
-        <span className="tab-badge danger">
-          {creditos.filter(c => c.estado === 'pendiente').length}
-        </span>
+  {canSee('solicitudes') && (
+    <button className={`nav-tab ${view === 'solicitudes' ? 'active' : ''}`} onClick={() => setView('solicitudes')}>
+      <FiDollarSign /> Solicitudes
+      {solicitudesCreditos?.length > 0 && (
+        <span className="tab-badge danger">{solicitudesCreditos.length}</span>
       )}
     </button>
   )}
 
-  {canSee('documentos') && (
-    <button className={`nav-tab ${view === 'documentos' ? 'active' : ''}`} onClick={() => setView('documentos')}>
-      <FiFileText /> Documentos
-      {/* Badge naranja para documentos pendientes de validar */}
+  {canSee('activos') && (
+    <button className={`nav-tab ${view === 'activos' ? 'active' : ''}`} onClick={() => setView('activos')}>
+      <FiDollarSign /> Activos
+      {activosCreditos?.length > 0 && (
+        <span className="tab-badge">{activosCreditos.length}</span>
+      )}
+    </button>
+  )}
+
+  {canSee('expedientes') && (
+    <button className={`nav-tab ${view === 'expedientes' ? 'active' : ''}`} onClick={() => setView('expedientes')}>
+      <FiFileText /> Expedientes
       {docsPendientesCount > 0 && (
         <span className="tab-badge warning">{docsPendientesCount}</span>
       )}
@@ -195,6 +234,31 @@ export const UserManagement = () => {
       <div className="admin-content">
         {view === 'usuarios' && canSee('usuarios') && (
           <section className="all-users-section animate-fade">
+             <div className="admin-actions-bar">
+                <div className="search-bar">
+                    <FiSearch />
+                    <input 
+                        type="text" 
+                        placeholder="Buscar por nombre, email o RFC..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                <div className="role-filter-box">
+                    <select 
+                        value={roleFilter} 
+                        onChange={(e) => setRoleFilter(e.target.value)}
+                        className="role-select-filter"
+                    >
+                        <option value="todos">Todos los roles</option>
+                        <option value="cliente">Clientes</option>
+                        <option value="rh">Recursos Humanos</option>
+                        <option value="analista">Analistas</option>
+                        <option value="admin">Administradores</option>
+                        <option value="tesorero">Tesorería</option>
+                    </select>
+                </div>
+             </div>
             <div className="users-list">
               {filteredUsers.map(u => (
                 <UserCard 
@@ -212,16 +276,26 @@ export const UserManagement = () => {
           <PendingCitasList citas={pendingCitas} onActionComplete={refreshData} />
         )}
 
-        {view === 'creditos' && canSee('creditos') && (
+        {view === 'solicitudes' && canSee('solicitudes') && (
           <PendingCreditosList 
-            creditos={creditos} 
+            creditos={solicitudesCreditos} 
+            fixedStatus="pendiente"
+            onAction={handleCreditAction}
+            onUpdateSuccess={refreshData}
+          />
+        )}
+
+        {view === 'activos' && canSee('activos') && (
+          <PendingCreditosList 
+            creditos={activosCreditos} 
+            fixedStatus="activo"
             onlyPayments={currentUser?.rol === 'tesorero'}
             onAction={handleCreditAction}
             onUpdateSuccess={refreshData}
           />
         )}
 
-        {view === 'documentos' && canSee('documentos') && (
+        {view === 'expedientes' && canSee('expedientes') && (
           <DocumentTracking />
         )}
 

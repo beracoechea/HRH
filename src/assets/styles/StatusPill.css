@@ -1,0 +1,45 @@
+.status-pill {
+    padding: 6px 14px;
+    border-radius: 40px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.status-pill.pendiente {
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.status-pill.activo {
+    background: #ecfdf5;
+    color: #059669;
+    border-color: #10b98120;
+}
+
+.status-pill.atrasado {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #ef444420;
+}
+
+.status-pill.finalizado {
+    background: #f0f9ff;
+    color: #0284c7;
+}
+
+.status-pill.rechazado {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.status-pill.revision {
+    background: #f5f3ff;
+    color: #7c3aed;
+}

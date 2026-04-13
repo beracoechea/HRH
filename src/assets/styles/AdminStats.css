@@ -18,16 +18,29 @@
 }
 
 .quick-badge {
-  background: white;
-  padding: 10px 20px;
-  border-radius: 50px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  color: #159082;
-  border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--admin-primary), var(--admin-primary-dark));
+    color: white;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(21, 144, 130, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quick-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(21, 144, 130, 0.3);
+    filter: brightness(1.1);
+}
+
+.quick-badge svg {
+    font-size: 1.1rem;
 }
 
 /* Grid de Cards */

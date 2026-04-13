@@ -4,24 +4,20 @@
 
 .user-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 20px;
   padding: 1.5rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  margin-bottom: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #eef2f6;
+  border: 1px solid var(--admin-border);
   position: relative;
   overflow: hidden;
 }
 
 .user-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.08);
-}
-
-.user-card.expanded {
-  border-color: #003366;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+  border-color: var(--admin-primary);
 }
 
 /* --- BADGE DE PRIORIDAD --- */
@@ -33,17 +29,18 @@
   position: absolute;
   top: 0;
   right: 0;
-  background: #fee2e2;
+  background: #fef2f2;
   color: #ef4444;
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: 0.65rem;
+  font-weight: 800;
   padding: 6px 14px;
-  border-bottom-left-radius: 12px;
+  border-bottom-left-radius: 14px;
   display: flex;
   align-items: center;
   gap: 5px;
   text-transform: uppercase;
   z-index: 2;
+  letter-spacing: 0.05em;
 }
 
 /* --- SECCIÓN PRINCIPAL --- */
@@ -57,23 +54,24 @@
 .user-info {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
+  gap: 1.25rem;
   flex: 1;
 }
 
 .user-avatar {
-  width: 52px;
-  height: 52px;
-  background: #003366;
+  width: 56px;
+  height: 56px;
+  background: var(--admin-primary);
   color: white;
-  border-radius: 14px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(0, 51, 102, 0.2);
+  box-shadow: 0 4px 12px rgba(21, 144, 130, 0.25);
+  border: 2px solid white;
 }
 
 .pulse-avatar {
@@ -82,78 +80,134 @@
 
 @keyframes avatarPulse {
   0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
   100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
 .user-text h3 {
   margin: 0;
-  font-size: 1.1rem;
-  color: #1e293b;
-  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--admin-text-main);
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .user-email-sub {
-  margin: 2px 0 6px 0;
+  margin: 2px 0 8px 0;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--admin-text-sec);
   word-break: break-all;
+  font-weight: 500;
 }
 
-/* --- ESTILOS DE ROLES ACTUALIZADOS --- */
+/* --- ESTILOS DE ROLES (Selector Premium) --- */
 .role-container {
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
 .role-badge {
-  font-size: 0.65rem;
-  padding: 4px 10px;
-  border-radius: 6px;
-  text-transform: uppercase;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  display: inline-block;
-}
-
-/* Paleta de colores por Rol */
-.role-badge.role-admin { background: #003366; color: white; }
-.role-badge.role-aprobador { background: #8b5cf6; color: white; } /* Morado */
-.role-badge.role-tesorero { background: #10b981; color: white; }  /* Esmeralda */
-.role-badge.role-marketing { background: #f59e0b; color: white; } /* Ámbar */
-.role-badge.role-cliente { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
-
-/* --- BOTONES DE ACCIÓN --- */
-.user-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.edit-role-btn {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  color: #475569;
+  font-size: 0.72rem;
   padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
+  border-radius: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  background: #f1f5f9;
+  color: #475569;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
-.edit-role-btn:hover {
-  background: #f8fafc;
-  color: #003366;
-  border-color: #003366;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+.role-badge:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(0.98);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.1);
 }
 
-.edit-role-btn svg {
-  font-size: 1rem;
+.role-badge:focus {
+  border-color: var(--primary-color);
+  background: white;
+  outline: none;
 }
+
+/* Colores dinámicos por rol (Premium) */
+.role-badge.role-admin { background: #1e293b; color: #f8fafc; border-color: #334155; }
+.role-badge.role-analista { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+.role-badge.role-rh { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+.role-badge.role-aprobador { background: #fdf4ff; color: #86198f; border-color: #f5d0fe; }
+.role-badge.role-tesorero { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+.role-badge.role-marketing { background: #fffaf5; color: #9a3412; border-color: #ffedd5; }
+.role-badge.role-cliente { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
+
+/* --- BOTONES DE EDICIÓN PREMIUM --- */
+.btn-edit-premium {
+    background: linear-gradient(135deg, #159082 0%, #094c5b 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(21, 144, 130, 0.2);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-edit-premium:hover {
+    transform: scale(1.03) translateY(-2px);
+    box-shadow: 0 8px 15px rgba(21, 144, 130, 0.3);
+    filter: brightness(1.1);
+}
+
+.btn-edit-premium:active {
+    transform: scale(0.98);
+}
+
+.btn-edit-round-premium {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: white;
+    border: 1.5px solid #e2e8f0;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.btn-edit-round-premium:hover {
+    border-color: #159082;
+    color: #159082;
+    box-shadow: 0 4px 10px rgba(21, 144, 130, 0.15);
+    transform: rotate(15deg);
+}
+
+.group-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 700;
+    margin-top: 5px;
+}
+
+.group-indicator svg { color: #159082; }
 
 /* --- ESTADÍSTICAS Y CRÉDITOS --- */
 .user-stats {

@@ -31,8 +31,13 @@ export const CtaFinanciamiento = () => {
 
           <div className="cta-separator"><span>O contáctanos directamente</span></div>
 
-          <a href={`https://wa.me/${ENTIDAD_CONFIG.CONTACTO_WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="btn-whatsapp-cta">
-              <FaWhatsapp className="wa-icon-cta" /> Iniciar Chat por WhatsApp
+         <a 
+            href={`https://wa.me/${ENTIDAD_CONFIG.CONTACTO_WHATSAPP}`} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="btn-whatsapp-cta"
+          >
+            <FaWhatsapp className="wa-icon-cta" /> Iniciar Chat por Whatsapp
           </a>
 
           <div className="footer-contact-links">

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiSave, FiAlertCircle, FiRefreshCw, FiDollarSign, FiCalendar, FiClock, FiEdit2, FiTrendingUp } from 'react-icons/fi';
 import { useCreditActions } from '../../pages/hooks/useCreditActions';
 import { StatusModal } from '../../components/Common/StatusModal';
+import { useAuth } from '../../context/AuthContext';
 import { db } from '../../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import { calcularEstructuraCredito, formatMoney } from '../../utils/creditCalculations';
@@ -12,6 +13,7 @@ import '../../assets/styles/AdminCredits.css';
 export const EditCreditPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { user: currentUser } = useAuth();
     const { updateCreditConditions, loading, status, closeStatus } = useCreditActions();
 
     const [creditData, setCreditData] = useState(null);
@@ -32,6 +34,16 @@ export const EditCreditPage = () => {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data();
+                    
+                    // SEGURIDAD: Validación de Grupo para RH
+                    if (currentUser?.rol === 'rh' && currentUser?.grupo) {
+                        const pertenece = data.grupo === currentUser.grupo || data.usuario_grupo === currentUser.grupo;
+                        if (!pertenece) {
+                             setError('No tienes permisos para editar créditos de otros grupos.');
+                             return;
+                        }
+                    }
+
                     setCreditData({ id: docSnap.id, ...data });
                     
                     const monto = Number(data.monto_solicitado) || 0;

@@ -1,40 +1,34 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { 
-  FiHome, FiCpu, FiUsers, FiTrendingUp, 
-  FiFileText, FiShield, FiMenu, FiX, 
-  FiBriefcase, FiLogIn, FiLogOut, FiSettings, FiChevronDown 
+import {
+  FiHome, FiCpu, FiUsers, FiTrendingUp,
+  FiFileText, FiShield, FiMenu, FiX,
+  FiBriefcase, FiLogIn, FiLogOut, FiSettings, FiChevronDown
 } from 'react-icons/fi';
 
-import '../../assets/styles/Navbar.css'; 
-import logoFull from '../../assets/images/LogoChido.png'; 
+import '../../assets/styles/Navbar.css';
+import logoFull from '../../assets/images/LogoChido.png';
 import logoIcon from '../../assets/images/MovilVerde.png';
-
 import { useAuth } from '../../context/AuthContext';
 import { AuthModal } from '../Modals/AuthModal';
-
-// 1. Definición de Permisos Centralizada
-const ROLE_PERMISSIONS = {
-  admin: { accessAdminPanel: true, canManageUsers: true, canManageNews: true },
-  aprobador: { accessAdminPanel: true, canManageUsers: true, canManageNews: false },
-  tesorero: { accessAdminPanel: true, canManageUsers: true, canManageNews: false },
-  marketing: { accessAdminPanel: true, canManageUsers: false, canManageNews: true },
-  cliente: { accessAdminPanel: false, canManageUsers: false, canManageNews: false }
-};
+import { ROLE_PERMISSIONS } from '../../helpers/permissions';
 
 export const Navbar = () => {
   const [click, setClick] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [adminDropdown, setAdminDropdown] = useState(false);
-  
+
   const { user, logout, isAuthenticated } = useAuth();
-  
-  // Determinar permisos y tipo de usuario
+
+  // Determinar permisos y tipo de usuario usando la matriz centralizada
   const permissions = ROLE_PERMISSIONS[user?.rol] || ROLE_PERMISSIONS.cliente;
   const isStaff = permissions.accessAdminPanel;
 
+  const canSeeUsers = permissions.views?.includes('usuarios');
+  const canSeeConfig = permissions.views?.includes('config');
+
   const handleClick = () => setClick(!click);
-  
+
   const closeMobileMenu = () => {
     setClick(false);
     setAdminDropdown(false);
@@ -67,12 +61,12 @@ export const Navbar = () => {
             {/* Renderizado de ítems públicos */}
             {navItems.map((item, index) => (
               <li className="nav-item" key={index}>
-                <NavLink 
-                  to={item.path} 
+                <NavLink
+                  to={item.path}
                   className={({ isActive }) => "nav-links" + (isActive ? " activated" : "")}
                   onClick={closeMobileMenu}
                 >
-                  {React.cloneElement(item.icon, { className: 'nav-icon' })} 
+                  {React.cloneElement(item.icon, { className: 'nav-icon' })}
                   {item.name}
                 </NavLink>
               </li>
@@ -84,8 +78,8 @@ export const Navbar = () => {
                 {/* 1. VISTA PARA CLIENTE: Botón Mi Perfil Directo */}
                 {!isStaff ? (
                   <li className="nav-item">
-                    <NavLink 
-                      to="/mi-perfil" 
+                    <NavLink
+                      to="/mi-perfil"
                       className={({ isActive }) => "nav-links" + (isActive ? " activated" : "")}
                       onClick={closeMobileMenu}
                     >
@@ -94,7 +88,7 @@ export const Navbar = () => {
                   </li>
                 ) : (
                   /* 2. VISTA PARA STAFF (Admin, etc): Menú Encapsulado */
-                  <li 
+                  <li
                     className="nav-item dropdown-container"
                     onMouseEnter={() => window.innerWidth > 960 && setAdminDropdown(true)}
                     onMouseLeave={() => window.innerWidth > 960 && setAdminDropdown(false)}
@@ -102,7 +96,7 @@ export const Navbar = () => {
                     <div className="nav-links admin-trigger" onClick={() => setAdminDropdown(!adminDropdown)}>
                       <FiSettings className="nav-icon" /> Gestionar <FiChevronDown className={`arrow ${adminDropdown ? 'open' : ''}`} />
                     </div>
-                    
+
                     <ul className={`admin-dropdown ${adminDropdown ? 'show' : ''}`}>
                       {/* Mi Perfil movido aquí para Staff */}
                       <li>
@@ -114,19 +108,19 @@ export const Navbar = () => {
                       {/* Divisor visual */}
                       <li className="dropdown-divider"></li>
 
-                      {/* Opciones Administrativas según permisos */}
-                      {permissions.canManageUsers && (
+                      {/* Opciones Administrativas según permisos dinámicos */}
+                      {canSeeUsers && (
                         <li>
                           <Link to="/admin/users" onClick={closeMobileMenu}>
                             <FiUsers className="nav-icon-drop" /> Gestión Operativa
                           </Link>
                         </li>
                       )}
-                      
-                      {permissions.canManageNews && (
+
+                      {canSeeConfig && (
                         <li>
                           <Link to="/admin/config" onClick={closeMobileMenu}>
-                            <FiSettings className="nav-icon-drop" /> NewsLetter
+                            <FiSettings className="nav-icon-drop" /> Configuración
                           </Link>
                         </li>
                       )}

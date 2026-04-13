@@ -9,31 +9,47 @@ export const useAuthActions = (onUpdate) => {
     const [status, setStatus] = useState({ open: false, type: '', message: '' });
 
     // --- NUEVA FUNCIÓN PARA ACTUALIZAR ROL ---
-    const updateUserRole = async (userId, userEmail, newRole) => {
+    /**
+     * Actualiza datos administrativos del usuario (Rol y Grupo) de forma independiente.
+     */
+    const updateUserAdminData = async (userId, userEmail, updates = {}) => {
         setLoading(true);
+        console.log("=== ACTUALIZACIÓN ADMINISTRATIVA ===", { userId, updates });
+        
         try {
+            if (!userId) throw new Error("ID de usuario no proporcionado.");
+            
             const userRef = doc(db, "usuarios", userId);
-            await updateDoc(userRef, {
-                rol: newRole,
+            const updateData = {
                 updatedAt: serverTimestamp()
-            });
+            };
+
+            if (updates.rol) {
+                updateData.rol = updates.rol;
+            }
+
+            if (updates.grupo !== undefined) {
+                updateData.grupo = updates.grupo;
+                updateData.idGrupo = updates.grupo ? updates.grupo.toLowerCase().replace(/\s+/g, '_') : null;
+            }
+
+            await updateDoc(userRef, updateData);
 
             setStatus({ 
                 open: true, 
                 type: 'success', 
-                message: `Rol de ${userEmail} actualizado a ${newRole}` 
+                message: `Datos de ${userEmail} actualizados correctamente.` 
             });
 
-            // Disparar el refresh si existe la función
-            if (onUpdate) onUpdate();
+            if (onUpdate) await onUpdate();
             
             return true;
         } catch (error) {
-            console.error("Error updating role:", error);
+            console.error("Error updating user admin data:", error);
             setStatus({ 
                 open: true, 
                 type: 'error', 
-                message: "No tienes permisos para cambiar roles o error de red." 
+                message: `Error: ${error.message || "No se pudo actualizar la información."}` 
             });
             return false;
         } finally {
@@ -74,7 +90,7 @@ export const useAuthActions = (onUpdate) => {
 
     return { 
         handleAuth, 
-        updateUserRole, // <-- Ahora sí se exporta
+        updateUserAdminData, // <-- Cambiado de updateUserRole
         loading, 
         status, 
         closeStatus: () => setStatus({ ...status, open: false }) 

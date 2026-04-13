@@ -156,7 +156,26 @@
 }
 
 .upload-btn.retry { background: var(--danger); }
+.upload-btn.mini { width: 30px; height: 30px; font-size: 0.8rem; }
 .st-icon { font-size: 1.2rem; }
+
+.action-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 1rem;
+}
+
+.action-icon-btn.view { background: #f1f5f9; color: var(--dark-bg); }
+.action-icon-btn.view:hover { background: #e2e8f0; color: var(--primary-color); }
+.action-icon-btn.delete { background: #fef2f2; color: #ef4444; }
+.action-icon-btn.delete:hover { background: #fee2e2; transform: scale(1.1); }
 
 .btn-sign-doc {
     background: #f59e0b;

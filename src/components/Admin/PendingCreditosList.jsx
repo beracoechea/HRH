@@ -7,8 +7,8 @@ import {
 import '../../assets/styles/AdminCredits.css';
 import { CreditRow } from './CreditRow';
 
-export const PendingCreditosList = ({ creditos = [], onAction, onUpdateSuccess }) => {
-    const [filterStatus, setFilterStatus] = useState('activo');
+export const PendingCreditosList = ({ creditos = [], onAction, onUpdateSuccess, fixedStatus = null }) => {
+    const [filterStatus, setFilterStatus] = useState(fixedStatus || 'activo');
     const [searchTerm, setSearchTerm] = useState('');
 
     // Contadores dinámicos
@@ -22,41 +22,56 @@ export const PendingCreditosList = ({ creditos = [], onAction, onUpdateSuccess }
     // Filtrado
     const filteredCreditos = useMemo(() => {
         return creditos.filter(cre => {
-            const matchesStatus = filterStatus === 'activo' 
-                ? (cre.estado === 'activo' || cre.estado === 'atrasado')
-                : cre.estado === filterStatus;
+            let matchesStatus = true;
+            if (fixedStatus === 'activo') {
+                matchesStatus = (cre.estado === 'activo' || cre.estado === 'atrasado');
+            } else if (fixedStatus) {
+                matchesStatus = cre.estado === fixedStatus;
+            } else {
+                matchesStatus = filterStatus === 'activo' 
+                    ? (cre.estado === 'activo' || cre.estado === 'atrasado')
+                    : cre.estado === filterStatus;
+            }
             
             const matchesSearch = 
                 cre.usuario_nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 cre.usuario_email?.toLowerCase().includes(searchTerm.toLowerCase());
             return matchesStatus && matchesSearch;
         });
-    }, [creditos, filterStatus, searchTerm]);
+    }, [creditos, filterStatus, searchTerm, fixedStatus]);
 
     return (
-        <div className="credits-admin-wrapper">
+        <div className="credits-admin-wrapper animate-fade">
             <div className="admin-filters-bar">
-                <div className="filter-group">
-                    <FiFilter />
-                    <div className="filter-buttons">
-                        {['activo', 'pendiente', 'finalizado', 'rechazado'].map((status) => (
-                            <button 
-                                key={status}
-                                className={`filter-tab-btn ${filterStatus === status ? 'active' : ''}`} 
-                                onClick={() => setFilterStatus(status)}
-                            >
-                                {status.charAt(0).toUpperCase() + status.slice(1)}s
-                                <span className="status-count-badge">{counts[status]}</span>
-                            </button>
-                        ))}
+                {!fixedStatus ? (
+                    <div className="filter-group">
+                        <FiFilter />
+                        <div className="filter-buttons">
+                            {['activo', 'pendiente', 'finalizado', 'rechazado'].map((status) => (
+                                <button 
+                                    key={status}
+                                    className={`filter-tab-btn ${filterStatus === status ? 'active' : ''}`} 
+                                    onClick={() => setFilterStatus(status)}
+                                >
+                                    {status.charAt(0).toUpperCase() + status.slice(1)}s
+                                    <span className="status-count-badge">{counts[status]}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="filter-group">
+                        <span className="status-label-fixed">
+                           Resultados: {filteredCreditos.length} coincidencias
+                        </span>
+                    </div>
+                )}
 
                 <div className="search-box-admin">
                     <FiSearch />
                     <input 
                         type="text" 
-                        placeholder="Buscar cliente..." 
+                        placeholder="Filtrar por nombre o email..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />

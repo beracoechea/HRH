@@ -2,23 +2,39 @@
 export const ROLE_PERMISSIONS = {
   admin: {
     accessAdminPanel: true,
-    views: ['usuarios', 'pendientes', 'creditos', 'documentos', 'stats', 'noticias'],
-    canManageRoles: true
+    views: ['mesa', 'tesoreria', 'stats', 'usuarios', 'noticias', 'config'],
+    canManageRoles: true,
+    mustFilterByGroup: true
+  },
+  analista: {
+    accessAdminPanel: true,
+    views: ['mesa'],
+    canManageRoles: false,
+    mustFilterByGroup: true
+  },
+  rh: {
+    accessAdminPanel: true,
+    views: ['mesa', 'usuarios'],
+    canManageRoles: false,
+    mustFilterByGroup: true
   },
   aprobador: {
     accessAdminPanel: true,
-    views: ['pendientes', 'creditos', 'documentos'],
-    canManageRoles: false
+    views: ['mesa'],
+    canManageRoles: false,
+    mustFilterByGroup: true
   },
   tesorero: {
     accessAdminPanel: true,
-    views: ['creditos'],
-    canManageRoles: false
+    views: ['tesoreria'],
+    canManageRoles: false,
+    mustFilterByGroup: true
   },
   marketing: {
     accessAdminPanel: true,
-    views: ['noticias'],
-    canManageRoles: false
+    views: ['noticias', 'stats'],
+    canManageRoles: false,
+    mustFilterByGroup: true
   },
   cliente: {
     accessAdminPanel: false,

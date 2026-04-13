@@ -1,9 +1,10 @@
-/* --- AuthModal.css --- */
+/* --- AuthModal.css (Versión Clara + Naranja CrediGo) --- */
 
-/* 1. Overlay (Fondo desenfocado) */
+/* 1. Fondo del Modal (Overlay) */
 .modal-overlay {
-  background: rgba(9, 76, 91, 0.6); /* Tono Teal Oscuro con transparencia */
-  backdrop-filter: blur(6px);
+  /* Usamos un blanco/gris muy claro con opacidad para desenfocar el fondo sin oscurecerlo */
+  background: rgba(38, 39, 39, 0.8) !important; /* var(--app-bg) con transparencia */
+  backdrop-filter: blur(8px);
   position: fixed;
   inset: 0;
   display: flex;
@@ -14,44 +15,78 @@
   animation: fadeIn 0.3s ease;
 }
 
-/* 2. Contenedor del Modal */
+/* 2. Contenedor Principal (Tarjeta Clara) */
 .modal-content {
-  background: var(--card-bg);
+  background: var(--card-bg); /* Blanco absoluto */
   width: 100%;
   max-width: 420px;
   border-radius: var(--border-radius);
   padding: 40px;
   position: relative;
-  box-shadow: 0 25px 50px -12px rgba(9, 76, 91, 0.25);
-  animation: slideUp 0.4s ease-out;
+  /* Sombra suave y limpia para dar profundidad */
+  box-shadow: 0 15px 35px rgba(9, 76, 91, 0.1); 
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  border: 1px solid var(--highlight); /* Borde muy suave */
 }
 
-/* 3. Header */
+/* 3. Encabezado */
+/* --- Ajuste Específico para la Cabecera de CrediGo --- */
+
 .modal-header {
-  text-align: center;
-  margin-bottom: 30px;
+    text-align: center;
+    /* Usamos el Teal Oscuro o Principal de tu marca para el fondo */
+    background-color: var(--dark-bg) !important; 
+    
+    /* Espaciado interno para que el color luzca */
+    padding: 35px 20px; 
+    
+    /* Importante: Mover el margen al contenedor para que el color llegue a los bordes */
+    margin: -40px -40px 30px -40px; 
+    
+    /* Redondeamos las esquinas superiores para que coincidan con el modal */
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-header h2 {
-  font-size: 1.8rem;
-  color: var(--dark-bg);
-  margin-bottom: 8px;
-  font-weight: 700;
+    /* Color Coral/Naranja de la marca */
+    color: var(--secondary-color) !important; 
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.2;
+    text-transform: uppercase; /* Opcional, para darle más fuerza */
 }
 
 .modal-header p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
+    /* Color blanco o teal muy claro para que sea legible sobre el fondo oscuro */
+    color: var(--highlight) !important; 
+    font-size: 0.9rem;
+    margin-top: 10px;
+    opacity: 0.9;
 }
 
-/* 4. Selector de Pestañas (Tabs) */
+/* Ajuste del botón X para que resalte sobre el nuevo fondo */
+.close-btn {
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* 4. Tabs de Selección (Login / Registro) */
 .auth-toggle-container {
   display: flex;
-  background: var(--app-bg);
+  background: #fcfdfe; /* Fondo muy claro para los tabs */
   padding: 5px;
   border-radius: 12px;
   margin-bottom: 25px;
-  border: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid var(--highlight);
 }
 
 .toggle-tab {
@@ -68,12 +103,12 @@
 }
 
 .toggle-tab.active {
-  background: white;
-  color: var(--primary-color);
+  background: var(--card-bg); /* Blanco */
+  color: var(--secondary-color); /* CAMBIO: Naranja para el tab activo */
   box-shadow: var(--shadow-sm);
 }
 
-/* 5. Grupos de Input (Corrección de encimado de texto) */
+/* 5. Inputs y Grupos */
 .input-group {
   position: relative;
   margin-bottom: 18px;
@@ -84,48 +119,40 @@
 .input-icon {
   position: absolute;
   left: 16px;
-  color: #9ca3af;
+  color: #a0aec0; /* Gris suave para el icono */
   font-size: 1.2rem;
   z-index: 10;
-  pointer-events: none; /* El icono no bloquea el clic */
-  transition: color 0.3s ease;
 }
 
 .input-group input {
   width: 100%;
-  /* Padding-left de 48px para dejar espacio total al icono */
   padding: 14px 16px 14px 48px !important;
-  border: 2px solid #eef2f3;
+  border: 2px solid var(--highlight) !important; /* Borde suave menta */
   border-radius: 10px;
   outline: none;
   font-size: 1rem;
   font-family: inherit;
-  background: #fcfdfe;
-  color: var(--text-main);
+  background: white !important;
+  color: var(--text-main); /* Texto principal oscuro */
   transition: all 0.3s ease;
 }
 
-.input-group input::placeholder {
-  color: #a0aec0;
-}
-
-/* Estado de Foco */
 .input-group input:focus {
-  border-color: var(--primary-color);
-  background: white;
-  box-shadow: 0 0 0 4px rgba(21, 144, 130, 0.1);
+  border-color: var(--secondary-color) !important; /* CAMBIO: Naranja en foco */
+  background: var(--card-bg);
+  box-shadow: 0 0 0 4px rgba(235, 110, 93, 0.1); /* Anillo de foco naranja suave */
 }
 
 .input-group:focus-within .input-icon {
-  color: var(--primary-color);
+  color: var(--secondary-color); /* CAMBIO: Icono naranja en foco */
 }
 
-/* 6. Botón de Envío */
+/* 6. Botón de Acción (Submit) */
 .auth-submit-btn {
   width: 100%;
-  background: var(--primary-color);
-  color: white;
-  padding: 14px;
+  background: var(--secondary-color) !important; /* CAMBIO: Botón Naranja */
+  color: white !important;
+  padding: 15px;
   border: none;
   border-radius: 10px;
   font-weight: 700;
@@ -137,47 +164,28 @@
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(235, 110, 93, 0.2);
 }
 
 .auth-submit-btn:hover:not(:disabled) {
-  background: var(--dark-bg);
+  background: var(--accent-color) !important; /* Naranja más fuerte al pasar el mouse */
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(21, 144, 130, 0.3);
-}
-
-.auth-submit-btn:active:not(:disabled) {
-  transform: translateY(0);
+  box-shadow: 0 8px 15px rgba(229, 73, 31, 0.3);
 }
 
 .auth-submit-btn:disabled {
-  background: #cbd5e0;
+  background: #f0c5bd !important; /* Naranja muy pálido para estado desactivado */
+  color: white !important;
   cursor: not-allowed;
-  transform: none;
+  opacity: 0.8;
+  box-shadow: none;
 }
 
-/* 7. Footer del Modal */
-.modal-footer {
-  margin-top: 25px;
-  text-align: center;
-}
-
-.toggle-auth-link {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.toggle-auth-link:hover {
-  color: var(--secondary-color);
-  font-weight: 600;
-}
-
-/* 8. Botón Cerrar (X) */
+/* 7. Botón de Cerrar (X) */
 .close-btn {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 15px;
+  right: 15px;
   background: var(--app-bg);
   border: none;
   width: 32px;
@@ -189,27 +197,19 @@
   cursor: pointer;
   color: var(--text-secondary);
   transition: all 0.2s ease;
+  z-index: 100;
 }
 
 .close-btn:hover {
-  background: var(--secondary-color);
+  background: var(--accent-color); /* Naranja fuerte al cerrar */
   color: white;
   transform: rotate(90deg);
 }
 
-/* 9. Animaciones */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+/* 8. Animaciones y Otros */
 .spinner {
   animation: spin 1s linear infinite;
+  color: white;
 }
 
 @keyframes spin {
@@ -217,9 +217,33 @@
   to { transform: rotate(360deg); }
 }
 
-/* Adaptabilidad Móvil */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Link de Texto inferior (si lo agregas después) */
+.toggle-auth-link {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.toggle-auth-link:hover {
+  color: var(--accent-color); /* Naranja fuerte */
+  font-weight: 600;
+}
+
+/* Soporte para móviles */
 @media (max-width: 480px) {
   .modal-content {
     padding: 30px 20px;
+    margin: 10px;
   }
 }

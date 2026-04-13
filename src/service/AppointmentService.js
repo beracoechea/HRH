@@ -29,9 +29,16 @@ export class AppointmentService {
         }
     }
 
-    async getAllCitas() {
+    async getAllCitas(grupo = null) {
         try {
-            const q = query(collection(db, this.collectionName), orderBy('createdAt', 'desc'));
+            let q = collection(db, this.collectionName);
+            
+            if (grupo) {
+                q = query(q, where('grupo', '==', grupo), orderBy('createdAt', 'desc'));
+            } else {
+                q = query(q, orderBy('createdAt', 'desc'));
+            }
+
             const snapshot = await getDocs(q);
             return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (error) {

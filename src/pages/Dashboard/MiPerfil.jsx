@@ -2,29 +2,23 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { usePerfil } from '../hooks/usePerfil';
 import { 
-    FiUser, FiDollarSign, FiCalendar, FiFileText, 
+    FiDollarSign, FiCalendar, FiFileText, 
     FiLoader, FiAlertCircle
 } from 'react-icons/fi';
-
-// Componentes Globales de Perfil
 
 // Componentes de Pestañas
 import { TabMiCredito } from '../../components/User/tabs/TabMiCredito';
 import { TabCitas } from '../../components/User/tabs/TabCitas';
 import { TabEstadosCuenta } from '../../components/User/tabs/TabEstadosCuenta';
-import { TabInformacionKYC } from '../../components/User/tabs/TabInformacionKYC';
 
 import '../../assets/styles/MiPerfil.css';
 
 export const MiPerfil = () => {
     const { user, loading: authLoading } = useAuth();
     const { data, loading: perfilLoading, error, refreshData } = usePerfil(user);
-    const [activeTab, setActiveTab] = useState('kyc');
-
-    // Buscamos el crédito activo para determinar la fase global en el Stepper
-    const creditoActivo = data.creditos?.find(c => 
-        !['finalizado', 'rechazado'].includes(c.estado?.toLowerCase())
-    );
+    
+    // Cambiado: 'mi-credito' ahora es el estado inicial por defecto
+    const [activeTab, setActiveTab] = useState('mi-credito');
 
     // --- ESTADOS DE CARGA Y ERROR ---
     if (authLoading || (perfilLoading && (!data || !data.creditos))) {
@@ -48,10 +42,25 @@ export const MiPerfil = () => {
                 </div>
 
                 <nav className="perfil-main-nav">
-                    <TabNavItem active={activeTab === 'mi-credito'} onClick={() => setActiveTab('mi-credito')} icon={<FiDollarSign />} label="Mi Crédito" />
-                    <TabNavItem active={activeTab === 'kyc'} onClick={() => setActiveTab('kyc')} icon={<FiUser />} label="Mi Información" />
-                    <TabNavItem active={activeTab === 'citas'} onClick={() => setActiveTab('citas')} icon={<FiCalendar />} label="Mis Citas" />
-                    <TabNavItem active={activeTab === 'historial'} onClick={() => setActiveTab('historial')} icon={<FiFileText />} label="Estados de Cuenta" />
+                    <TabNavItem 
+                        active={activeTab === 'mi-credito'} 
+                        onClick={() => setActiveTab('mi-credito')} 
+                        icon={<FiDollarSign />} 
+                        label="Mi Crédito" 
+                    />
+                    {/* Se eliminó TabNavItem de "Mi Información" */}
+                    <TabNavItem 
+                        active={activeTab === 'citas'} 
+                        onClick={() => setActiveTab('citas')} 
+                        icon={<FiCalendar />} 
+                        label="Mis Citas" 
+                    />
+                    <TabNavItem 
+                        active={activeTab === 'historial'} 
+                        onClick={() => setActiveTab('historial')} 
+                        icon={<FiFileText />} 
+                        label="Estados de Cuenta" 
+                    />
                 </nav>
             </header>
 
@@ -65,12 +74,7 @@ export const MiPerfil = () => {
                     />
                 )}
 
-                {activeTab === 'kyc' && (
-                    <TabInformacionKYC 
-                        user={user} 
-                        onComplete={() => { refreshData(); setActiveTab('mi-credito'); }} 
-                    />
-                )}
+                {/* Se eliminó el renderizado condicional de TabInformacionKYC */}
 
                 {activeTab === 'citas' && (
                     <TabCitas citas={data.citas} />

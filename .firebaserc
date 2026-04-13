@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "stratego-firma",
+    "default": "credigo-f6ac4",
     "produccion": "stratego-firma"
   },
   "targets": {
@@ -8,6 +8,13 @@
       "hosting": {
         "portal-nuevo": [
           "hrh2022"
+        ]
+      }
+    },
+    "credigo-f6ac4": {
+      "hosting": {
+        "portal-nuevo": [
+          "credigo-f6ac4"
         ]
       }
     }

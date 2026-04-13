@@ -8,7 +8,9 @@ const adminService = new AdminService()
 const creditService = new CreditService()
 const appointmentService = new AppointmentService()
 
-export const useUserManager = () => {
+export const useUserManager = (currentUser = null) => {
+  const isHRH = currentUser?.grupo?.toUpperCase() === 'HRH';
+  const userGroup = currentUser?.grupo;
 
   const [data, setData] = useState({
     users: [],
@@ -23,23 +25,27 @@ export const useUserManager = () => {
 
     return execute(async () => {
 
+      const queryGroup = isHRH ? null : userGroup;
+
       const [users, citas, creditos] = await Promise.all([
-
-        adminService.getAllUsers().catch(() => []),
-        appointmentService.getAllCitas().catch(() => []),
-        creditService.getAll().catch(() => [])
-
+        adminService.getAllUsers(queryGroup).catch(() => []),
+        appointmentService.getAllCitas(queryGroup).catch(() => []),
+        creditService.getAll(queryGroup).catch(() => [])
       ])
 
+      const filteredUsers = !isHRH && userGroup ? users.filter(u => u.grupo === userGroup) : users;
+      const filteredCitas = !isHRH && userGroup ? citas.filter(c => c.grupo === userGroup) : citas;
+      const filteredCreditos = !isHRH && userGroup ? creditos.filter(c => c.grupo === userGroup || c.usuario_grupo === userGroup) : creditos;
+
       setData({
-        users,
-        pendingCitas: citas,
-        creditos
+        users: filteredUsers,
+        pendingCitas: filteredCitas,
+        creditos: filteredCreditos
       })
 
     })
 
-  }, [execute])
+  }, [execute, isHRH, userGroup])
 
 
   const updateCreditStatus = useCallback(async (payload) => {

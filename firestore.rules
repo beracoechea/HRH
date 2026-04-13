@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- FUNCIONES HELPER ---
+    function isSignedIn() { return request.auth != null; }
+    
+    // Función segura para obtener datos del usuario actual (Admin-only)
+    function getUserData() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+    }
+
+    // Funciones de conveniencia basadas en el documento del usuario
+    function isSuperAdmin() {
+      return isSignedIn() && getUserData().grupo == 'HRH';
+    }
+
+    function isStaff() {
+      let rol = getUserData().rol;
+      return isSignedIn() && (rol == 'admin' || rol == 'analista' || rol == 'rh' || rol == 'aprobador' || rol == 'tesorero' || rol == 'marketing');
+    }
+
+    // --- REGLAS PARA GRUPOS ---
+    match /grupos/{groupId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && (getUserData().rol == 'admin' || getUserData().rol == 'rh');
+    }
+
+    // --- REGLAS PARA USUARIOS ---
+    match /usuarios/{userId} {
+      // PRIORIDAD 1: El usuario siempre puede leer su propio perfil.
+      // Esto evita que AuthContext falle si no puede cargar otros datos.
+      allow read: if isSignedIn() && (request.auth.uid == userId);
+      
+      // PRIORIDAD 2: El staff administrativo puede leer si es del mismo grupo (o HRH)
+      // Usamos .get() de forma defensiva
+      allow read: if isSignedIn() && (
+        isSuperAdmin() || 
+        (isStaff() && getUserData().grupo == resource.data.grupo)
+      );
+
+      // Escritura: Misma lógica
+      allow write: if isSignedIn() && (
+        request.auth.uid == userId || 
+        isSuperAdmin() || 
+        (isStaff() && getUserData().grupo == resource.data.grupo)
+      );
+      
+      match /perfil/kyc {
+        allow read, write: if isSignedIn() && (
+          request.auth.uid == userId || 
+          isSuperAdmin() || 
+          (isStaff() && getUserData().grupo == get(/databases/$(database)/documents/usuarios/$(userId)).data.grupo)
+        );
+      }
+    }
+
+    // --- REGLAS PARA CRÉDITOS ---
+    match /creditos/{creditoId} {
+      // Regla de lectura multi-tenant: 
+      // El usuario puede ver su propio crédito.
+      // El staff puede ver si el crédito tiene el MISMO grupo que el staff.
+      allow read: if isSignedIn() && (
+        resource.data.usuario_id == request.auth.uid || 
+        isSuperAdmin() || 
+        (isStaff() && (resource.data.grupo == getUserData().grupo || resource.data.usuario_grupo == getUserData().grupo))
+      );
+      
+      allow create: if isSignedIn();
+      
+      allow update: if isSignedIn() && (
+        resource.data.usuario_id == request.auth.uid || 
+        isSuperAdmin() || 
+        (isStaff() && resource.data.grupo == getUserData().grupo)
+      );
+    }
+
+    // --- REGLAS PARA CITAS ---
+    match /citas/{citaId} {
+      allow read: if isSignedIn() && (
+        resource.data.usuario_id == request.auth.uid || 
+        isSuperAdmin() || 
+        (isStaff() && resource.data.grupo == getUserData().grupo)
+      );
+      allow write: if isSignedIn();
+    }
+  }
+}

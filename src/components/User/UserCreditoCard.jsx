@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { 
     FiClock, FiCheckCircle, FiUploadCloud, 
-    FiLoader, FiTrendingUp, FiFileText, FiChevronDown, FiChevronUp, FiPenTool 
+    FiLoader, FiTrendingUp, FiFileText, FiChevronDown, FiChevronUp, FiPenTool,
+    FiEye, FiTrash2, FiLock
 } from 'react-icons/fi';
 import { db, storage, functions } from '../../firebase/config'; 
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -9,12 +10,14 @@ import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 
 import { StatusModal } from '../Common/StatusModal';
+import { GeminiProcessingModal } from './GeminiProcessingModal';
 import '../../assets/styles/UserCreditoCard.css';
 
 export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) => {
     const [uploading, setUploading] = useState(null);
     const [status, setStatus] = useState({ open: false, type: '', message: '' });
     const [showAmortization, setShowAmortization] = useState(false);
+    const [showGeminiModal, setShowGeminiModal] = useState(false);
 
     const formatMoney = (val) => {
         return new Intl.NumberFormat('es-MX', {
@@ -89,9 +92,63 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
         }
     };
 
+    const handleRemoveDocument = async (nombreDocumento) => {
+        const targetDoc = expediente.find(d => d.nombre === nombreDocumento);
+        if (targetDoc?.isAdmin) {
+            setStatus({ open: true, type: 'warning', message: "Este documento es administrativo y no puede ser eliminado." });
+            return;
+        }
+
+        if (!window.confirm(`¿Estás seguro de que deseas eliminar el documento "${nombreDocumento}"?`)) return;
+        
+        setUploading(nombreDocumento);
+        try {
+            const creditoRef = doc(db, "creditos", credito.id);
+            const creditoSnap = await getDoc(creditoRef);
+
+            if (creditoSnap.exists()) {
+                const nuevoExpediente = creditoSnap.data().expediente.map(docExp => 
+                    docExp.nombre === nombreDocumento ? { 
+                        ...docExp, 
+                        url: null, 
+                        estatus: 'pendiente', 
+                        fecha_remocion: new Date().toISOString() 
+                    } : docExp
+                );
+                await updateDoc(creditoRef, { expediente: nuevoExpediente, lastUpdate: new Date() });
+                
+                const userRef = doc(db, "usuarios", credito.usuario_id);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    const userExp = userSnap.data().expediente.map(docExp => 
+                        docExp.nombre === nombreDocumento ? { 
+                            ...docExp, 
+                            url: null, 
+                            estatus: 'pendiente'
+                        } : docExp
+                    );
+                    await updateDoc(userRef, { expediente: userExp });
+                }
+            }
+            setStatus({ open: true, type: 'success', message: "Documento eliminado correctamente." });
+            if (onUploadSuccess) await onUploadSuccess();
+        } catch (error) {
+            console.error("Error removing:", error);
+            setStatus({ open: true, type: 'error', message: "Error al eliminar documento." });
+        } finally {
+            setUploading(null);
+        }
+    };
+
     const handleFileChange = async (e, nombreDocumento) => {
         const file = e.target.files[0];
         if (!file) return;
+        const targetDoc = expediente.find(d => d.nombre === nombreDocumento);
+        if (targetDoc?.isAdmin) {
+            setStatus({ open: true, type: 'warning', message: "Este documento es administrativo y no puede ser modificado." });
+            return;
+        }
+
         if (esEstadoFinal && credito.estado?.toLowerCase() !== 'activo') {
             setStatus({ open: true, type: 'error', message: `No se pueden subir documentos en estado ${credito.estado}.` });
             return;
@@ -108,30 +165,17 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
             const creditoSnap = await getDoc(creditoRef);
 
             if (creditoSnap.exists()) {
+                const currentStatus = targetDoc?.estatus?.toLowerCase();
                 const nuevoExpediente = creditoSnap.data().expediente.map(docExp => 
                     docExp.nombre === nombreDocumento ? { ...docExp, url: downloadURL, estatus: 'revision', fecha_subida: new Date().toISOString() } : docExp
                 );
                 await updateDoc(creditoRef, { expediente: nuevoExpediente, lastUpdate: new Date() });
                 
                 // OCR y Auto-KYC: Revisa si todos los docs de la Fase 1 fueron subidos
+                // O si estamos reemplazando un documento RECHAZADO
                 const todosSubidos = nuevoExpediente.every(d => d.url && d.url.trim() !== '');
-                if (todosSubidos && (credito.fase === 1 || !credito.fase)) {
-                    setStatus({ open: true, type: 'info', message: 'Autocompletando tu Perfil (KYC). Leyendo documentos con IA, por favor espere unos segundos...' });
-                    try {
-                        const urls = nuevoExpediente.map(d => d.url).filter(Boolean);
-                        const analizarFunc = httpsCallable(functions, 'analizarDocumentosGenerales');
-                        const res = await analizarFunc({ creditoId: credito.id, documentUrls: urls });
-                        
-                        // NOTA: Si success === true, la nube (backend) ya avanza la fase a 2 y guarda kycData.
-                        setStatus({ open: true, type: 'success', message: '¡Análisis completo! Verifica la información extraída.' });
-                        if (onUploadSuccess) await onUploadSuccess();
-                        return; // Evitar el toast nativo normal
-                    } catch (ocrError) {
-                        console.error('Error con OCR Gemini:', ocrError);
-                        setStatus({ open: true, type: 'error', message: 'Hubo un error analizando los documentos. Por favor procede o vuelve a intentar.' });
-                        if (onUploadSuccess) await onUploadSuccess();
-                        return;
-                    }
+                if ((todosSubidos && (credito.fase === 1 || !credito.fase)) || currentStatus === 'rechazado') {
+                     await runOCR(nuevoExpediente);
                 }
             }
             setStatus({ open: true, type: 'success', message: `¡${nombreDocumento} subido!` });
@@ -143,6 +187,53 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
             e.target.value = null;
         }
     };
+
+    const runOCR = async (docsExpediente) => {
+        setShowGeminiModal(true);
+        setUploading('OCR_PROGRESS');
+        try {
+            const urls = docsExpediente.map(d => d.url).filter(Boolean);
+            const analizarFunc = httpsCallable(functions, 'analizarDocumentosGenerales');
+            const res = await analizarFunc({ 
+                creditoId: credito.id, 
+                usuarioId: credito.usuario_id,
+                documentUrls: urls 
+            });
+            
+            const payload = res.data || {};
+            
+            // Avanzamos a la Fase 2 (KYC) automáticamente después del análisis IA (solo si estamos en fase 1)
+            try {
+                if (credito.fase === 1 || !credito.fase) {
+                    const creditoRef = doc(db, "creditos", credito.id);
+                    await updateDoc(creditoRef, { 
+                        fase: 2,
+                        lastUpdate: new Date()
+                    });
+                }
+            } catch (phaseError) {
+                console.error("Error updating phase after OCR:", phaseError);
+            }
+
+            if (payload.requiresManualReview) {
+                 setStatus({ open: true, type: 'warning', message: payload.message || 'Se requiere revisión manual de un revisor. Dirígete a la pestaña de KYC para comprobar tus datos actuales.' });
+            } else {
+                 setStatus({ open: true, type: 'success', message: '¡Análisis completo IA! Ya puedes verificar tu información en el Paso 2.' });
+            }
+            
+            if (onUploadSuccess) await onUploadSuccess();
+        } catch (ocrError) {
+            console.error('Error con OCR Gemini:', ocrError);
+            setStatus({ open: true, type: 'error', message: 'Hubo un error analizando los documentos. Por favor procede manualmente a KYC o intenta re-analizar más tarde.' });
+            if (onUploadSuccess) await onUploadSuccess();
+        } finally {
+            setUploading(null);
+            setShowGeminiModal(false);
+        }
+    };
+
+    const todosDocUploadeds = expediente.length > 0 && expediente.every(d => !!d.url);
+    const requiresRetryOption = todosDocUploadeds && !credito.kycMaster && (credito.fase === 1 || !credito.fase);
 
     return (
         <div className={`user-credit-card animate-pop ${credito.estado?.toLowerCase()}`}>
@@ -195,7 +286,19 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
             </div>
 
             <div className="expediente-section">
-                <h4 className="section-subtitle">DOCUMENTACIÓN</h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <h4 className="section-subtitle" style={{ margin: 0 }}>DOCUMENTACIÓN</h4>
+                    {requiresRetryOption && (
+                        <button 
+                            onClick={() => runOCR(expediente)}
+                            disabled={uploading === 'OCR_PROGRESS'}
+                            style={{ padding: '6px 12px', fontSize: '0.85rem', fontWeight: 'bold', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                            title="Reintentar el análisis automático con IA"
+                        >
+                            {uploading === 'OCR_PROGRESS' ? <FiLoader className="spinner" /> : <FiTrendingUp />} Reintentar IA
+                        </button>
+                    )}
+                </div>
                 <div className="docs-grid">
                     {expediente.map((doc, idx) => {
                         const est = (doc.estatus || 'pendiente').toLowerCase();
@@ -203,8 +306,27 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
                             <div key={idx} className={`doc-box ${est}`}>
                                 <span className="doc-name">{doc.nombre}</span>
                                 <div className="doc-action">
-                                    {est === 'aprobado' || est === 'validado' || est === 'firmado' ? <FiCheckCircle className="st-icon text-success" /> :
-                                     est === 'revision' ? <FiClock className="st-icon text-warning pulse" /> :
+                                    {est === 'aprobado' || est === 'validado' || est === 'firmado' ? (
+                                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                            {doc.url && <a href={doc.url} target="_blank" rel="noreferrer" className="action-icon-btn view"><FiEye /></a>}
+                                            <FiCheckCircle className="st-icon text-success" />
+                                        </div>
+                                    ) :
+                                     est === 'revision' || est === 'rechazado' || (doc.url && est === 'pendiente') ? (
+                                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center' }}>
+                                            {doc.url && (
+                                                <>
+                                                    <a href={doc.url} target="_blank" rel="noreferrer" className="action-icon-btn view" title="Ver documento"><FiEye /></a>
+                                                    <button onClick={() => handleRemoveDocument(doc.nombre)} className="action-icon-btn delete" title="Eliminar"><FiTrash2 /></button>
+                                                </>
+                                            )}
+                                            <label className={`upload-btn mini ${uploading === doc.nombre ? 'loading' : ''} ${est === 'rechazado' ? 'retry' : ''}`} title="Reemplazar">
+                                                {uploading === doc.nombre ? <FiLoader className="spinner" /> : <FiUploadCloud />}
+                                                <input type="file" hidden onChange={(e) => handleFileChange(e, doc.nombre)} disabled={!!uploading} accept=".pdf,.jpg,.jpeg,.png" />
+                                            </label>
+                                            {est === 'revision' && !doc.url && <FiClock className="st-icon text-warning pulse" />}
+                                        </div>
+                                     ) :
                                      est === 'pendiente_firma' ? (
                                          <button 
                                             className="btn-sign-doc" 
@@ -215,10 +337,14 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
                                              <span>Firmar</span>
                                          </button>
                                      ) : (
-                                     <label className={`upload-btn ${uploading === doc.nombre ? 'loading' : ''} ${est === 'rechazado' ? 'retry' : ''}`}>
-                                         {uploading === doc.nombre ? <FiLoader className="spinner" /> : <FiUploadCloud />}
-                                         <input type="file" hidden onChange={(e) => handleFileChange(e, doc.nombre)} disabled={!!uploading} accept=".pdf,.jpg,.jpeg,.png" />
-                                     </label>
+                                        doc.isAdmin ? (
+                                            <span className="admin-only-tag"><FiLock /> Solo Lectura</span>
+                                        ) : (
+                                            <label className={`upload-btn ${uploading === doc.nombre ? 'loading' : ''} ${est === 'rechazado' ? 'retry' : ''}`}>
+                                                {uploading === doc.nombre ? <FiLoader className="spinner" /> : <FiUploadCloud />}
+                                                <input type="file" hidden onChange={(e) => handleFileChange(e, doc.nombre)} disabled={!!uploading} accept=".pdf,.jpg,.jpeg,.png" />
+                                            </label>
+                                        )
                                      )}
                                 </div>
                             </div>
@@ -228,6 +354,7 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
             </div>
 
             <StatusModal isOpen={status.open} type={status.type} message={status.message} onClose={() => setStatus({ ...status, open: false })} />
+            <GeminiProcessingModal isOpen={showGeminiModal} />
         </div>
     );
 };

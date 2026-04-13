@@ -9,9 +9,13 @@ import {
 } from 'recharts';
 import '../../assets/styles/AdminStats.css';
 
+import { ProcessTimeline } from './ProcessTimeline';
+
 export const AdminStats = ({ creditos = [], usuarios = [], citas = [], ingresosReales = [] }) => {
-  
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+
   const metrics = useMemo(() => {
+    // ... (existing metrics logic stays the same)
     
     const tieneDatos = Array.isArray(ingresosReales) && ingresosReales.length > 0;
     
@@ -64,8 +68,8 @@ export const AdminStats = ({ creditos = [], usuarios = [], citas = [], ingresosR
           <h1>Análisis de Cartera y Recaudación</h1>
           <p>Métricas consolidadas basadas en pagos reales.</p>
         </div>
-        <div className="quick-badge">
-          <FiActivity /> Tasa de aprobación: {metrics.tasaAprobacion}%
+        <div className="quick-badge" onClick={() => setIsSidebarOpen(true)} style={{ cursor: 'pointer' }}>
+          <FiActivity /> Ver Línea de Tiempo
         </div>
       </div>
 
@@ -183,7 +187,7 @@ export const AdminStats = ({ creditos = [], usuarios = [], citas = [], ingresosR
         {/* BAR CHART - ESTATUS */}
         <div className="chart-card">
           <h3><FiLayers /> Estatus Operativo</h3>
-          <div style={{ width: '100%', height: 250 }}>
+          <div style={{ width: '100%', height: 250, minHeight: 250, minWidth: 0 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart layout="vertical" data={metrics.estadosData} margin={{ left: 20 }}>
                 <XAxis type="number" hide />
@@ -206,6 +210,13 @@ export const AdminStats = ({ creditos = [], usuarios = [], citas = [], ingresosR
           </div>
         </div>
       </div>
+
+      {/* RENDERIZADO DEL SIDEBAR */}
+      <ProcessTimeline 
+        creditos={creditos} 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+      />
     </div>
   );
 };

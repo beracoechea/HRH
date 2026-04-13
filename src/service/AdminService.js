@@ -3,9 +3,15 @@ import { db } from '../firebase/config';
 import { collection, getDocs, query, where, updateDoc, doc } from 'firebase/firestore';
 
 export class AdminService {
-    // Obtener todos los usuarios
-    async getAllUsers() {
-        const snapshot = await getDocs(collection(db, 'usuarios'));
+    // Obtener todos los usuarios (con filtro opcional por grupo para multi-tenancy)
+    async getAllUsers(grupo = null) {
+        let q = collection(db, 'usuarios');
+        
+        if (grupo) {
+            q = query(q, where('grupo', '==', grupo));
+        }
+
+        const snapshot = await getDocs(q);
         return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     }
 

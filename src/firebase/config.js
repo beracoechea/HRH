@@ -5,12 +5,13 @@ import { getStorage } from "firebase/storage";
 import { getFunctions } from "firebase/functions";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBZBUxKn2uaj1lakn8WvwWtVGVjS5tAyec",
-  authDomain: "stratego-firma.firebaseapp.com",
-  projectId: "stratego-firma",
-  storageBucket: "stratego-firma.firebasestorage.app",
-  messagingSenderId: "411011222977",
-  appId: "1:411011222977:web:b82c625d51521082463340"
+  apiKey: "AIzaSyD02aMFVVsJRLf6tYFQNuVWvaFuK01zWGc",
+  authDomain: "credigo-f6ac4.firebaseapp.com",
+  projectId: "credigo-f6ac4",
+  storageBucket: "credigo-f6ac4.firebasestorage.app",
+  messagingSenderId: "296121254537",
+  appId: "1:296121254537:web:2ee923b93c63e0ac3c3c58",
+  measurementId: "G-DCNVVM1NJ0"
 };
 
 // Inicializar la App (evitando duplicados)
@@ -21,8 +22,7 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 // 1. Exportar Auth (Esto soluciona tu SyntaxError)
 export const auth = getAuth(app); 
 
-// 2. Exportar Firestore apuntando a la base de datos 'credigo'
-export const db = getFirestore(app, "credigo");
+export const db = getFirestore(app);
 
 // 3. Exportar Storage si lo usas
 export const storage = getStorage(app);

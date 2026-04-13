@@ -25,11 +25,12 @@ import { MiPerfil } from './pages/Dashboard/MiPerfil';
 import LegalTransparency from './pages/Legal/LegalTransparency';
 
 // Pages Admin 
-import { UserManagement } from './pages/Admin/UserManagement';
+import { AdminDashboard } from './pages/Admin/AdminDashboard';
 import { PageConfig } from './pages/Admin/PageConfig';
 import { EditCreditPage } from './pages/Admin/EditCreditPage';
 import { CreditPaymentPage } from './pages/Admin/CreditPaymentPage';
 import { DocumentReviewPage } from './pages/Admin/DocumentReviewPage';
+import { DevTools } from './pages/Admin/DevTools';
 
 // --- COMPONENTE DE RUTA PRIVADA (CLIENTES) ---
 const PrivateRoute = ({ children }) => {
@@ -88,7 +89,7 @@ const { isAuthModalOpen, closeLogin } = useAuth();
             path="/admin/users" 
             element={
               <AdminRoute>
-                <UserManagement />
+                <AdminDashboard />
               </AdminRoute>
             } 
           />
@@ -127,6 +128,11 @@ const { isAuthModalOpen, closeLogin } = useAuth();
                 <DocumentReviewPage />
               </AdminRoute>
             } 
+          />
+
+          <Route 
+            path="/admin/dev" 
+            element={<DevTools />} 
           />
 
           <Route path="*" element={<NotFound />} />
