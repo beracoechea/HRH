@@ -14,6 +14,7 @@ import { useAuth } from '../../context/AuthContext';
 import { functions } from '../../firebase/config';
 import { httpsCallable } from 'firebase/functions';
 import { FiShield, FiSend, FiCheckCircle as FiCheckCircleSolid } from 'react-icons/fi';
+import { ROLE_PERMISSIONS } from '../../helpers/permissions';
 
 const TrafficLight = ({ score, semaforo }) => {
     let color = '#7f8c8d'; 
@@ -51,11 +52,14 @@ export const DocumentReviewPage = () => {
             if (docSnap.exists()) {
                 const data = { id: docSnap.id, ...docSnap.data() };
                 
-                // SEGURIDAD: Si es RH, solo puede ver si pertenece a su grupo
-                if (currentUser?.rol === 'rh' && currentUser?.grupo) {
+                // MED-04: SEGURIDAD → aplica a TODOS los roles con mustFilterByGroup,
+                // no solo al rol 'rh'. Evita acceso cruzado con solo cambiar la URL.
+                const esSuperAdmin = currentUser?.grupo?.toUpperCase() === 'HRH';
+                const rolConFiltro = ROLE_PERMISSIONS[currentUser?.rol]?.mustFilterByGroup;
+                if (rolConFiltro && currentUser?.grupo && !esSuperAdmin) {
                     const pertenece = data.grupo === currentUser.grupo || data.usuario_grupo === currentUser.grupo;
                     if (!pertenece) {
-                         setError('No tienes permisos para ver este expediente de otro grupo.');
+                         setError('No tienes permisos para ver este expediente.');
                          return;
                     }
                 }

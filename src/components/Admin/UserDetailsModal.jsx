@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    FiX, FiUser, FiMail, FiShield, FiFileText, 
+import {
+    FiX, FiUser, FiMail, FiShield, FiFileText,
     FiCheckCircle, FiInfo, FiEdit, FiUpload, FiDownload, FiActivity,
     FiDollarSign, FiCalendar, FiMapPin, FiPhone, FiBriefcase, FiSave, FiPenTool,
-    FiAlertCircle, FiTrendingUp, FiSearch, FiFlag, FiCreditCard, FiRefreshCw, FiCheck, FiEye
+    FiAlertCircle, FiTrendingUp, FiSearch, FiFlag, FiCreditCard, FiRefreshCw, FiCheck, FiEye, FiZap
 } from 'react-icons/fi';
 import { CREDIT_STEPS } from '../../constants/creditSteps';
 import { formatMoney } from '../../utils/creditCalculations';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../firebase/config';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from '../../firebase/config';
 import { useAdminUserActions } from '../../pages/hooks/useAdminUserActions';
 import { useAuthActions } from '../../pages/hooks/useAuthActions';
 import { useDocumentTracking } from '../../pages/hooks/useDocumentTracking';
@@ -25,60 +26,108 @@ export const UserDetailsModal = ({ isOpen, user, creditos = [], citas = [], onUp
     const [editingKYC, setEditingKYC] = useState(false);
     const [editingRole, setEditingRole] = useState(false);
     const [groupModalOpen, setGroupModalOpen] = useState(false);
-    const [kycForm, setKycForm] = useState({});
+    const [kycForm, setKycForm] = useState({
+        nombreCompleto: '', curp: '', rfc: '', telefono: '',
+        fechaNacimiento: '', genero: '', ingresos: 0,
+        domicilio: '', ocupacion: '', paisNacimiento: 'MÉXICO',
+        entidadNacimiento: '', correo: ''
+    });
     const [aiData, setAiData] = useState(null);
     const [loadingAI, setLoadingAI] = useState(false);
 
     const fileInputRef = React.useRef();
     const signatureInputRef = React.useRef();
 
-    const { uploadUserDoc, updateUserKYC, updateUserPhase, uploading, actionStatus, closeActionStatus } = useAdminUserActions(onUpdateRole);
-    const { updateUserAdminData, loading: roleLoading } = useAuthActions(onUpdateRole);
+    const { 
+        uploadUserDoc, updateUserKYC, updateUserPhase, 
+        updateUserAdminData, uploading, actionStatus, closeActionStatus 
+    } = useAdminUserActions(onUpdateRole);
+    const { loading: authLoading } = useAuthActions(onUpdateRole);
     const { updateSingleDocStatus } = useDocumentTracking();
+    const [analyzing, setAnalyzing] = useState(false);
+
+    const handleManualAnalysis = async () => {
+        if (!user || !lastCredit) return;
+        setAnalyzing(true);
+        try {
+            const docsBaseRequeridos = ['Identificación Oficial vigente', 'Comprobante de ingresos reciente', 'Comprobante de Domicilio', 'Solicitud de Crédito'];
+            const urls = (lastCredit.expediente || [])
+                .filter(d => docsBaseRequeridos.includes(d.nombre))
+                .map(d => d.url)
+                .filter(Boolean);
+
+            if (urls.length < docsBaseRequeridos.length) {
+                if (!window.confirm("Faltan documentos base. ¿Ejecutar análisis con lo disponible?")) {
+                    setAnalyzing(false);
+                    return;
+                }
+            }
+
+            const analizarFunc = httpsCallable(functions, 'analizarDocumentosGenerales');
+            await analizarFunc({
+                creditoId: lastCredit.id,
+                usuarioId: user.id,
+                documentUrls: urls
+            });
+            if (onUpdateRole) onUpdateRole();
+        } catch (err) {
+            console.error("Error en análisis manual:", err);
+            alert("Error al procesar el análisis.");
+        } finally {
+            setAnalyzing(false);
+        }
+    };
 
     // Filtramos datos del usuario actual
     const userCreditos = creditos.filter(c => c.usuario_id === user?.id);
-    const lastCredit = userCreditos[0]; 
+    const lastCredit = userCreditos[0];
 
     useEffect(() => {
         const loadFullData = async () => {
             if (user && isOpen) {
                 setLoadingAI(true);
                 try {
-                    // 1. Obtener perfil maestro primero (fuente de verdad base)
+                    // 1. Obtener perfil maestro (base)
                     const kycDocRef = doc(db, "usuarios", user.id, "perfil", "kyc");
                     const kycSnap = await getDoc(kycDocRef);
-                    if (kycSnap.exists()) {
-                        setKycForm(kycSnap.data());
-                    }
+                    let profileKyc = kycSnap.exists() ? kycSnap.data() : {};
 
-                    // 2. Si hay crédito, sobreescribir con datos específicos del crédito (IA o confirmados)
+                    // 2. Si hay crédito, obtener datos específicos
                     if (lastCredit?.id) {
                         const creditRef = doc(db, "creditos", lastCredit.id);
                         const snap = await getDoc(creditRef);
                         
                         if (snap.exists()) {
                             const creditData = snap.data();
-                            if (creditData.datosKYC) {
-                                setKycForm(creditData.datosKYC);
-                                setAiData(creditData.kycMaster || null);
-                            } else if (creditData.kycMaster) {
-                                // Si no hay confirmados pero hay IA, poblamos el form con lo detectado
-                                const m = creditData.kycMaster;
-                                setAiData(m);
-                                setKycForm({
-                                    nombreCompleto: m.perfilIdentidad?.nombreCompleto || '',
-                                    curp: m.perfilIdentidad?.curp || '',
-                                    rfc: m.perfilIdentidad?.rfc || '',
-                                    telefono: user.telefono || '',
-                                    fechaNacimiento: m.perfilIdentidad?.fechaNacimiento || '',
-                                    genero: m.perfilIdentidad?.genero || '',
-                                    ingresos: m.perfilFinanciero?.ingresoMensualNeto || 0,
-                                    domicilio: m.analisisDomicilio?.direccionFinalConsolidada || '',
-                                    ocupacion: m.perfilFinanciero?.patronOEmpresa || ''
-                                });
-                            }
+                            const m = creditData.kycMaster || {};
+                            setAiData(creditData.kycMaster || null);
+
+                            // El correo y teléfono SIEMPRE deben venir de la solicitud de crédito para el administrador
+                            const contactInfo = {
+                                telefono: creditData.telefono_contacto || user.telefono || '',
+                                correo: creditData.usuario_email || user.email || ''
+                            };
+
+                            // Consolidamos datos confirmados (datosKYC) con respaldo en IA (m.perfilIdentidad)
+                            const confirmedKyc = creditData.datosKYC || profileKyc;
+                            
+                            setKycForm({
+                                nombreCompleto: confirmedKyc.nombreCompleto || m.perfilIdentidad?.nombreCompleto || '',
+                                curp: confirmedKyc.curp || m.perfilIdentidad?.curp || '',
+                                rfc: confirmedKyc.rfc || m.perfilIdentidad?.rfc || '',
+                                fechaNacimiento: confirmedKyc.fechaNacimiento || m.perfilIdentidad?.fechaNacimiento || '',
+                                genero: confirmedKyc.genero || m.perfilIdentidad?.genero || '',
+                                ingresos: confirmedKyc.ingresos || m.perfilFinanciero?.ingresoMensualNeto || 0,
+                                domicilio: confirmedKyc.domicilio || m.analisisDomicilio?.direccionFinalConsolidada || '',
+                                ocupacion: confirmedKyc.ocupacion || m.perfilFinanciero?.patronOEmpresa || '',
+                                entidadNacimiento: confirmedKyc.entidadNacimiento || m.perfilIdentidad?.entidadNacimiento || '',
+                                paisNacimiento: confirmedKyc.paisNacimiento || m.perfilIdentidad?.paisNacimiento || 'MÉXICO',
+                                ...contactInfo
+                            });
                         }
+                    } else if (kycSnap.exists()) {
+                        // Si no hay crédito, usamos lo que haya en el perfil
+                        setKycForm(prev => ({ ...prev, ...profileKyc }));
                     }
                 } catch (err) {
                     console.error("Error cargando expediente:", err);
@@ -100,7 +149,7 @@ export const UserDetailsModal = ({ isOpen, user, creditos = [], citas = [], onUp
 
     const handleKycChange = (e) => {
         const { name, value } = e.target;
-        const skipUppercase = ['telefono', 'fechaNacimiento', 'ingresos'];
+        const skipUppercase = ['telefono', 'fechaNacimiento', 'ingresos', 'correo'];
         setKycForm(prev => ({ ...prev, [name]: skipUppercase.includes(name) ? value : value.toUpperCase() }));
     };
 
@@ -152,19 +201,19 @@ export const UserDetailsModal = ({ isOpen, user, creditos = [], citas = [], onUp
                                         <div className="section-title">
                                             <span><FiShield /> Configuración Administrativa</span>
                                         </div>
-                                        
+
                                         <div className="admin-config-box">
                                             {/* GESTIÓN DE ROL */}
                                             <div className="admin-field-group">
                                                 <label>Rol de Acceso</label>
                                                 <div className="admin-input-wrapper">
-                                                    <select 
+                                                    <select
                                                         className={`role-badge-large ${getRoleClass(user.rol)}`}
-                                                        value={user.rol || 'cliente'} 
-                                                        onChange={async (e) => { 
-                                                            await updateUserAdminData(user.id, user.email, { rol: e.target.value }); 
+                                                        value={user.rol || 'cliente'}
+                                                        onChange={async (e) => {
+                                                            await updateUserAdminData(user.id, user.email, { rol: e.target.value, grupo: user.grupo });
                                                         }}
-                                                        disabled={roleLoading}
+                                                        disabled={uploading}
                                                     >
                                                         <option value="cliente">Cliente</option>
                                                         <option value="marketing">Marketing</option>
@@ -183,10 +232,10 @@ export const UserDetailsModal = ({ isOpen, user, creditos = [], citas = [], onUp
                                                 <div className="admin-input-wrapper">
                                                     <div className="user-group-tag" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                                         <span>{user.grupo || 'Sin Grupo'}</span>
-                                                        <button 
-                                                            className="btn-edit-round-premium" 
+                                                        <button
+                                                            className="btn-edit-round-premium"
                                                             onClick={() => setGroupModalOpen(true)}
-                                                            disabled={roleLoading}
+                                                            disabled={uploading}
                                                         >
                                                             <FiPenTool size={14} />
                                                         </button>
@@ -203,7 +252,7 @@ export const UserDetailsModal = ({ isOpen, user, creditos = [], citas = [], onUp
                                 <div className="kyc-column">
                                     <section className="modal-section">
                                         <div className="section-title">
-                                            <FiCheckCircle color="var(--primary-color)" /> 
+                                            <FiCheckCircle color="var(--primary-color)" />
                                             <span>Información KYC Detectada</span>
                                             {!editingKYC ? (
                                                 <button className="btn-edit-text" onClick={() => setEditingKYC(true)}><FiEdit /> Editar</button>
@@ -216,12 +265,41 @@ export const UserDetailsModal = ({ isOpen, user, creditos = [], citas = [], onUp
                                             <KycItem label="CURP" name="curp" value={kycForm.curp} editing={editingKYC} onChange={handleKycChange} icon={<FiFileText />} />
                                             <KycItem label="RFC" name="rfc" value={kycForm.rfc} editing={editingKYC} onChange={handleKycChange} icon={<FiFileText />} />
                                             <KycItem label="WhatsApp" name="telefono" value={kycForm.telefono} editing={editingKYC} type="tel" onChange={handleKycChange} icon={<FiPhone />} />
+                                            <KycItem label="Correo" name="correo" value={kycForm.correo} editing={editingKYC} type="email" onChange={handleKycChange} icon={<FiMail />} />
                                             <KycItem label="Fecha Nac." name="fechaNacimiento" value={kycForm.fechaNacimiento} editing={editingKYC} type="date" onChange={handleKycChange} icon={<FiCalendar />} />
                                             <KycItem label="Género" name="genero" value={kycForm.genero} editing={editingKYC} onChange={handleKycChange} icon={<FiUser />} />
+                                            <KycItem label="País Nac." name="paisNacimiento" value={kycForm.paisNacimiento} editing={editingKYC} onChange={handleKycChange} icon={<FiFlag />} />
+                                            <KycItem label="Entidad Nac." name="entidadNacimiento" value={kycForm.entidadNacimiento} editing={editingKYC} onChange={handleKycChange} icon={<FiMapPin />} />
                                             <KycItem label="Ingresos" name="ingresos" value={formatMoney(kycForm.ingresos)} editing={editingKYC} onChange={handleKycChange} icon={<FiDollarSign />} />
                                         </div>
-                                        
+
                                         {/* Reporte IA Gemini 2.5 */}
+                                        <div className="section-title" style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <span><FiTrendingUp /> Análisis IA</span>
+                                            {lastCredit && (
+                                                <button 
+                                                    className={`btn-ai-trigger-mini ${analyzing ? 'loading' : ''}`}
+                                                    onClick={handleManualAnalysis}
+                                                    disabled={analyzing}
+                                                    style={{
+                                                        padding: '6px 12px',
+                                                        fontSize: '0.75rem',
+                                                        background: 'var(--primary-color)',
+                                                        color: 'white',
+                                                        borderRadius: '20px',
+                                                        border: 'none',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '6px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    {analyzing ? <FiRefreshCw className="spinner" size={12} /> : <FiZap size={12} />}
+                                                    {aiData ? 'Actualizar' : 'Analizar ahora'}
+                                                </button>
+                                            )}
+                                        </div>
+
                                         {aiData && (
                                             <div className="ai-report-card">
                                                 <div className="ai-report-header">
@@ -240,7 +318,7 @@ export const UserDetailsModal = ({ isOpen, user, creditos = [], citas = [], onUp
                                                         <h5><FiFlag /> Dictamen Final IA</h5>
                                                         <p className="ai-conclusion">{aiData.dictamenRiesgo?.motivoSemaforo}</p>
                                                     </div>
-                                                    
+
                                                     {aiData.dictamenRiesgo?.discrepancias?.length > 0 && (
                                                         <div className="ai-full-box discrepancy">
                                                             <h5><FiAlertCircle /> Inconsistencias Detectadas</h5>
@@ -251,7 +329,7 @@ export const UserDetailsModal = ({ isOpen, user, creditos = [], citas = [], onUp
                                                                             <>
                                                                                 <strong>{d.campo}:</strong> {d.diferencia}
                                                                                 <br />
-                                                                                <small style={{opacity: 0.7}}>({d.documento1} vs {d.documento2})</small>
+                                                                                <small style={{ opacity: 0.7 }}>({d.documento1} vs {d.documento2})</small>
                                                                             </>
                                                                         )}
                                                                     </li>
@@ -372,12 +450,12 @@ export const UserDetailsModal = ({ isOpen, user, creditos = [], citas = [], onUp
                 </footer>
             </div>
             <StatusModal isOpen={actionStatus.open} type={actionStatus.type} message={actionStatus.message} onClose={closeActionStatus} />
-            
-            <GroupAssignmentModal 
+
+            <GroupAssignmentModal
                 isOpen={groupModalOpen}
                 currentGroup={user.grupo}
                 onSelect={(newGroup) => {
-                    updateUserAdminData(user.id, user.email, { grupo: newGroup });
+                    updateUserAdminData(user.id, user.email, { rol: user.rol || 'cliente', grupo: newGroup });
                 }}
                 onClose={() => setGroupModalOpen(false)}
             />

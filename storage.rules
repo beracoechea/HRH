@@ -1,0 +1,64 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // ─────────────────────────────────────────────────────────────────────────
+    // FUNCIONES HELPER
+    // ─────────────────────────────────────────────────────────────────────────
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // El usuario autenticado es el dueño de la carpeta
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // El usuario es personal administrativo (Staff)
+    function isStaff() {
+      return isSignedIn() && (
+        request.auth.token.rol in ['admin', 'analista', 'rh', 'aprobador', 'tesoreria', 'marketing', 'operaciones', 'ventas']
+      );
+    }
+
+    // Super Administrador global
+    function isSuperAdmin() {
+      return isSignedIn() && (request.auth.token.grupo == 'hrh' || request.auth.token.grupo == 'HRH');
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // REGLAS POR RUTA
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Carpeta de identificación y documentos personales de usuarios
+    match /usuarios/{userId}/{allPaths=**} {
+      // Dueño: Lectura y escritura de sus propios documentos
+      // Staff/SuperAdmin: Lectura y escritura para gestión de expediente
+      allow read, write: if isOwner(userId) || isStaff() || isSuperAdmin();
+    }
+
+    // Carpeta de expedientes de créditos específicos
+    match /expedientes/{creditoId}/{allPaths=**} {
+      // Acceso general para usuarios autenticados (Staff o dueños)
+      // Nota: En una fase más avanzada se podría restringir por grupo de crédito
+      allow read, write: if isSignedIn() && (isStaff() || isSuperAdmin());
+      
+      // Permitir que el usuario suba archivos a la carpeta de su crédito
+      // Para esto necesitaríamos el userId dentro del path o validación extra
+      // Por ahora, permitimos lectura/escritura si es staff o admin.
+    }
+
+    // Carpeta de blogs y noticias
+    match /blog/{allPaths=**} {
+      allow read: if true; // Público
+      allow write: if isSuperAdmin() || (isStaff() && request.auth.token.rol in ['admin', 'marketing']);
+    }
+
+    // Carpeta de formatos y documentos públicos
+    match /public_docs/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+  }
+}

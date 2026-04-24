@@ -36,9 +36,16 @@ export const AuthModal = ({ isOpen, onClose }) => {
     const isFormValid = useMemo(() => {
         const { nombre, email, password } = formData;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email) && 
-               password.length >= 6 && 
-               (isLogin ? true : nombre.trim().length >= 3);
+        
+        // MED-03: Solo para registro exigimos complejidad
+        // Login solo requiere que se haya ingresado algo
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+        
+        const isEmailValid = emailRegex.test(email);
+        const isPasswordValid = isLogin ? password.length > 0 : passwordRegex.test(password);
+        const isNameValid = isLogin ? true : nombre.trim().length >= 3;
+
+        return isEmailValid && isPasswordValid && isNameValid;
     }, [formData, isLogin]);
 
     const handleSubmit = async (e) => { // Agregar async
@@ -103,7 +110,15 @@ export const AuthModal = ({ isOpen, onClose }) => {
                         </div>
                         <div className="input-group">
                             <FiLock className="input-icon" />
-                            <input name="password" type="password" placeholder="Contraseña" value={formData.password} onChange={handleChange} disabled={loading} />
+                            <input 
+                                name="password" 
+                                type="password" 
+                                placeholder={isLogin ? "Contraseña" : "Contraseña (8+ car., 1 mayúscula, 1 número)"} 
+                                value={formData.password} 
+                                onChange={handleChange} 
+                                disabled={loading} 
+                                autoComplete={isLogin ? "current-password" : "new-password"}
+                            />
                         </div>
 
                         <button type="submit" className={`auth-submit-btn ${loading ? 'loading' : ''}`} disabled={loading || !isFormValid}>

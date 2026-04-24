@@ -16,11 +16,14 @@ export const useCalculadoraPrestamo = () => {
     }, [tipoCredito, monto, plazo]);
 
     const calculos = useMemo(() => {
-        const res = calcularEstructuraCredito(monto, plazo, tipoCredito);
+        const res = calcularEstructuraCredito(monto, plazo * 2, tipoCredito);
         return {
             pagoMensualAno1: res.cuotaQuincenal1, // Se muestra como quincenal en UI
             pagoMensualAno2: res.cuotaQuincenal2,
+            cuotaQuincenal1: res.cuotaQuincenal1, // Alias para compatibilidad
+            cuotaQuincenal2: res.cuotaQuincenal2,
             totalPagarFinal: res.totalPagar,
+            totalPagar: res.totalPagar, // Alias para compatibilidad
             tasaAplicada: res.tasaMensual,
             reglas: REGLAS_NEGOCIO[tipoCredito]
         };

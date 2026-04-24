@@ -1,8 +1,17 @@
+/* src/pages/hooks/useDocumentTracking.js
+ *
+ * REFACTORIZADO — Aprobación/Rechazo de documentos vía backend.
+ *
+ * CAMBIOS:
+ * ─ Reemplaza updateDoc directo por actualizarEstadoDocumentos (creditApi).
+ * ─ Mantiene listeners para visibilidad de cambios.
+ */
 import { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';
-import { collection, onSnapshot, doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
+import { actualizarEstadoDocumentos } from '../../api/creditApi';
 
-export const useDocumentTracking = (currentUser = null) => {
+export const useDocumentTracking = (currentUser = null, selectedGroup = null) => {
   const [creditosDocs, setCreditosDocs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -10,45 +19,53 @@ export const useDocumentTracking = (currentUser = null) => {
   const userGroup = currentUser?.grupo;
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "creditos"), (snapshot) => {
-      const docs = snapshot.docs.map(d => ({ 
+    if (!currentUser) return;
+    if (!isHRH && !userGroup) {
+      setCreditosDocs([]);
+      setLoading(false);
+      return;
+    }
+
+    let q = isHRH
+      ? collection(db, "creditos")
+      : query(collection(db, "creditos"), where("usuario_grupo", "==", userGroup));
+
+    const unsub = onSnapshot(q, (snapshot) => {
+      let docs = snapshot.docs.map(d => ({ 
         id: d.id, 
         ...d.data(),
         expediente: d.data().expediente || [] 
       }));
 
-      const filtered = !isHRH && userGroup 
-        ? docs.filter(d => d.grupo === userGroup || d.usuario_grupo === userGroup)
-        : docs;
+      if (isHRH && selectedGroup) {
+        docs = docs.filter(d => {
+            const cGroup = (d.usuario_grupo || d.grupo || '').toLowerCase().trim().replace(/\s+/g, '_');
+            return cGroup === selectedGroup.toLowerCase();
+        });
+      }
 
-      setCreditosDocs(filtered);
+      setCreditosDocs(docs);
+      setLoading(false);
+    }, (err) => {
+      console.error("Error en useDocumentTracking snapshot:", err);
       setLoading(false);
     });
+
     return () => unsub();
-  }, [isHRH, userGroup]);
+  }, [currentUser, isHRH, userGroup, selectedGroup]);
+
+  // ─── Funciones de mutación delegadas al backend ─────────────────
 
   const updateMultipleDocs = async (creditoId, updates, observaciones) => {
     if (!creditoId) return { success: false };
     try {
-      const docRef = doc(db, "creditos", creditoId);
-      const docSnap = await getDoc(docRef);
-      if (!docSnap.exists()) return { success: false };
+      const formattedUpdates = updates.map(u => ({
+          nombreDoc: u.tipo, // El componente usa 'tipo' para identificar
+          status: u.status,
+          observaciones
+      }));
 
-      const data = docSnap.data();
-      const nuevoExpediente = data.expediente.map(docItem => {
-        const update = updates.find(u => u.tipo === docItem.tipo_documento);
-        if (update) {
-          return { 
-            ...docItem, 
-            estatus: update.status, 
-            observaciones: update.status === 'rechazado' ? observaciones : "",
-            url: update.status === 'rechazado' ? null : docItem.url 
-          };
-        }
-        return docItem;
-      });
-
-      await updateDoc(docRef, { expediente: nuevoExpediente });
+      await actualizarEstadoDocumentos(creditoId, formattedUpdates);
       return { success: true };
     } catch (e) {
       console.error(e);
@@ -59,24 +76,11 @@ export const useDocumentTracking = (currentUser = null) => {
   const updateSingleDocStatus = async (creditoId, docNombre, newStatus, observaciones = "") => {
     if (!creditoId || !docNombre) return { success: false };
     try {
-      const docRef = doc(db, "creditos", creditoId);
-      const docSnap = await getDoc(docRef);
-      if (!docSnap.exists()) return { success: false };
-
-      const data = docSnap.data();
-      const nuevoExpediente = data.expediente.map(docItem => {
-        if (docItem.nombre === docNombre) {
-          return { 
-            ...docItem, 
-            estatus: newStatus, 
-            observaciones: newStatus === 'rechazado' ? observaciones : (docItem.observaciones || ""),
-            url: newStatus === 'rechazado' ? null : docItem.url 
-          };
-        }
-        return docItem;
-      });
-
-      await updateDoc(docRef, { expediente: nuevoExpediente, lastUpdate: serverTimestamp() });
+      await actualizarEstadoDocumentos(creditoId, [{
+          nombreDoc: docNombre,
+          status: newStatus,
+          observaciones
+      }]);
       return { success: true };
     } catch (e) {
       console.error("Error updating single doc:", e);
@@ -84,33 +88,58 @@ export const useDocumentTracking = (currentUser = null) => {
     }
   };
 
-  const addAdminDocument = async (creditoId, docNombre, docUrl) => {
-    if (!creditoId || !docNombre || !docUrl) return { success: false };
+  // NOTA: addAdminDocument y removeAdminDocument todavía escriben directo al expediente.
+  // Como el expediente no está bloqueado para staff en las reglas, funcionan,
+  // pero para perfecta separación se deberían mover a Cloud Functions en el futuro.
+  const addMultipleFolderDocuments = async (creditoId, carpetaId, uploadedDocs) => {
+    if (!creditoId || uploadedDocs.length === 0) return { success: false };
     try {
-      const docRef = doc(db, "creditos", creditoId);
-      const docSnap = await getDoc(docRef);
-      if (!docSnap.exists()) return { success: false };
+      const docRef = doc(db, 'creditos', creditoId);
+      
+      const newExpedienteItems = uploadedDocs.map(docData => ({
+        nombre: docData.nombre,
+        url: docData.url,
+        carpeta: carpetaId,
+        estatus: 'aprobado', // Archivos administrativos se aprueban por defecto
+        timestamp: new Date()
+      }));
 
-      const data = docSnap.data();
-      const nuevoExpediente = [
-        ...(data.expediente || []),
-        {
-          nombre: docNombre,
-          url: docUrl,
-          estatus: 'aprobado',
-          tipo_documento: 'ADMIN',
-          isAdmin: true,
-          fecha_subida: new Date().toISOString()
-        }
-      ];
-
-      await updateDoc(docRef, { expediente: nuevoExpediente, lastUpdate: serverTimestamp() });
+      await updateDoc(docRef, {
+        expediente: arrayUnion(...newExpedienteItems)
+      });
       return { success: true };
     } catch (e) {
-      console.error("Error adding admin doc:", e);
+      console.error("Error adding multiple folder docs:", e);
       return { success: false };
     }
   };
 
-  return { creditosDocs, loading, updateMultipleDocs, updateSingleDocStatus, addAdminDocument };
+  const removeAdminDocument = async (creditoId, docNombre) => {
+    if (!creditoId || !docNombre) return { success: false };
+    try {
+      const docRef = doc(db, 'creditos', creditoId);
+      const snap = await getDoc(docRef);
+      if (!snap.exists()) return { success: false };
+      
+      const currentExpediente = snap.data().expediente || [];
+      const updatedExpediente = currentExpediente.filter(d => d.nombre !== docNombre);
+      
+      await updateDoc(docRef, {
+        expediente: updatedExpediente
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("Error removing admin doc:", e);
+      return { success: false };
+    }
+  };
+
+  return { 
+    creditosDocs, 
+    loading, 
+    updateMultipleDocs, 
+    updateSingleDocStatus,
+    addMultipleFolderDocuments,
+    removeAdminDocument
+  };
 };

@@ -10,6 +10,7 @@ import { db } from '../../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import { formatMoney } from '../../utils/creditCalculations';
 import { useAuth } from '../../context/AuthContext';
+import { EstadoCuentaEditorModal } from '../../components/Admin/EstadoCuentaEditorModal';
 
 export const CreditPaymentPage = () => {
     const { id } = useParams();
@@ -25,6 +26,7 @@ export const CreditPaymentPage = () => {
     const [montoAbono, setMontoAbono] = useState('');
     const [isEditingFull, setIsEditingFull] = useState(false);
     const [corregirTotal, setCorregirTotal] = useState('');
+    const [showEstadoCuentaModal, setShowEstadoCuentaModal] = useState(false);
 
     const fetchCredit = async () => {
         try {
@@ -56,7 +58,8 @@ export const CreditPaymentPage = () => {
         const success = await registerPayment(id, montoAbono, user?.id);
         if (success) {
             setMontoAbono('');
-            fetchCredit(); // Recargar datos
+            await fetchCredit(); // Recargar datos
+            setShowEstadoCuentaModal(true); // Abrir modal del estado de cuenta
         }
     };
 
@@ -199,6 +202,22 @@ export const CreditPaymentPage = () => {
                         </form>
                     </section>
 
+                    <section style={{ backgroundColor: 'var(--card-bg)', borderRadius: 'var(--border-radius)', padding: '2rem', boxShadow: 'var(--shadow-md)' }}>
+                        <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--dark-bg)' }}>
+                            <FiCheckCircle color="var(--primary-color)" /> Emisión de Documentos
+                        </h2>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+                            Genera o actualiza el Estado de Cuenta oficial para este crédito. Puedes revisarlo antes de enviarlo al cliente.
+                        </p>
+                        <button 
+                            type="button" 
+                            onClick={() => setShowEstadoCuentaModal(true)}
+                            style={{ width: '100%', padding: '1rem', backgroundColor: 'var(--app-bg)', color: 'var(--dark-bg)', border: '2px dashed var(--secondary-color)', borderRadius: '8px', fontWeight: 600, fontSize: '0.95rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}
+                        >
+                            <FiEdit /> Revisar / Generar Estado de Cuenta
+                        </button>
+                    </section>
+
                     <section style={{ backgroundColor: 'var(--card-bg)', borderRadius: 'var(--border-radius)', padding: '2.5rem 2rem', border: '1px solid var(--highlight)' }}>
                         {!isEditingFull ? (
                             <div style={{ textAlign: 'center' }}>
@@ -256,6 +275,15 @@ export const CreditPaymentPage = () => {
                 message={status.message}
                 onClose={closeStatus}
             />
+
+            {credit && (
+                <EstadoCuentaEditorModal 
+                    isOpen={showEstadoCuentaModal}
+                    onClose={() => setShowEstadoCuentaModal(false)}
+                    credito={credit}
+                    user={user}
+                />
+            )}
 
             <style>{`
                 @keyframes spin { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }

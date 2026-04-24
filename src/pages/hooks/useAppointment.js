@@ -39,7 +39,9 @@ export const useAppointment = (onClose) => {
             const appointmentData = {
                 ...formData,
                 user_id: user?.uid, // Se mapeará a usuario_id en el servicio
-                user_email: user?.email
+                user_email: user?.email,
+                grupo: user?.grupo || '', // Para filtrado de citas
+                usuario_grupo: user?.grupo || '' // Redundancia para filtros de créditos/usuarios
             };
 
             await appointmentService.crearCita(appointmentData);

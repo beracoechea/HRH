@@ -6,28 +6,40 @@ import {
 } from 'react-icons/fi';
 import { formatMoney } from '../../utils/creditCalculations';
 import { StatusPill } from '../Common/StatusPill';
+import { normalizeCreditData, getExpectedMonthlyPayment } from '../../utils/creditNormalization';
 
 export const CreditRow = ({ cre, onAction }) => {
     const navigate = useNavigate();
     
-    // --- LÓGICA DE CÁLCULO INTEGRADA ---
+    // --- LÓGICA DE CÁLCULO INTEGRADA CON AMORTIZACIÓN DINÁMICA ---
+    const { total, monto, plazo } = normalizeCreditData(cre);
+    const expectedPayments = getExpectedMonthlyPayment(cre);
+
     const calculos = useMemo(() => {
         const pagado = cre.pagado || 0;
-        const total = cre.total_estimado || 0;
-        const cuota = cre.montoAbono || 1; 
+        const cuota = cre.montoAbono || expectedPayments.q1 || 1; 
 
         const porcentaje = total > 0 ? Math.round((pagado / total) * 100) : 0;
         const qLiquidadas = Math.floor(pagado / cuota);
-        const qTotales = cre.plazo_meses ? cre.plazo_meses * 2 : 0;
+        const qTotales = plazo ? plazo * 2 : 0;
 
         return {
             porcentajeProgreso: Math.min(porcentaje, 100),
             quincenasLiquidadas: qLiquidadas,
-            quincenasTotales: qTotales
+            quincenasTotales: qTotales,
+            q1Expected: expectedPayments.q1,
+            q2Expected: expectedPayments.q2,
+            faseA: expectedPayments.faseA,
+            faseB: expectedPayments.faseB,
+            totalNormalized: total,
+            montoNormalized: monto
         };
-    }, [cre.pagado, cre.total_estimado, cre.montoAbono, cre.plazo_meses]);
+    }, [cre.pagado, cre.montoAbono, expectedPayments, total, monto, plazo]);
 
-    const { porcentajeProgreso, quincenasLiquidadas, quincenasTotales } = calculos;
+    const { 
+        porcentajeProgreso, quincenasLiquidadas, quincenasTotales,
+        q1Expected, q2Expected, totalNormalized, montoNormalized
+    } = calculos;
 
     // Validación de documentos
     const docsListos = useMemo(() => {
@@ -60,26 +72,26 @@ export const CreditRow = ({ cre, onAction }) => {
             </td>
             
             {/* COLUMNA 2: MONTO SOLICITADO */}
-            <td>{formatMoney(cre.monto_solicitado)}</td>
+            <td>{formatMoney(montoNormalized)}</td>
             
             {/* COLUMNA 3: TOTAL ESTIMADO */}
             <td>
                 <strong className="text-total-interes">
-                    {formatMoney(cre.total_estimado || 0)}
+                    {formatMoney(totalNormalized)}
                 </strong>
             </td>
             
-            {/* COLUMNA 4: ABONOS */}
+            {/* COLUMNA 4: ESQUEMA DE PAGOS (FASE A Y B) */}
             <td>
                 <div className="admin-payment-info">
-                    <span className="payment-tag">
-                        Q1: {formatMoney(cre.pago_quincenal_ano1)}
-                    </span>
-                    {Number(cre.plazo_meses) > 12 && (
-                        <span className="payment-tag second">
-                            Q2: {formatMoney(cre.pago_quincenal_ano2)}
-                        </span>
-                    )}
+                    <div className="payment-phase-group">
+                        <span className="phase-label">Fase A (Int):</span>
+                        <strong className="phase-value">{formatMoney(calculos.faseA)}</strong>
+                    </div>
+                    <div className="payment-phase-group">
+                        <span className="phase-label">Fase B (Amort):</span>
+                        <strong className="phase-value">{formatMoney(calculos.faseB)}</strong>
+                    </div>
                 </div>
             </td>
             

@@ -21,24 +21,33 @@ export const FooterSection = () => {
         </div>
 
         <div className="footer-legal-grid">
-          <div className="legal-box">
-            <h4>Unidad Especializada (UNE)</h4>
-            <p><b>{ENTIDAD_CONFIG.NOMBRE_RAZON_SOCIAL}</b></p>
-            <p>Titular: {ENTIDAD_CONFIG.UNE_TITULAR}</p>
-            <p>Domicilio: {ENTIDAD_CONFIG.DOMICILIO_FISCAL}</p>
-            <p>Tel: {ENTIDAD_CONFIG.UNE_TELEFONO} | <a href={`mailto:${ENTIDAD_CONFIG.UNE_CORREO}`}>{ENTIDAD_CONFIG.UNE_CORREO}</a></p>
+          <div className="legal-box full-width">
+            <h4>Atencion al Usuario (UNE)</h4>
+            <p className="legal-text-small">
+              {ENTIDAD_CONFIG.LEYENDAS.UNE_5_9(
+                ENTIDAD_CONFIG.DOMICILIO_FISCAL,
+                ENTIDAD_CONFIG.UNE_CORREO,
+                ENTIDAD_CONFIG.UNE_TELEFONO
+              )}
+            </p>
           </div>
 
           <div className="legal-box">
              <h4>CONDUSEF</h4>
-             <div className="buro-link-footer">
+             <p className="legal-text-small"><b>{ENTIDAD_CONFIG.LEYENDAS.CONDUSEF_TITLE}</b></p>
+             <p className="legal-text-small">{ENTIDAD_CONFIG.LEYENDAS.CONDUSEF_CONTACT}</p>
+             <div className="buro-link-footer" style={{marginTop: '10px'}}>
                <img src={ENTIDAD_CONFIG.LOGOS.CONDUSEF} alt="CONDUSEF" className="buro-logo-small" />
-               <p>Atención: 55 5340 0999 y 800 999 8080</p>
+               <a href={ENTIDAD_CONFIG.LINK_CONDUSEF} target="_blank" rel="noreferrer">www.condusef.gob.mx</a>
              </div>
-            <p><a href={ENTIDAD_CONFIG.LINK_CONDUSEF} target="_blank" rel="noreferrer">www.condusef.gob.mx</a></p>
-            <div className="buro-link-footer">
+          </div>
+
+          <div className="legal-box">
+            <h4>Buro de Entidades Financieras</h4>
+            <p className="legal-text-small">{ENTIDAD_CONFIG.LEYENDAS.BURO_5_4}</p>
+            <div className="buro-link-footer" style={{marginTop: '10px'}}>
               <img src={ENTIDAD_CONFIG.LOGOS.BURO} alt="Buró" className="buro-logo-small" />
-              <Link to="/transparencia">Buró de Entidades Financieras <FiExternalLink /></Link>
+              <Link to="/transparencia">Consultar Desempeño <FiExternalLink /></Link>
             </div>
           </div>
         </div>
@@ -46,9 +55,10 @@ export const FooterSection = () => {
         <hr className="footer-divider" />
 
         <div className="footer-articles">
-          <p>Para su constitución y operación... (texto legal) </p>
+          <p className="legal-article-item"><b>LEYENDA SHCP:</b> {ENTIDAD_CONFIG.LEYENDAS.SHCP_5_1}</p>
+          <p className="legal-article-item"><b>LEYENDA CNBV (Supervisión):</b> {ENTIDAD_CONFIG.LEYENDAS.CNBV_5_2}</p>
+          <p className="legal-article-item"><b>LEYENDA CNBV (Vigilancia):</b> {ENTIDAD_CONFIG.LEYENDAS.CNBV_5_3}</p>
           <p className="article-warning">Incumplir tus obligaciones te puede generar comisiones e intereses moratorios.</p>
-          <p className="article-disclaimer">De acuerdo con el Art. 87-J de la LGOAAC...</p>
         </div>
 
         <div className="footer-bottom">

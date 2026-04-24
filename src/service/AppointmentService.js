@@ -65,4 +65,18 @@ export class AppointmentService {
             throw error;
         }
     }
+
+    async actualizarEstadoCita(citaId, nuevoEstado) {
+        try {
+            const docRef = doc(db, this.collectionName, citaId);
+            await updateDoc(docRef, {
+                estatus: nuevoEstado,
+                ultimaActualizacion: serverTimestamp(),
+            });
+            return true;
+        } catch (error) {
+            console.error("Error al actualizar estado de cita:", error);
+            throw error;
+        }
+    }
 }

@@ -2,87 +2,206 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- FUNCIONES HELPER ---
-    function isSignedIn() { return request.auth != null; }
-    
-    // Función segura para obtener datos del usuario actual (Admin-only)
-    function getUserData() {
-      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+    // ─────────────────────────────────────────────────────────────────────────
+    // FUNCIONES HELPER — Todas basadas en Custom Claims del JWT
+    // Los roles ya NO se leen de Firestore (lento y manipulable).
+    // Fuente de verdad: request.auth.token.{rol, grupo}
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
     }
 
-    // Funciones de conveniencia basadas en el documento del usuario
+    // Super Admin: grupo 'hrh' en el token JWT (normalizado a minúsculas)
     function isSuperAdmin() {
-      return isSignedIn() && getUserData().grupo == 'HRH';
+      return isSignedIn() && (request.auth.token.grupo == 'hrh' || request.auth.token.grupo == 'HRH');
     }
 
+    // Staff: rol reconocido en su Custom Claim
     function isStaff() {
-      let rol = getUserData().rol;
-      return isSignedIn() && (rol == 'admin' || rol == 'analista' || rol == 'rh' || rol == 'aprobador' || rol == 'tesorero' || rol == 'marketing');
+      return isSignedIn() &&
+             request.auth.token.rol in ['admin', 'analista', 'rh', 'aprobador', 'tesoreria', 'marketing', 'operaciones', 'ventas'];
     }
 
-    // --- REGLAS PARA GRUPOS ---
+    // Grupo del staff extraído del token (no requiere lectura de Firestore)
+    function staffGroup() {
+      return request.auth.token.grupo;
+    }
+
+    // Verifica que el staff tiene grupo asignado
+    function staffHasGroup() {
+      return staffGroup() != null && staffGroup() != '';
+    }
+
+    // El usuario autenticado es el dueño del recurso
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Staff del mismo grupo que el recurso
+    function isStaffOfGroup(resourceGroup) {
+      return isStaff() && staffHasGroup() && staffGroup() == resourceGroup;
+    }
+
+    // ─── Protección de campos de crédito ──────────────────────────────────────
+    // Campos que los clientes NO pueden modificar directamente
+    function creditCamposProtegidosSinCambio() {
+      return !request.resource.data.diff(resource.data).affectedKeys()
+        .hasAny(['estado', 'fase', 'pagado', 'historialPagos', 'usuario_grupo',
+                 'usuario_id', 'kycMaster', 'semaforoConfiabilidad', 'kycStatus',
+                 'metricasTiempos', 'mifielId', 'statusRevision']);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // GRUPOS
+    // ─────────────────────────────────────────────────────────────────────────
     match /grupos/{groupId} {
       allow read: if isSignedIn();
-      allow write: if isSignedIn() && (getUserData().rol == 'admin' || getUserData().rol == 'rh');
+      allow write: if isSuperAdmin();
     }
 
-    // --- REGLAS PARA USUARIOS ---
+    // ─────────────────────────────────────────────────────────────────────────
+    // USUARIOS
+    // ─────────────────────────────────────────────────────────────────────────
     match /usuarios/{userId} {
-      // PRIORIDAD 1: El usuario siempre puede leer su propio perfil.
-      // Esto evita que AuthContext falle si no puede cargar otros datos.
-      allow read: if isSignedIn() && (request.auth.uid == userId);
-      
-      // PRIORIDAD 2: El staff administrativo puede leer si es del mismo grupo (o HRH)
-      // Usamos .get() de forma defensiva
+
+      // Lectura: propio usuario, super admin, o staff del mismo grupo
       allow read: if isSignedIn() && (
-        isSuperAdmin() || 
-        (isStaff() && getUserData().grupo == resource.data.grupo)
+        isOwner(userId) ||
+        isSuperAdmin() ||
+        isStaffOfGroup(resource.data.grupo)
       );
 
-      // Escritura: Misma lógica
-      allow write: if isSignedIn() && (
-        request.auth.uid == userId || 
-        isSuperAdmin() || 
-        (isStaff() && getUserData().grupo == resource.data.grupo)
+      // Creación: SOLO la Cloud Function puede crear usuarios nuevos.
+      // Los clientes NO pueden crear documentos directamente (seguridad máxima).
+      // Excepción: permitimos auto-creación SOLO si no toca campos privilegiados.
+      allow create: if isSignedIn() && (
+        isSuperAdmin() ||
+        (
+          isOwner(userId) &&
+          request.resource.data.rol == 'cliente' &&
+          request.resource.data.grupo == null
+        )
       );
-      
+
+      // Actualización: un usuario puede actualizar SUS datos pero NO campos privilegiados
+      allow update: if isSignedIn() && (
+        isSuperAdmin() ||
+        isStaffOfGroup(resource.data.grupo) ||
+        (
+          isOwner(userId) &&
+          !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['rol', 'grupo', 'idGrupo', 'status', 'disabledAt', 'disabledBy', 'deletedAt'])
+        )
+      );
+
+      // Sub-colección: perfil KYC (Protegida por grupo)
       match /perfil/kyc {
-        allow read, write: if isSignedIn() && (
-          request.auth.uid == userId || 
-          isSuperAdmin() || 
-          (isStaff() && getUserData().grupo == get(/databases/$(database)/documents/usuarios/$(userId)).data.grupo)
+        allow read: if isSignedIn() && (
+          isOwner(userId) ||
+          isSuperAdmin() ||
+          (isStaff() && staffHasGroup() && get(/databases/$(database)/documents/usuarios/$(userId)).data.grupo == staffGroup())
+        );
+        allow write: if isSignedIn() && (
+          isOwner(userId) ||
+          isSuperAdmin() ||
+          (isStaff() && staffHasGroup() && get(/databases/$(database)/documents/usuarios/$(userId)).data.grupo == staffGroup())
+        );
+      }
+
+      // Sub-colección: datos KYC procesados por IA (solo lectura para el cliente)
+      match /kyc_ai/data {
+        allow read: if isSignedIn() && (
+          isOwner(userId) || isSuperAdmin() || isStaff()
+        );
+        allow write: if false; // Solo la Cloud Function puede escribir aquí
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // CRÉDITOS
+    // ─────────────────────────────────────────────────────────────────────────
+    match /creditos/{creditoId} {
+
+      allow read: if isSignedIn() && (
+        resource.data.usuario_id == request.auth.uid ||
+        isSuperAdmin() ||
+        isStaffOfGroup(resource.data.usuario_grupo)
+      );
+
+      // Creación: el cliente puede crear su propia solicitud con campos controlados
+      allow create: if isSignedIn() && (
+        isSuperAdmin() ||
+        isStaff() ||
+        (
+          request.resource.data.usuario_id == request.auth.uid &&
+          request.resource.data.estado == 'pendiente' &&
+          request.resource.data.fase == 1 &&
+          request.resource.data.pagado == 0 &&
+          request.resource.data.monto_solicitado is number &&
+          request.resource.data.monto_solicitado > 0 &&
+          request.resource.data.monto_solicitado <= 5000000
+        )
+      );
+
+      // Actualización: clientes solo pueden tocar campos no críticos
+      allow update: if isSignedIn() && (
+        isSuperAdmin() ||
+        isStaffOfGroup(resource.data.usuario_grupo) ||
+        (resource.data.usuario_id == request.auth.uid && creditCamposProtegidosSinCambio())
+      );
+
+      // Sub-colección: estados de cuenta
+      match /estados_cuenta/{docId} {
+        allow read: if isSignedIn() && (
+          get(/databases/$(database)/documents/creditos/$(creditoId)).data.usuario_id == request.auth.uid ||
+          isSuperAdmin() ||
+          isStaff()
+        );
+        allow write: if isSignedIn() && (
+          isSuperAdmin() ||
+          (
+            isStaff() &&
+            request.auth.token.rol in ['admin', 'tesorero'] &&
+            staffHasGroup()
+          )
         );
       }
     }
 
-    // --- REGLAS PARA CRÉDITOS ---
-    match /creditos/{creditoId} {
-      // Regla de lectura multi-tenant: 
-      // El usuario puede ver su propio crédito.
-      // El staff puede ver si el crédito tiene el MISMO grupo que el staff.
+    // ─────────────────────────────────────────────────────────────────────────
+    // CITAS
+    // ─────────────────────────────────────────────────────────────────────────
+    match /citas/{citaId} {
+
       allow read: if isSignedIn() && (
-        resource.data.usuario_id == request.auth.uid || 
-        isSuperAdmin() || 
-        (isStaff() && (resource.data.grupo == getUserData().grupo || resource.data.usuario_grupo == getUserData().grupo))
+        resource.data.usuario_id == request.auth.uid ||
+        isSuperAdmin() ||
+        isStaffOfGroup(resource.data.grupo)
       );
-      
-      allow create: if isSignedIn();
-      
-      allow update: if isSignedIn() && (
-        resource.data.usuario_id == request.auth.uid || 
-        isSuperAdmin() || 
-        (isStaff() && resource.data.grupo == getUserData().grupo)
+
+      allow create: if isSignedIn() && (
+        isSuperAdmin() ||
+        isStaff() ||
+        request.resource.data.usuario_id == request.auth.uid
+      );
+
+      allow update, delete: if isSignedIn() && (
+        isSuperAdmin() ||
+        (isStaff() && staffHasGroup() && resource.data.grupo == staffGroup())
       );
     }
 
-    // --- REGLAS PARA CITAS ---
-    match /citas/{citaId} {
-      allow read: if isSignedIn() && (
-        resource.data.usuario_id == request.auth.uid || 
-        isSuperAdmin() || 
-        (isStaff() && resource.data.grupo == getUserData().grupo)
+    // ─────────────────────────────────────────────────────────────────────────
+    // BLOG / NOTICIAS (solo lectura pública, escritura solo para marketing/admin)
+    // ─────────────────────────────────────────────────────────────────────────
+    match /blog/{postId} {
+      allow read: if true;
+      allow write: if isSignedIn() && (
+        isSuperAdmin() ||
+        (isStaff() && request.auth.token.rol in ['admin', 'marketing'])
       );
-      allow write: if isSignedIn();
     }
+
   }
 }

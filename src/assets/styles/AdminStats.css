@@ -104,6 +104,22 @@
 
 .stat-card.gold .stat-value { color: white; }
 
+.stat-sub-grid {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.stat-sub-grid small {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #10b981;
+  background: #ecfdf5;
+  padding: 2px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
 /* Gráficas */
 .charts-main-grid {
   display: grid;
@@ -143,14 +159,105 @@
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
-  /* IMPORTANTE: El padre directo debe tener altura */
   min-height: 400px; 
   display: flex;
   flex-direction: column;
+  min-width: 0; /* Fix para Recharts width -1 en grids */
+  position: relative;
 }
 
 .chart-render {
-  flex-grow: 1; /* Esto hace que ocupe todo el espacio disponible */
+  flex-grow: 1;
   width: 100%;
-  min-height: 300px; /* Asegura que no colapse a 0 */
+  min-height: 300px;
+  position: relative;
+}
+
+/* --- FOOTER DE RESUMEN BAJO GRÁFICA --- */
+.chart-header-group {
+    margin-bottom: 25px;
+}
+
+.chart-subtitle {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.chart-summary-footer {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.summary-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94a3b8;
+}
+
+.summary-monto {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.summary-monto.highlight {
+    color: #159082;
+}
+
+.summary-item small {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.summary-divider {
+    width: 1px;
+    height: 40px;
+    background: #e2e8f0;
+}
+
+.no-data-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: #94a3b8;
+    background: #fbfcfd;
+    border-radius: 12px;
+    border: 2px dashed #e2e8f0;
+}
+
+.placeholder-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    opacity: 0.3;
+}
+
+@media (max-width: 768px) {
+    .chart-summary-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    .summary-divider {
+        display: none;
+    }
 }

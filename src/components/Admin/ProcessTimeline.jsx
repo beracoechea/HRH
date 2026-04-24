@@ -24,7 +24,15 @@ export const ProcessTimeline = ({ creditos = [], isOpen, onClose }) => {
     const intervals = {}; // { '1-2': [durations], '2-3': [durations], ... }
     
     creditos.forEach(c => {
-      const history = c.historialPasos || [];
+      let history = c.historialPasos || [];
+      
+      // Si no hay historial de pasos pero hay fecha de creación, la tomamos como fase 1
+      if (history.length === 0 && c.createdAt) {
+        history = [{ fase: 1, timestamp: c.createdAt }];
+      } else if (history.length > 0 && !history.find(h => h.fase === 1) && c.createdAt) {
+        history = [{ fase: 1, timestamp: c.createdAt }, ...history];
+      }
+
       if (history.length < 2) return;
 
       // Ordenamos por fase para asegurar secuencia
@@ -36,11 +44,16 @@ export const ProcessTimeline = ({ creditos = [], isOpen, onClose }) => {
         
         if (next.fase === current.fase + 1) {
           const key = `${current.fase}-${next.fase}`;
-          const diff = (next.timestamp.toDate ? next.timestamp.toDate() : new Date(next.timestamp)) - 
-                       (current.timestamp.toDate ? current.timestamp.toDate() : new Date(current.timestamp));
           
-          if (!intervals[key]) intervals[key] = [];
-          intervals[key].push(diff);
+          const timeA = current.timestamp?.toDate ? current.timestamp.toDate() : new Date(current.timestamp);
+          const timeB = next.timestamp?.toDate ? next.timestamp.toDate() : new Date(next.timestamp);
+          
+          const diff = timeB - timeA;
+          
+          if (diff > 0) { // Ignorar tiempos negativos por inconsistencias
+            if (!intervals[key]) intervals[key] = [];
+            intervals[key].push(diff);
+          }
         }
       }
     });

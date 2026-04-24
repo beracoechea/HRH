@@ -130,10 +130,17 @@ const { isAuthModalOpen, closeLogin } = useAuth();
             } 
           />
 
-          <Route 
-            path="/admin/dev" 
-            element={<DevTools />} 
-          />
+          {/* SECURITY: DevTools solo disponible en desarrollo y solo para admins */}
+          {import.meta.env.DEV && (
+            <Route 
+              path="/admin/dev" 
+              element={
+                <AdminRoute>
+                  <DevTools />
+                </AdminRoute>
+              } 
+            />
+          )}
 
           <Route path="*" element={<NotFound />} />
         </Routes>

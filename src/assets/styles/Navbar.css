@@ -14,6 +14,38 @@
   z-index: 9999;
   width: 100%;
   box-shadow: var(--shadow-md);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar.hidden {
+  transform: translateY(-100%);
+}
+
+.nav-toggle-visibility {
+  position: fixed;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--dark-bg);
+  color: white;
+  padding: 5px 25px;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  cursor: pointer;
+  z-index: 10000;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+.nav-toggle-visibility.visible {
+  top: 0;
+}
+.nav-toggle-visibility:hover {
+  background: var(--primary-color);
+  padding-top: 8px; /* Slight pull effect on hover */
 }
 
 .navbar-container {
@@ -189,6 +221,26 @@
 .nav-auth-btn.logout:hover {
   background: var(--danger);
   color: white;
+}
+
+.hide-nav-trigger {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-light);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 10px;
+}
+.hide-nav-trigger:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
 }
 
 /* =========================================

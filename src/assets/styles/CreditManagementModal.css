@@ -737,6 +737,22 @@
     vertical-align: middle;
 }
 
+/* Semaforo Pill (IA Analysis) */
+.semaforo-pill {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+.semaforo-pill.VERDE { background: #10b981; }
+.semaforo-pill.AMARILLO { background: #f59e0b; }
+.semaforo-pill.ROJO { background: #ef4444; }
+.semaforo-pill.GRIS { background: #94a3b8; }
+
 /* Lock Badge Styles */
 .lock-badge {
     font-size: 0.65rem;
@@ -758,4 +774,542 @@
 
 .doc-card-premium.locked .btn-view-doc {
     color: #94a3b8;
+}
+
+/* =============================================
+   VISTA DE CARPETAS — EXPEDIENTE ADMIN
+   ============================================= */
+
+.folder-obs-row {
+    margin-bottom: 1rem;
+}
+
+.expediente-folders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.folder-accordion {
+    background: white;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+
+.folder-accordion.has-files {
+    border-color: var(--primary-color);
+}
+
+.folder-accordion.open {
+    box-shadow: 0 4px 12px rgba(21, 144, 130, 0.08);
+}
+
+.folder-accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: background 0.15s;
+    user-select: none;
+}
+
+.folder-accordion-header:hover {
+    background: #f8fafc;
+}
+
+.folder-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.folder-chevron {
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.folder-accordion.open .folder-chevron {
+    color: var(--primary-color);
+}
+
+.folder-icon-emoji {
+    font-size: 1.3rem;
+    line-height: 1;
+}
+
+.folder-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.folder-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+
+.folder-desc {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.folder-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.folder-count-badge {
+    background: #f0fdfa;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.btn-folder-upload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+}
+
+.btn-folder-upload:hover {
+    background: var(--dark-bg);
+    transform: scale(1.05);
+}
+
+.btn-folder-upload.loading {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.folder-accordion-body {
+    border-top: 1px solid #f1f5f9;
+    padding: 12px 18px;
+    background: #fafcff;
+}
+
+.folder-empty-state {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    padding: 12px 0;
+}
+
+.folder-files-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.folder-file-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.15s;
+}
+
+.folder-file-row:hover {
+    border-color: var(--primary-color);
+    background: #f0fdfa;
+}
+
+.folder-file-row.aprobado { border-left: 3px solid #10b981; }
+.folder-file-row.rechazado { border-left: 3px solid #ef4444; }
+.folder-file-row.revision  { border-left: 3px solid #f59e0b; }
+
+.file-icon-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.file-icon {
+    color: #64748b;
+    flex-shrink: 0;
+}
+
+.file-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.file-status-pill {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.file-status-pill.aprobado  { background: #d1fae5; color: #059669; }
+.file-status-pill.rechazado { background: #fee2e2; color: #dc2626; }
+.file-status-pill.revision  { background: #fef3c7; color: #d97706; }
+
+.btn-indiv.view-link {
+    background: #f1f5f9;
+    color: var(--dark-bg);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.btn-indiv.view-link:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Acciones agrupadas en cabecera de carpeta */
+.folder-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-ai-folder {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.btn-ai-folder:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+    filter: brightness(1.1);
+}
+
+.btn-ai-folder:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-ai-folder.loading .spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.btn-ai-folder span {
+    font-size: 0.7rem;
+    opacity: 0.9;
+}
+
+/* =============================================
+   ESTADOS DE CUENTA (TESORERÍA)
+   ============================================= */
+.account-statements-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed #e2e8f0;
+}
+
+.statement-upload-box {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.2s;
+}
+
+.upload-drop-area {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+}
+
+.no-file-msg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #64748b;
+}
+
+.file-selected-info {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #2b6cb0;
+}
+
+.input-with-suggestion {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-with-suggestion input {
+    padding: 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+.input-with-suggestion small {
+    font-size: 0.7rem;
+    color: #718096;
+    margin-top: 0.2rem;
+}
+
+.upload-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    justify-content: center;
+}
+
+.btn-upload-confirm {
+    background: #3182ce;
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.btn-upload-cancel {
+    background: #edf2f7;
+    color: #4a5568;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.statements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.statement-item-row {
+    background: white;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #edf2f7;
+}
+
+.st-info {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.st-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.st-text strong {
+    font-size: 0.9rem;
+    color: #2d3748;
+}
+
+.st-text span {
+    font-size: 0.75rem;
+    color: #a0aec0;
+}
+
+.btn-st-view {
+    color: #3182ce;
+    padding: 0.4rem;
+    background: #ebf8ff;
+    border-radius: 6px;
+}
+
+.btn-st-delete {
+    color: #e53e3e;
+    padding: 0.4rem;
+    background: #fff5f5;
+    border-radius: 6px;
+    margin-left: 0.5rem;
+}
+
+.empty-statements {
+    text-align: center;
+    padding: 2rem;
+    color: #a0aec0;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.column-left, .column-right {
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- TABLA DE AMORTIZACIÓN MODAL OVERLAY --- */
+.amortization-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.amortization-modal {
+    background: white;
+    width: 100%;
+    max-width: 900px;
+    height: 90%;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e2e8f0;
+}
+
+.amortization-modal header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.amortization-modal header h3 {
+    margin: 0;
+    color: #1a365d;
+}
+
+.amortization-modal header button {
+    background: #f1f5f9;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+}
+
+.table-scroll {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem 2rem;
+}
+
+.admin-table.mini {
+    font-size: 0.85rem;
+}
+
+.admin-table.mini th {
+    padding: 12px;
+    background: #f8fafc;
+    position: sticky;
+    top: 0;
+}
+
+.admin-table.mini td {
+    padding: 10px 12px;
+}
+
+.bold {
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.notice-small {
+    font-size: 0.75rem;
+    color: #718096;
+    margin-top: 1rem;
+    font-style: italic;
+}
+
+.action-buttons-row {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn-view-amortization {
+    flex: 1;
+    background: white;
+    color: #3182ce;
+    border: 1px solid #3182ce;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-view-amortization:hover {
+    background: #ebf8ff;
 }

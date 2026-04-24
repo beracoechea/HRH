@@ -1,59 +1,78 @@
 import React from 'react';
-import { FiFileText, FiDownload, FiClock } from 'react-icons/fi';
+import { FiFileText, FiDownload, FiClock, FiCheckCircle } from 'react-icons/fi';
+import { useAccountStatements } from '../../../pages/hooks/useAccountStatements';
+import '../../../assets/styles/TabEstadosCuenta.css';
 
 export const TabEstadosCuenta = ({ creditos = [] }) => {
-    
-    // Función para simular descarga o redirección a archivo en Firebase Storage
-    const handleDownload = (creditoId) => {
-        alert(`Generando estado de cuenta para el folio: ${creditoId}`);
-        // Aquí iría la lógica de: window.open(url_del_pdf);
-    };
-
     return (
         <section className="history-container animate-fade">
             <div className="section-header-inline">
                 <div>
                     <h2>Estados de Cuenta</h2>
-                    <p>Consulta el historial de tus pagos y descarga tus comprobantes anuales.</p>
+                    <p>Consulta y descarga tus estados de cuenta oficiales emitidos por Tesorería.</p>
                 </div>
             </div>
 
-            <div className="history-table-card">
+            <div className="credits-statements-grid">
                 {creditos.length > 0 ? (
-                    <div className="history-list">
-                        {creditos.map(c => (
-                            <div key={c.id} className="history-row-item">
-                                <div className="hist-main-info">
-                                    <div className="icon-doc-type">
-                                        <FiFileText />
-                                    </div>
-                                    <div className="text-details">
-                                        <strong>Crédito {c.tipo_credito || 'Personal'}</strong>
-                                        <span>Folio: #{c.id?.slice(-8).toUpperCase()}</span>
-                                    </div>
-                                </div>
-
-                                <div className="hist-status-date">
-                                    <FiClock /> 
-                                    <span>Iniciado: {c.fecha_inicio || 'En trámite'}</span>
-                                </div>
-
-                                <button 
-                                    className="btn-download-action"
-                                    onClick={() => handleDownload(c.id)}
-                                >
-                                    <FiDownload /> PDF
-                                </button>
-                            </div>
-                        ))}
-                    </div>
+                    creditos.map(credit => (
+                        <CreditStatementGroup key={credit.id} credit={credit} />
+                    ))
                 ) : (
                     <div className="empty-state-simple">
                         <FiFileText size={40} />
-                        <p>No se encontraron créditos registrados para generar estados de cuenta.</p>
+                        <p>Aún no tienes créditos activos para generar estados de cuenta.</p>
                     </div>
                 )}
             </div>
         </section>
+    );
+};
+
+const CreditStatementGroup = ({ credit }) => {
+    const { statements, loading } = useAccountStatements(credit.id);
+
+    return (
+        <div className="credit-statement-card">
+            <div className="card-header-credit">
+                <div className="credit-badge">{credit.tipo_credito || 'Personal'}</div>
+                <h3>Folio: {credit.id?.slice(-8).toUpperCase()}</h3>
+                <span className="status-indicator"><FiCheckCircle /> Activo</span>
+            </div>
+
+            <div className="statements-list-user">
+                {loading ? (
+                    <div className="loading-mini">Cargando documentos...</div>
+                ) : statements.length > 0 ? (
+                    statements.map(st => (
+                        <div key={st.id} className="user-statement-row">
+                            <div className="st-info">
+                                <FiFileText className="st-icon" />
+                                <div className="st-details">
+                                    <span className="st-name">{st.nombre}</span>
+                                    <span className="st-date">
+                                        Emitido: {new Date(st.createdAt?.toDate?.() || st.createdAt).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            </div>
+                            <a 
+                                href={st.url} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                className="btn-download-st"
+                                title="Descargar PDF"
+                            >
+                                <FiDownload /> PDF
+                            </a>
+                        </div>
+                    ))
+                ) : (
+                    <div className="no-statements-msg">
+                        <FiClock />
+                        <p>No hay documentos anexados por Tesorería para este crédito aún.</p>
+                    </div>
+                )}
+            </div>
+        </div>
     );
 };

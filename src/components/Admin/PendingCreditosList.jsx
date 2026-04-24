@@ -8,7 +8,8 @@ import '../../assets/styles/AdminCredits.css';
 import { CreditRow } from './CreditRow';
 
 export const PendingCreditosList = ({ creditos = [], onAction, onUpdateSuccess, fixedStatus = null }) => {
-    const [filterStatus, setFilterStatus] = useState(fixedStatus || 'activo');
+    // Para la Mesa de Control, el estado por defecto lógico es 'pendiente'
+    const [filterStatus, setFilterStatus] = useState(fixedStatus || 'pendiente');
     const [searchTerm, setSearchTerm] = useState('');
 
     // Contadores dinámicos

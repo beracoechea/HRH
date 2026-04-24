@@ -3,7 +3,9 @@ import React from 'react';
 import { FiArrowRight } from 'react-icons/fi';
 import './InfoSimulador.css';
 import { CalculadoraForm } from './CalculadoraForm';
+import { ENTIDAD_CONFIG } from '../../utils/Propiedades';
 import imgSimulador from '../../assets/images/9.jpg';
+
 
 export const InfoSimulador = () => {
   return (
@@ -33,6 +35,18 @@ export const InfoSimulador = () => {
           <p className="simulador-note">
             <strong>Nota:</strong> Los montos y plazos están sujetos a la capacidad de pago y validación de historial crediticio.
           </p>
+
+          <div className="simulador-legal-glossary">
+            <div className="legal-item">
+              <strong>DEFINICION DE CAT:</strong>
+              <p>{ENTIDAD_CONFIG.LEYENDAS.CAT_5_5}</p>
+            </div>
+            <div className="legal-item">
+               <strong>IMPORTANTE:</strong>
+               <p>{ENTIDAD_CONFIG.LEYENDAS.TASA_VARIABLE_5_7}</p>
+               <p>{ENTIDAD_CONFIG.LEYENDAS.AVAL_5_8}</p>
+            </div>
+          </div>
         </div>
 
         <div className="simulador-input-column">
@@ -41,6 +55,7 @@ export const InfoSimulador = () => {
             Revisa tu correo, ahí recibirás tu oferta formal.
           </p>
         </div>
+
 
       </div>
     </section>

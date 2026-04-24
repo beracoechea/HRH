@@ -24,21 +24,18 @@ dist-ssr
 *.sw?
 /functions
 functions/
-google-keys.json
+
+# Firebase debug logs
 firebase-debug.log
 firebase-debug.*.log
-firebase-debug.*.log.*
-firebase-debug.*.log.*.gz
-firebase-debug.*.log.*.zip
-firebase-debug.*.log.*.tar.gz
-firebase-debug.*.log.*.tar
-firebase-debug.*.log.*.tar.bz2
-firebase-debug.*.log.*.tar.xz
-firebase-debug.*.log.*.tar.lz
-firebase-debug.*.log.*.tar.lzma
-firebase-debug.*.log.*.tar.lzo
-firebase-debug.*.log.*.tar.zst
-# Secret keys
+
+# SECURITY: Archivos de credenciales y claves. NUNCA subir al repositorio.
+# LOW-02: Se eliminó "*.json" global ya que bloqueaba package.json y package-lock.json
+.env
+.env.local
+.env.*.local
+google-keys.json
 functions/config/google-keys.json
 functions/test/key.json
-*.json
+service-account*.json
+*-credentials.json

@@ -21,7 +21,7 @@ export const InfoCredito = () => {
           icon: <FiUser className="prod-icon" />
         },
         {
-          nombre: "Go Nómina",
+          nombre: "Go Convenio",
           subtitulo: "Con Convenio",
           reca: "PENDIENTE",
           plazo: "12 a 48 meses",

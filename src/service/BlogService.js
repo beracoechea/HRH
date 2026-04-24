@@ -26,7 +26,7 @@ export class BlogService extends FirestoreService {
       const snapshot = await getDocs(q);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
-      console.log("Base de datos actual:", db._databaseId.database);
+      // SECURITY: No exponer detalles de infraestructura en la consola del navegador
       throw this.handleError(error);
     }
   }

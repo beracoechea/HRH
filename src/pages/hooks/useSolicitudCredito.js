@@ -72,11 +72,15 @@ export const useSolicitudCredito = (user, datosPrestamo, onSuccess) => {
         // --- NUEVA LÓGICA DE MAPEO ---
         // Extraemos los valores numéricos de datosPrestamo para asegurar que no vayan vacíos
         const payloadFinanciero = {
-            monto_solicitado: datosPrestamo.montoReal || 0, // Necesitaremos pasar el valor numérico
-            pago_quincenal_ano1: datosPrestamo.cuotaQuincenal1 || 0,
-            pago_quincenal_ano2: datosPrestamo.cuotaQuincenal2 || 0,
-            plazo_meses: datosPrestamo.plazoMeses || 0,
-            total_estimado: datosPrestamo.totalPagar || 0,
+            monto_solicitado: datosPrestamo.montoReal || 0,
+            pago_quincenal_ano1: datosPrestamo.cuotaQuincenal1 || datosPrestamo.pagoMensualAno1 || 0,
+            pago_quincenal_ano2: datosPrestamo.cuotaQuincenal2 || datosPrestamo.pagoMensualAno2 || 0,
+            plazo_meses: datosPrestamo.plazoMeses || datosPrestamo.plazo || 0,
+            total_estimado: datosPrestamo.totalPagar || datosPrestamo.totalPagarFinal || 0,
+            // Redundancia para asegurar visibilidad en cualquier versión de la UI
+            cuotaQuincenal1: datosPrestamo.cuotaQuincenal1 || datosPrestamo.pagoMensualAno1 || 0,
+            cuotaQuincenal2: datosPrestamo.cuotaQuincenal2 || datosPrestamo.pagoMensualAno2 || 0,
+            totalPagar: datosPrestamo.totalPagar || datosPrestamo.totalPagarFinal || 0,
             frecuencia_pago: "quincenal",
             tipo_credito: datosPrestamo.tipoLabel || "PERSONAL"
         };

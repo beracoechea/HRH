@@ -3,21 +3,24 @@ import { useAuth } from '../../context/AuthContext';
 import { ROLE_PERMISSIONS } from '../../helpers/permissions';
 import { useUserManager } from '../hooks/useUserManager';
 import { useDocumentTracking } from '../hooks/useDocumentTracking';
+import { useGroups } from '../hooks/useGroups';
 
 // Iconos
 import { 
   FiUsers, FiGrid, FiDollarSign, FiPieChart, 
-  FiLoader, FiSearch, FiFilter, FiLayers
+  FiLoader, FiSearch, FiFilter, FiLayers, FiBriefcase, FiShield, FiCalendar
 } from 'react-icons/fi';
 
 // Componentes
 import { UserCard } from '../../components/Admin/UserCard';
 import { AdminStats } from '../../components/Admin/AdminStats';
 import { PendingCreditosList } from '../../components/Admin/PendingCreditosList';
+import { PendingCitasList } from '../../components/Admin/PendingCitasList';
 import { UserDetailsModal } from '../../components/Admin/UserDetailsModal';
 import { StatusModal } from '../../components/Common/StatusModal';
 import { CreditManagementModal } from '../../components/Admin/CreditManagementModal';
 import { GroupManager } from '../../components/Admin/GroupManager';
+import { PageConfig } from './PageConfig';
 
 // Estilos
 import '../../assets/styles/UserManagement.css';
@@ -31,10 +34,14 @@ export const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('todos');
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [selectedCreditId, setSelectedCreditId] = useState(null);
   const [creditModalOpen, setCreditModalOpen] = useState(false);
+  
+  // --- FILTRO GLOBAL HRH ---
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const { groups } = useGroups();
   
   const [statusConfig, setStatusConfig] = useState({ 
     isOpen: false, 
@@ -48,19 +55,27 @@ export const AdminDashboard = () => {
     creditos, 
     loading: loadingUsers, 
     refreshData, 
-    ingresosReales = 0,
-  } = useUserManager(currentUser);
+    ingresosReales = [],
+  } = useUserManager(currentUser, selectedGroup);
 
-  const { creditosDocs, loading: loadingDocs } = useDocumentTracking(currentUser);
+  const { creditosDocs, loading: loadingDocs } = useDocumentTracking(currentUser, selectedGroup);
+  
+  // Derivamos el usuario actual para el modal del estado de tiempo real
+  const currentUserForModal = users?.find(u => u.id === selectedUserId);
 
-  // Inicializar pestaña permitida
+  // Inicializar pestaña permitida y proteger acceso
   useEffect(() => {
     if (!activeTab && permissions?.views?.length > 0) {
       if (permissions.views.includes('usuarios')) setActiveTab('usuarios');
       else if (permissions.views.includes('mesa')) setActiveTab('mesa');
       else setActiveTab(permissions.views[0]);
     }
-  }, [permissions, activeTab]);
+
+    // Seguridad extra: Si no es HRH y está en la pestaña de grupos, moverlo
+    if (activeTab === 'grupos' && !isHRH) {
+       setActiveTab('usuarios');
+    }
+  }, [permissions, activeTab, isHRH]);
 
   // --- HELPERS ---
   const canSee = useCallback((viewName) => permissions.views.includes(viewName), [permissions]);
@@ -70,7 +85,7 @@ export const AdminDashboard = () => {
   };
 
   const handleUserClick = (user) => {
-    setSelectedUser(user);
+    setSelectedUserId(user.id);
     setUserModalOpen(true);
   };
 
@@ -85,9 +100,9 @@ export const AdminDashboard = () => {
                           u.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           u.rfc?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === 'todos' || u.rol === roleFilter;
-    if (permissions.mustFilterByGroup && currentUser?.grupo) {
-        return matchesSearch && matchesRole && u.grupo === currentUser.grupo;
-    }
+    
+    // El filtrado por grupo se hace ahora a nivel de Hook (onSnapshot)
+    // Pero mantenemos una validación extra aquí por si acaso
     return matchesSearch && matchesRole;
   }) || [];
 
@@ -96,15 +111,38 @@ export const AdminDashboard = () => {
   return (
     <div className="admin-container">
       <header className="admin-header">
-        <div className="header-title">
-          <h1>
-            {activeTab === 'usuarios' && <><FiUsers /> Gestión de Usuarios</>}
-            {activeTab === 'mesa' && <><FiGrid /> Mesa de Control</>}
-            {activeTab === 'tesoreria' && <><FiDollarSign /> Tesorería y Pagos</>}
-            {activeTab === 'stats' && <><FiPieChart /> Análisis y Estadísticas</>}
-            {activeTab === 'grupos' && <><FiLayers /> Gestión de Grupos</>}
-            {loading && <FiLoader className="spinner" />}
-          </h1>
+        <div className="header-top">
+            <div className="header-title">
+            <h1>
+                {activeTab === 'usuarios' && <><FiUsers /> Gestión de Usuarios</>}
+                {activeTab === 'mesa' && <><FiGrid /> Mesa de Control</>}
+                {activeTab === 'tesoreria' && <><FiDollarSign /> Tesorería y Pagos</>}
+                {activeTab === 'stats' && <><FiPieChart /> Análisis y Estadísticas</>}
+                {activeTab === 'grupos' && <><FiLayers /> Gestión de Grupos</>}
+                {activeTab === 'citas' && <><FiCalendar /> Gestión de Citas</>}
+                {activeTab === 'noticias' && <><FiShield /> Gestión de Noticias y Newsletter</>}
+                {loading && <FiLoader className="spinner" />}
+            </h1>
+            </div>
+
+            {/* --- SELECTOR DE GRUPO GLOBAL (SOLO HRH) --- */}
+            {isHRH && (
+                <div className="hrh-global-filter animate-fade">
+                    <div className="filter-label">
+                        <FiBriefcase /> <span>Empresa:</span>
+                    </div>
+                    <select 
+                        className="hrh-group-select"
+                        value={selectedGroup || ''}
+                        onChange={(e) => setSelectedGroup(e.target.value || null)}
+                    >
+                        <option value="">Todas las empresas</option>
+                        {groups.map(g => (
+                            <option key={g.id} value={g.id_grupo}>{g.nombre}</option>
+                        ))}
+                    </select>
+                </div>
+            )}
         </div>
         
         <div className="admin-nav-tabs">
@@ -126,6 +164,17 @@ export const AdminDashboard = () => {
           {canSee('stats') && (
             <button className={`nav-tab ${activeTab === 'stats' ? 'active' : ''}`} onClick={() => setActiveTab('stats')}>
               <FiPieChart /> Estadísticas
+            </button>
+          )}
+          {canSee('noticias') && (
+            <button className={`nav-tab ${activeTab === 'noticias' ? 'active' : ''}`} onClick={() => setActiveTab('noticias')}>
+              <FiShield /> Noticias
+            </button>
+          )}
+          {canSee('citas') && (
+            <button className={`nav-tab ${activeTab === 'citas' ? 'active' : ''}`} onClick={() => setActiveTab('citas')}>
+              <FiCalendar /> Citas
+              {pendingCitas?.length > 0 && <span className="tab-badge">{pendingCitas.length}</span>}
             </button>
           )}
           {isHRH && (
@@ -180,7 +229,7 @@ export const AdminDashboard = () => {
         {activeTab === 'mesa' && canSee('mesa') && (
           <PendingCreditosList 
             creditos={creditos} 
-            onAction={handleCreditClick} // Ahora abre el modal
+            onAction={handleCreditClick} 
             onUpdateSuccess={refreshData}
           />
         )}
@@ -207,6 +256,14 @@ export const AdminDashboard = () => {
         {activeTab === 'grupos' && isHRH && (
           <GroupManager currentUser={currentUser} />
         )}
+        
+        {activeTab === 'citas' && canSee('citas') && (
+          <PendingCitasList citas={pendingCitas} onActionComplete={refreshData} />
+        )}
+
+        {activeTab === 'noticias' && canSee('noticias') && (
+          <PageConfig />
+        )}
       </div>
 
       {/* --- MODALES --- */}
@@ -219,7 +276,7 @@ export const AdminDashboard = () => {
 
       <UserDetailsModal 
         isOpen={userModalOpen}
-        user={selectedUser}
+        user={currentUserForModal}
         creditos={creditos}
         citas={pendingCitas} 
         onClose={() => setUserModalOpen(false)}

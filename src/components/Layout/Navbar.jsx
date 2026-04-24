@@ -3,7 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import {
   FiHome, FiCpu, FiUsers, FiTrendingUp,
   FiFileText, FiShield, FiMenu, FiX,
-  FiBriefcase, FiLogIn, FiLogOut, FiSettings, FiChevronDown
+  FiBriefcase, FiLogIn, FiLogOut, FiSettings, FiChevronDown, FiChevronUp
 } from 'react-icons/fi';
 
 import '../../assets/styles/Navbar.css';
@@ -17,6 +17,7 @@ export const Navbar = () => {
   const [click, setClick] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [adminDropdown, setAdminDropdown] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
 
   const { user, logout, isAuthenticated } = useAuth();
 
@@ -36,7 +37,7 @@ export const Navbar = () => {
 
   // Ítems base de la navegación (Públicos)
   const navItems = [
-    { name: 'Inicio', path: '/', icon: <FiHome /> },
+    { name: 'Inicios', path: '/', icon: <FiHome /> },
     { name: 'Quiénes Somos', path: '/quienes-somos', icon: <FiUsers /> },
     { name: 'Requerimientos', path: '/formatos', icon: <FiFileText /> },
     { name: 'Soluciones', path: '/soluciones-financieras', icon: <FiTrendingUp /> },
@@ -46,7 +47,15 @@ export const Navbar = () => {
 
   return (
     <>
-      <nav className="navbar">
+      <div
+        className={`nav-toggle-visibility ${isHidden ? 'visible' : ''}`}
+        onClick={() => setIsHidden(false)}
+        title="Mostrar Menú Principal"
+      >
+        <FiChevronDown />
+      </div>
+
+      <nav className={`navbar ${isHidden ? 'hidden' : ''}`}>
         <div className="navbar-container">
           <Link to="/" className="navbar-logo" onClick={closeMobileMenu}>
             <img src={logoFull} alt="CrediGO" className="logo-desktop" />
@@ -141,6 +150,12 @@ export const Navbar = () => {
                   <FiLogIn className="nav-icon" /> Ingresar
                 </button>
               )}
+            </li>
+
+            <li className="nav-item">
+              <button className="hide-nav-trigger" onClick={() => setIsHidden(true)} title="Ocultar Navbar para maximizar espacio">
+                <FiChevronUp />
+              </button>
             </li>
           </ul>
         </div>

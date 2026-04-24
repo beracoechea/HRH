@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { 
     FiSave, FiEye, FiEyeOff, FiLink, FiImage, FiSettings, 
-    FiUser, FiExternalLink, FiPlus, FiList, FiEdit, FiCalendar, FiType
+    FiUser, FiExternalLink, FiPlus, FiList, FiEdit, FiCalendar, FiType,
+    FiCheckCircle
 } from 'react-icons/fi';
 import { useBlogs } from '../hooks/useBlogs';
 import { StatusModal } from '../../components/Common/StatusModal';
@@ -11,7 +12,6 @@ export const PageConfig = () => {
     const [activeTab, setActiveTab] = useState('list'); // 'list' o 'form'
     const [editingId, setEditingId] = useState(null);
     const { blogs, status, saveBlog, closeStatus } = useBlogs();
-
     const [formData, setFormData] = useState({
         titulo: '', 
         categoria: 'Finanzas', 
@@ -123,7 +123,9 @@ export const PageConfig = () => {
                 </div>
             ) : (
                 <div className="config-grid animate-fade">
+                    {/* ... (Todo el formulario existente) ... */}
                     <form className="blog-form" onSubmit={handleSubmit}>
+                        {/* ... (Contenido del formulario que ya estaba) ... */}
                         <h2>{editingId ? 'Modificar Publicación' : 'Crear Nueva Noticia'}</h2>
                         
                         <div className="input-group">

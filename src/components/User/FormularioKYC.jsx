@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    FiSave, FiLoader, FiUser, FiFileText, 
-    FiMapPin, FiPhone, FiCalendar, FiBriefcase, 
-    FiAlertCircle, FiEdit3, FiCheckCircle, FiArrowRight, FiDollarSign
+import {
+    FiSave, FiLoader, FiUser, FiFileText,
+    FiMapPin, FiPhone, FiCalendar, FiBriefcase,
+    FiAlertCircle, FiEdit3, FiCheckCircle, FiArrowRight, FiDollarSign,
+    FiMail, FiGlobe
 } from 'react-icons/fi';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { useKYC } from '../../pages/hooks/useKYC';
+import { ESTADOS_MEXICO, PAISES_VIGENTES } from '../../utils/Propiedades';
 import '../../assets/styles/User/FormularioKYC.css';
 
 export const FormularioKYC = ({ user, creditoId, onComplete }) => {
     const { saveKYC, loading, error } = useKYC();
     const [isEditing, setIsEditing] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
-    
+
     const [formData, setFormData] = useState({
         nombreCompleto: '', curp: '', rfc: '', fechaNacimiento: '',
-        genero: '', domicilio: '', telefono: '', tipoCredito: 'personal',
+        genero: '', domicilio: '', telefono: '', correo: '',
+        paisNacimiento: 'MÉXICO', entidadNacimiento: '',
+        tipoCredito: 'personal',
         ocupacion: '', ingresos: 0, marcaVehiculo: '', modeloVehiculo: '', anioVehiculo: ''
     });
 
@@ -38,7 +42,7 @@ export const FormularioKYC = ({ user, creditoId, onComplete }) => {
         if (!creditoId) return;
 
         const creditoRef = doc(db, "creditos", creditoId);
-        
+
         const unsub = onSnapshot(creditoRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
@@ -47,23 +51,41 @@ export const FormularioKYC = ({ user, creditoId, onComplete }) => {
 
                 if (kycValido) {
                     const isMaster = !data.datosKYC && !!data.kycMaster;
-                    
-                    setFormData(prev => ({
-                        ...prev,
-                        nombreCompleto: (isMaster ? kycValido.perfilIdentidad?.nombreCompleto : kycValido.nombreCompleto) || prev.nombreCompleto,
-                        curp: (isMaster ? kycValido.perfilIdentidad?.curp : kycValido.curp) || '',
-                        rfc: (isMaster ? kycValido.perfilIdentidad?.rfc : kycValido.rfc) || '',
-                        fechaNacimiento: formatFecha(isMaster ? kycValido.perfilIdentidad?.fechaNacimiento : kycValido.fechaNacimiento) || '',
-                        genero: formatGenero(isMaster ? kycValido.perfilIdentidad?.genero : kycValido.genero),
-                        domicilio: (isMaster ? kycValido.analisisDomicilio?.direccionFinalConsolidada : kycValido.domicilio) || '',
-                        ocupacion: (isMaster ? kycValido.perfilFinanciero?.patronOEmpresa : kycValido.ocupacion) || '',
-                        ingresos: (isMaster ? kycValido.perfilFinanciero?.ingresoMensualNeto : kycValido.ingresos) || 0,
-                        tipoCredito: (isMaster ? (kycValido.datosEspecificosCredito?.tipoDeCredito?.toLowerCase() === 'automotriz' ? 'automotriz' : 'personal') : (kycValido.tipoCredito || 'personal')),
-                        marcaVehiculo: (isMaster ? kycValido.datosEspecificosCredito?.detallesAuto?.marca : kycValido.marcaVehiculo) || '',
-                        modeloVehiculo: (isMaster ? kycValido.datosEspecificosCredito?.detallesAuto?.modelo : kycValido.modeloVehiculo) || '',
-                        anioVehiculo: (isMaster ? kycValido.datosEspecificosCredito?.detallesAuto?.anio : kycValido.anioVehiculo) || ''
-                    }));
-                    
+
+                    setFormData(prev => {
+                        const newNombre = (isMaster ? kycValido.perfilIdentidad?.nombreCompleto : kycValido.nombreCompleto) || prev.nombreCompleto;
+                        const newCurp = (isMaster ? kycValido.perfilIdentidad?.curp : kycValido.curp) || prev.curp;
+                        const newRfc = (isMaster ? kycValido.perfilIdentidad?.rfc : kycValido.rfc) || prev.rfc;
+                        const newFecha = formatFecha(isMaster ? kycValido.perfilIdentidad?.fechaNacimiento : kycValido.fechaNacimiento) || prev.fechaNacimiento;
+                        const newGenero = formatGenero(isMaster ? kycValido.perfilIdentidad?.genero : kycValido.genero) || prev.genero;
+                        const newDomicilio = (isMaster ? kycValido.analisisDomicilio?.direccionFinalConsolidada : kycValido.domicilio) || prev.domicilio;
+                        const newOcupacion = (isMaster ? kycValido.perfilFinanciero?.patronOEmpresa : kycValido.ocupacion) || prev.ocupacion;
+                        const newIngresos = (isMaster ? kycValido.perfilFinanciero?.ingresoMensualNeto : kycValido.ingresos) || prev.ingresos;
+
+                        return {
+                            ...prev,
+                            nombreCompleto: newNombre,
+                            curp: newCurp,
+                            rfc: newRfc,
+                            fechaNacimiento: newFecha,
+                            genero: newGenero,
+                            domicilio: newDomicilio,
+                            ocupacion: newOcupacion,
+                            ingresos: newIngresos,
+
+                            // Para los nuevos campos: solo actualizar si el doc tiene valor o si prev está vacío
+                            telefono: kycValido.telefono || data.telefono_contacto || prev.telefono,
+                            correo: kycValido.correo || (isMaster ? kycValido.perfilIdentidad?.correo : null) || data.usuario_email || prev.correo,
+                            paisNacimiento: kycValido.paisNacimiento || (isMaster ? kycValido.perfilIdentidad?.paisNacimiento : null) || prev.paisNacimiento,
+                            entidadNacimiento: kycValido.entidadNacimiento || (isMaster ? kycValido.perfilIdentidad?.entidadNacimiento : null) || prev.entidadNacimiento || '',
+
+                            tipoCredito: (isMaster ? (kycValido.datosEspecificosCredito?.tipoDeCredito?.toLowerCase() === 'automotriz' ? 'automotriz' : 'personal') : (kycValido.tipoCredito || 'personal')),
+                            marcaVehiculo: (isMaster ? kycValido.datosEspecificosCredito?.detallesAuto?.marca : kycValido.marcaVehiculo) || prev.marcaVehiculo,
+                            modeloVehiculo: (isMaster ? kycValido.datosEspecificosCredito?.detallesAuto?.modelo : kycValido.modeloVehiculo) || prev.modeloVehiculo,
+                            anioVehiculo: (isMaster ? kycValido.datosEspecificosCredito?.detallesAuto?.anio : kycValido.anioVehiculo) || prev.anioVehiculo
+                        };
+                    });
+
                     // Si ya hay datos confirmados, no activamos el modo edición automáticamente
                     if (isMaster) setIsEditing(true);
                 }
@@ -76,8 +98,8 @@ export const FormularioKYC = ({ user, creditoId, onComplete }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        const finalValue = (e.target.type === 'text' || e.target.tagName === 'TEXTAREA') 
-            ? value.toUpperCase() 
+        const finalValue = (e.target.type === 'text' || e.target.tagName === 'TEXTAREA')
+            ? value.toUpperCase()
             : value;
         setFormData(prev => ({ ...prev, [name]: finalValue }));
     };
@@ -119,7 +141,7 @@ export const FormularioKYC = ({ user, creditoId, onComplete }) => {
 
             <form onSubmit={handleSubmit} className={`kyc-form ${!isEditing ? 'readonly' : ''}`}>
                 {error && <div className="error-banner"><FiAlertCircle /> {error}</div>}
-                
+
                 <div className="form-grid">
                     <div className="input-group">
                         <label><FiUser /> Nombre Completo</label>
@@ -153,6 +175,37 @@ export const FormularioKYC = ({ user, creditoId, onComplete }) => {
                     <div className="input-group">
                         <label><FiDollarSign /> Ingresos Mensuales</label>
                         <input type="number" name="ingresos" value={formData.ingresos} onChange={handleChange} required disabled={!isEditing} />
+                    </div>
+
+                    {/* Nuevos Campos */}
+                    <div className="input-group">
+                        <label><FiGlobe /> País de Nacimiento</label>
+                        <select name="paisNacimiento" value={formData.paisNacimiento} onChange={handleChange} required disabled={!isEditing}>
+                            {PAISES_VIGENTES.map(p => <option key={p} value={p}>{p}</option>)}
+                        </select>
+                    </div>
+
+                    <div className="input-group">
+                        <label><FiMapPin /> Entidad de Nacimiento</label>
+                        <input
+                            type="text"
+                            name="entidadNacimiento"
+                            value={formData.entidadNacimiento}
+                            onChange={handleChange}
+                            placeholder="Ej: JALISCO, CDMX..."
+                            required={formData.paisNacimiento === 'MÉXICO'}
+                            disabled={!isEditing}
+                        />
+                    </div>
+
+                    <div className="input-group">
+                        <label><FiMail /> Correo Electrónico</label>
+                        <input type="email" name="correo" value={formData.correo} onChange={handleChange} required disabled={!isEditing} />
+                    </div>
+
+                    <div className="input-group">
+                        <label><FiPhone /> Teléfono Particular</label>
+                        <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} required disabled={!isEditing} />
                     </div>
                 </div>
 

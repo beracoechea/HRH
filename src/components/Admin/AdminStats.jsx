@@ -1,13 +1,15 @@
 import React, { useMemo } from 'react';
 import { 
   FiTrendingUp, FiCheckCircle, FiPieChart, 
-  FiCalendar, FiDollarSign, FiActivity, FiBarChart2, FiLayers
+  FiCalendar, FiDollarSign, FiActivity, FiBarChart2, FiLayers,
+  FiRefreshCw, FiDatabase
 } from 'react-icons/fi';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, 
   ResponsiveContainer, PieChart, Pie, Cell, Legend, AreaChart, Area
 } from 'recharts';
 import '../../assets/styles/AdminStats.css';
+import { normalizeCreditData, getExpectedMonthlyPayment } from '../../utils/creditNormalization';
 
 import { ProcessTimeline } from './ProcessTimeline';
 
@@ -19,26 +21,45 @@ export const AdminStats = ({ creditos = [], usuarios = [], citas = [], ingresosR
     
     const tieneDatos = Array.isArray(ingresosReales) && ingresosReales.length > 0;
     
+    // 2. Cálculos Financieros
+    const activos = creditos.filter(c => c.estado === 'activo' || c.estado === 'atrasado');
+    
+    // Los pagos son dinámicos - Calculamos lo esperado para el MES ACTUAL basándonos en la amortización
+    const totals = activos.reduce((acc, curr) => {
+        const projection = getExpectedMonthlyPayment(curr);
+        return {
+            q1: acc.q1 + projection.q1,
+            q2: acc.q2 + projection.q2,
+            faseA: acc.faseA + projection.faseA,
+            faseB: acc.faseB + projection.faseB
+        };
+    }, { q1: 0, q2: 0, faseA: 0, faseB: 0 });
+
+    const totalQ1Val = totals.q1;
+    const totalQ2Val = totals.q2;
+    const mensualidadesVal = totalQ1Val + totalQ2Val;
+    
+    // Totales nominales para referencia en tarjetas
+    const totalFaseA = totals.faseA;
+    const totalFaseB = totals.faseB;
+    
     const dataIngresos = tieneDatos 
       ? ingresosReales.map(item => ({
           mes: item.mes,
-          monto: Number(item.monto) || 0
+          monto: Number(item.monto) || 0,
+          estimado: mensualidadesVal // Línea de referencia del objetivo mensual actual
         }))
       : [];
 
-    // 2. Cálculos Financieros
-    const activos = creditos.filter(c => c.estado === 'activo');
-    
     const totalPrestadoVal = creditos
-        .filter(c => c.estado === 'activo' || c.estado === 'finalizado')
+        .filter(c => c.estado === 'activo' || c.estado === 'finalizado' || c.estado === 'atrasado')
         .reduce((acc, curr) => acc + parseFloat(curr.monto_solicitado || 0), 0);
 
-    const mensualidadesVal = activos
-        .reduce((acc, curr) => acc + parseFloat(curr.pago_mensual_ano1 || 0), 0);
+    const totalRecaudadoVal = creditos.reduce((acc, curr) => acc + (Number(curr.pagado) || 0), 0);
 
     // 3. Distribución por Categoría 
-    const personalCount = creditos.filter(c => parseFloat(c.monto_solicitado) <= 50000 && c.estado === 'activo').length;
-    const autoCount = creditos.filter(c => parseFloat(c.monto_solicitado) > 50000 && c.estado === 'activo').length;
+    const personalCount = creditos.filter(c => parseFloat(c.monto_solicitado) <= 50000 && (c.estado === 'activo' || c.estado === 'atrasado')).length;
+    const autoCount = creditos.filter(c => parseFloat(c.monto_solicitado) > 50000 && (c.estado === 'activo' || c.estado === 'atrasado')).length;
 
     // 4. Estatus Operativo (Bar Chart)
     const estadosData = [
@@ -51,6 +72,11 @@ export const AdminStats = ({ creditos = [], usuarios = [], citas = [], ingresosR
     return {
       totalPrestado: totalPrestadoVal,
       mensualidadesEstimadas: mensualidadesVal,
+      totalQ1: totalQ1Val,
+      totalQ2: totalQ2Val,
+      totalRecaudado: totalRecaudadoVal,
+      totalFaseA,
+      totalFaseB,
       tasaAprobacion: creditos.length > 0 ? ((activos.length / creditos.length) * 100).toFixed(1) : 0,
       carteraData: [
         { name: 'Personal', value: personalCount, color: '#159082' },
@@ -68,8 +94,10 @@ export const AdminStats = ({ creditos = [], usuarios = [], citas = [], ingresosR
           <h1>Análisis de Cartera y Recaudación</h1>
           <p>Métricas consolidadas basadas en pagos reales.</p>
         </div>
-        <div className="quick-badge" onClick={() => setIsSidebarOpen(true)} style={{ cursor: 'pointer' }}>
-          <FiActivity /> Ver Línea de Tiempo
+        <div className="header-actions" style={{ display: 'flex', gap: '10px' }}>
+          <div className="quick-badge" onClick={() => setIsSidebarOpen(true)} style={{ cursor: 'pointer' }}>
+            <FiActivity /> Ver Línea de Tiempo
+          </div>
         </div>
       </div>
 
@@ -88,7 +116,10 @@ export const AdminStats = ({ creditos = [], usuarios = [], citas = [], ingresosR
           <div className="stat-content">
             <span className="stat-label">Recaudación Proyectada</span>
             <h2 className="stat-value">${metrics.mensualidadesEstimadas.toLocaleString()}</h2>
-            <small>Expectativa mensual</small>
+            <div className="stat-sub-grid">
+              <small title="Suma de cuotas Fase A">Fase A: ${metrics.totalFaseA.toLocaleString()}</small>
+              <small title="Suma de cuotas Fase B">Fase B: ${metrics.totalFaseB.toLocaleString()}</small>
+            </div>
           </div>
         </div>
 
@@ -114,11 +145,16 @@ export const AdminStats = ({ creditos = [], usuarios = [], citas = [], ingresosR
       <div className="charts-main-grid">
         {/* GRÁFICO DE ÁREA - FLUJO DE INGRESOS */}
         <div className="chart-card full-width">
-          <h3><FiBarChart2 /> Flujo de Ingresos Mensuales Registrados</h3>
+          <div className="chart-header-group">
+            <h3><FiBarChart2 /> Flujo de Ingresos Mensuales Registrados</h3>
+            <p className="chart-subtitle">Histórico de cobranza real recibida vía tesorería</p>
+          </div>
           
           {metrics.historialIngresos.length === 0 ? (
             <div className="no-data-placeholder">
-              <p>No hay registros de pagos en los últimos 6 meses</p>
+              <FiDollarSign className="placeholder-icon" />
+              <p>No hay registros de pagos recientes para generar la gráfica.</p>
+              <small>Los nuevos abonos registrados aparecerán aquí en tiempo real.</small>
             </div>
           ) : (
             <div style={{ width: '100%', height: 300, minHeight: 300 }}>
@@ -144,7 +180,17 @@ export const AdminStats = ({ creditos = [], usuarios = [], citas = [], ingresosR
                     tickFormatter={(value) => `$${value}`}
                   />
                   <Tooltip 
+                    formatter={(value) => [`$${value.toLocaleString()}`, 'Recaudado']}
                     contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px rgba(0,0,0,0.1)'}} 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="estimado" 
+                    stroke="#94a3b8" 
+                    strokeDasharray="5 5"
+                    fill="transparent"
+                    strokeWidth={2} 
+                    name="Meta Proyectada"
                   />
                   <Area 
                     type="monotone" 
@@ -153,11 +199,33 @@ export const AdminStats = ({ creditos = [], usuarios = [], citas = [], ingresosR
                     fillOpacity={1} 
                     fill="url(#colorMonto)" 
                     strokeWidth={3} 
+                    name="Recaudado Real"
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           )}
+
+          {/* --- BLOQUE DE RESUMEN BAJO LA GRÁFICA --- */}
+          <div className="chart-summary-footer">
+            <div className="summary-item">
+              <div className="summary-info">
+                <span className="summary-label">Proyección Quincenal (Q1 / Q2)</span>
+                <span className="summary-monto">${metrics.totalQ1.toLocaleString()} / ${metrics.totalQ2.toLocaleString()}</span>
+              </div>
+              <small>Monto esperado para cada periodo de corte</small>
+            </div>
+            
+            <div className="summary-divider"></div>
+
+            <div className="summary-item main">
+              <div className="summary-info">
+                <span className="summary-label">Pagos Realizados Totales</span>
+                <span className="summary-monto highlight">${metrics.totalRecaudado.toLocaleString()}</span>
+              </div>
+              <small>Suma histórica de cobranza confirmada</small>
+            </div>
+          </div>
         </div>
 
         {/* PIE CHART - COMPOSICIÓN */}

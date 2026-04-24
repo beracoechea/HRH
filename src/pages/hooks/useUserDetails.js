@@ -1,9 +1,13 @@
+/* src/pages/hooks/useUserDetails.js
+ *
+ * REFACTORIZADO — Gestión de citas por backend.
+ */
 import { useState, useCallback } from 'react';
 import { db } from '../../firebase/config';
 import { 
-  collection, query, where, getDocs, 
-  updateDoc, doc, orderBy 
+  collection, query, where, getDocs, orderBy 
 } from 'firebase/firestore';
+import { confirmarCita, rechazarCita } from '../../api/appointmentApi';
 
 export const useUserDetails = (userId) => {
     const [details, setDetails] = useState({ citas: [], creditos: [] });
@@ -14,14 +18,12 @@ export const useUserDetails = (userId) => {
         if (!userId) return;
         setLoading(true);
         try {
-            // 1. Consulta de Citas (Usa user_id según tu AppointmentService)
             const citasQuery = query(
                 collection(db, "citas"),
                 where("user_id", "==", userId),
                 orderBy("createdAt", "desc") 
             );
 
-            // 2. Consulta de Créditos (Usa usuario_id según tu CreditService)
             const creditosQuery = query(
                 collection(db, "creditos"),
                 where("usuario_id", "==", userId),
@@ -39,47 +41,45 @@ export const useUserDetails = (userId) => {
             });
         } catch (error) {
             console.error("Error en fetchDetails:", error);
-            // IMPORTANTE: Si ves un error en consola, haz clic en el link para crear el INDEX
         } finally {
             setLoading(false);
         }
     }, [userId]);
 
-    const confirmarCita = async (citaId) => {
+    const handleConfirmarCita = async (citaId) => {
         setActionId(citaId);
         try {
-            const citaRef = doc(db, "citas", citaId);
-            await updateDoc(citaRef, { 
-                estatus: 'confirmada',
-                updatedAt: new Date() 
-            });
+            await confirmarCita(citaId);
             setDetails(prev => ({
                 ...prev,
                 citas: prev.citas.map(c => c.id === citaId ? { ...c, estatus: 'confirmada' } : c)
             }));
             return { success: true, message: "Cita confirmada." };
         } catch (error) {
-            return { success: false, message: "Error al confirmar." };
+            return { success: false, message: "Error al confirmar: " + error.message };
         } finally { setActionId(null); }
     };
 
-    const rechazarCita = async (citaId) => {
+    const handleRechazarCita = async (citaId) => {
         setActionId(citaId);
         try {
-            const citaRef = doc(db, "citas", citaId);
-            await updateDoc(citaRef, { 
-                estatus: 'rechazada',
-                updatedAt: new Date() 
-            });
+            await rechazarCita(citaId);
             setDetails(prev => ({
                 ...prev,
                 citas: prev.citas.map(c => c.id === citaId ? { ...c, estatus: 'rechazada' } : c)
             }));
             return { success: true, message: "Cita rechazada." };
         } catch (error) {
-            return { success: false, message: "Error al rechazar." };
+            return { success: false, message: "Error al rechazar: " + error.message };
         } finally { setActionId(null); }
     };
 
-    return { details, loading, actionId, fetchDetails, confirmarCita, rechazarCita };
+    return { 
+        details, 
+        loading, 
+        actionId, 
+        fetchDetails, 
+        confirmarCita: handleConfirmarCita, 
+        rechazarCita: handleRechazarCita 
+    };
 };

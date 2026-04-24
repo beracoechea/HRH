@@ -18,8 +18,8 @@ export const ENTIDAD_CONFIG = {
 
   // --- CONTACTO PÚBLICO ---
   CONTACTO_CORREO: "administrador@credigo.com.mx",
-  CONTACTO_WHATSAPP: "523312345678",
-  CONTACTO_TEL_VUE: "33 1234 5678",
+  CONTACTO_WHATSAPP: "523318960436",
+  CONTACTO_TEL_VUE: "33 1896 0436",
 
   // --- RECURSOS Y LOGOS (Rutas relativas a /public) ---
   LOGOS: {
@@ -33,10 +33,27 @@ export const ENTIDAD_CONFIG = {
   NUMERO_RECA: "1234-439-034567/01-05432",
   LINK_CONDUSEF: "https://www.condusef.gob.mx",
   LINK_BURO: "https://www.buro.gob.mx",
+  SITE_URL: "https://www.hrh2022.mx",
   
   // --- DINÁMICOS ---
-  YEAR: new Date().getFullYear().toString()
+  YEAR: new Date().getFullYear().toString(),
+
+  // --- LEYENDAS LEGALES Y REGULATORIAS (SOFOM E.N.R. COMPLIANCE) ---
+  LEYENDAS: {
+    SHCP_5_1: "Para la Constitucion y Operacion de HRH 2022, S.A.P.I. de C.V., SOFOM, E.N.R., no requiere de autorizacion de la Secretaria de Hacienda y Credito Publico.",
+    CNBV_5_2: "HRH 2022, S.A.P.I. de C.V., SOFOM, E.N.R. esta sujeta a la supervision de la Comision Nacional Bancaria y de Valores, unicamente para efectos de lo dispuesto por el articulo 56 de la Ley General de Organizaciones y Actividades Auxiliares del Credito.",
+    CNBV_5_3: "En lo que respecta a las Sociedades Financieras de Objeto Multiple no Reguladas, los centros cambiarios y los transmisores de dinero, la inspeccion y vigilancia de estas sociedades, se llevara a cabo por la Comision Nacional Bancaria y de Valores, exclusivamente para verificar el cumplimiento de los preceptos a que se refiere el articulo 95 Bis de la Ley General de Organizaciones y Actividades Auxiliares del Credito y las disposiciones de caracter general que de este deriven.",
+    BURO_5_4: "El Buro de Entidades Financieras contiene informacion de HRH 2022, S.A.P.I. de C.V. SOFOM E.N.R. sobre las caracteristicas de nuestros productos y nuestro desempeno frente a los Usuarios en la prestacion de servicios. Te invitamos a consultarlo en la pagina https://www.buro.gob.mx/ o en nuestra pagina de internet https://www.hrh2022.mx/.",
+    CAT_5_5: "CAT: El Costo Anual Total de financiamiento expresado en terminos porcentuales anuales que, para fines informativos y de comparacion, incorpora la totalidad de los costos y gastos inherentes a los creditos.",
+    MORTGAGE_5_6: "Es tu derecho solicitar la oferta vinculante para comparar distintas opciones de credito.",
+    TASA_VARIABLE_5_7: "Al ser tu credito de tasa variable, los intereses pueden aumentar.",
+    AVAL_5_8: "El avalista, obligado solidario o coacreditado respondera como obligado principal por el total del pago frente a la Entidad Financiera.",
+    UNE_5_9: (domicilio, correo, tel) => `HRH 2022, S.A.P.I. de C.V. SOFOM E.N.R. recibe las consultas, reclamaciones o aclaraciones, en su Unidad Especializada de Atencion a Usuarios, ubicada en ${domicilio} y por correo electronico ${correo} o telefono ${tel}, asi como en cualquiera de sus sucursales u oficinas. En el caso de no obtener una respuesta satisfactoria, podra acudir a CONDUSEF (www.condusef.gob.mx / 01 800 999 8080 y 53 40 09 99).`,
+    CONDUSEF_TITLE: "Comision Nacional para la Proteccion y Defensa de los Usuarios de Servicios Financieros (CONDUSEF)",
+    CONDUSEF_CONTACT: "Telefono: 01 800 999 8080 y 53 40 09 99 | Pagina de Internet: www.condusef.gob.mx"
+  }
 };
+
 
 export const REGLAS_NEGOCIO = {
     personal: {
@@ -54,3 +71,15 @@ export const REGLAS_NEGOCIO = {
         tasaMensual: 0.0125
     }
 };
+
+export const ESTADOS_MEXICO = [
+    "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas", 
+    "Chihuahua", "Ciudad de México", "Coahuila", "Colima", "Durango", "Estado de México", 
+    "Guanajuato", "Guerrero", "Hidalgo", "Jalisco", "Michoacán", "Morelos", "Nayarit", 
+    "Nuevo León", "Oaxaca", "Puebla", "Querétaro", "Quintana Roo", "San Luis Potosí", 
+    "Sinaloa", "Sonora", "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
+];
+
+export const PAISES_VIGENTES = [
+    "MÉXICO", "ESTADOS UNIDOS", "CANADÁ", "OTRO"
+];

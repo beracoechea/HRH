@@ -1,0 +1,137 @@
+/* src/assets/styles/TabEstadosCuenta.css */
+.credits-statements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 2rem;
+    padding: 1rem 0;
+}
+
+.credit-statement-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #edf2f7;
+    transition: transform 0.2s ease;
+}
+
+.credit-statement-card:hover {
+    transform: translateY(-4px);
+}
+
+.card-header-credit {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.credit-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-indicator {
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #48bb78;
+}
+
+.statements-list-user {
+    padding: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.user-statement-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #f7fafc;
+    transition: background 0.2s;
+}
+
+.user-statement-row:last-child {
+    border-bottom: none;
+}
+
+.user-statement-row:hover {
+    background: #f8fafc;
+}
+
+.st-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.st-icon {
+    font-size: 1.5rem;
+    color: #3182ce;
+}
+
+.st-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.st-name {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.st-date {
+    font-size: 0.75rem;
+    color: #718096;
+}
+
+.btn-download-st {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #ebf8ff;
+    color: #3182ce;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.btn-download-st:hover {
+    background: #3182ce;
+    color: white;
+}
+
+.no-statements-msg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    color: #a0aec0;
+    text-align: center;
+    gap: 1rem;
+}
+
+.no-statements-msg p {
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .credits-statements-grid {
+        grid-template-columns: 1fr;
+    }
+}

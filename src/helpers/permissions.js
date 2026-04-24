@@ -2,19 +2,19 @@
 export const ROLE_PERMISSIONS = {
   admin: {
     accessAdminPanel: true,
-    views: ['mesa', 'tesoreria', 'stats', 'usuarios', 'noticias', 'config'],
+    views: ['mesa', 'tesoreria', 'stats', 'usuarios', 'grupos', 'noticias', 'config', 'citas'],
     canManageRoles: true,
     mustFilterByGroup: true
   },
   analista: {
     accessAdminPanel: true,
-    views: ['mesa'],
+    views: ['mesa', 'citas'],
     canManageRoles: false,
     mustFilterByGroup: true
   },
   rh: {
     accessAdminPanel: true,
-    views: ['mesa', 'usuarios'],
+    views: ['usuarios', 'citas'],
     canManageRoles: false,
     mustFilterByGroup: true
   },
@@ -32,7 +32,7 @@ export const ROLE_PERMISSIONS = {
   },
   marketing: {
     accessAdminPanel: true,
-    views: ['noticias', 'stats'],
+    views: ['noticias', 'stats', 'config'],
     canManageRoles: false,
     mustFilterByGroup: true
   },
