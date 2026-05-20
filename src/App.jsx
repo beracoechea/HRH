@@ -31,6 +31,7 @@ import { EditCreditPage } from './pages/Admin/EditCreditPage';
 import { CreditPaymentPage } from './pages/Admin/CreditPaymentPage';
 import { DocumentReviewPage } from './pages/Admin/DocumentReviewPage';
 import { DevTools } from './pages/Admin/DevTools';
+import TestEstadoCuenta from './pages/TestEstadoCuenta';
 
 // --- COMPONENTE DE RUTA PRIVADA (CLIENTES) ---
 const PrivateRoute = ({ children }) => {
@@ -141,6 +142,8 @@ const { isAuthModalOpen, closeLogin } = useAuth();
               } 
             />
           )}
+
+          <Route path="/preview-pdf" element={<TestEstadoCuenta />} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>

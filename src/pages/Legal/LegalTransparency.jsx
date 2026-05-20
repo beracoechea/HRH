@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import html2pdf from 'html2pdf.js';
-import { FiFileText, FiShield, FiInfo, FiChevronRight, FiDownload, FiCheckCircle, FiPrinter } from 'react-icons/fi';
+import { FiFileText, FiShield, FiInfo, FiChevronRight, FiDownload, FiCheckCircle, FiPrinter, FiBriefcase } from 'react-icons/fi';
 import './LegalTransparency.css';
+import LegalServices from './LegalService';
 
 const LegalTransparency = () => {
   const [activeTab, setActiveTab] = useState('terminos');
@@ -59,7 +60,7 @@ const LegalTransparency = () => {
           </ul>
 
           <h4>5. PROPIEDAD INTELECTUAL</h4>
-          <p>Todas las marcas, logotipos, diseños, software y contenidos publicados en este Sitio son propiedad exclusiva de HRH 2022 o cuenta con las licencias necesarias para su uso.</p>
+          <p>Todas las marcas, logotipos, designs, software y contenidos publicados en este Sitio son propiedad exclusiva de HRH 2022 o cuenta con las licencias necesarias para su uso.</p>
 
           <h4>7. UNIDAD ESPECIALIZADA (UNE) Y ATENCIÓN</h4>
           <div className="une-box">
@@ -152,8 +153,13 @@ const LegalTransparency = () => {
           <p>Configuración de navegador: Chrome (Privacidad y seguridad), Safari (Preferencias/Privacidad), Edge (Cookies y permisos).</p>
         </div>
       )
+    },
+    servicios: {
+      title: "Transparencia de Productos y Servicios",
+      date: "19 de mayo de 2026",
+      content: <LegalServices />
     }
-  };
+  }; // Corregido el cierre del objeto aquí
 
   return (
     <div className="legal-container animate-fade">
@@ -174,6 +180,12 @@ const LegalTransparency = () => {
           </button>
           <button className={activeTab === 'cookies' ? 'active' : ''} onClick={() => setActiveTab('cookies')}>
             <FiInfo /> Política de Cookies
+            <FiChevronRight className="arrow" />
+          </button>
+          
+          {/* Botón de Servicios Integrado */}
+          <button className={activeTab === 'servicios' ? 'active' : ''} onClick={() => setActiveTab('servicios')}>
+            <FiBriefcase /> Productos y Servicios
             <FiChevronRight className="arrow" />
           </button>
 

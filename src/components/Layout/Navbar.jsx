@@ -37,7 +37,7 @@ export const Navbar = () => {
 
   // Ítems base de la navegación (Públicos)
   const navItems = [
-    { name: 'Inicios', path: '/', icon: <FiHome /> },
+    { name: 'Inicio', path: '/', icon: <FiHome /> },
     { name: 'Quiénes Somos', path: '/quienes-somos', icon: <FiUsers /> },
     { name: 'Requerimientos', path: '/formatos', icon: <FiFileText /> },
     { name: 'Soluciones', path: '/soluciones-financieras', icon: <FiTrendingUp /> },

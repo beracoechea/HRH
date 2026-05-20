@@ -89,15 +89,33 @@
 .footer-contact-links {
   display: flex;
   justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 15px;
   color: var(--text-secondary);
   font-size: 0.95rem;
+}
+
+.emails-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .footer-link-item {
   color: var(--primary-color);
   text-decoration: none;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.3s ease;
+}
+
+.footer-link-item:hover {
+  color: var(--accent-color);
 }
 
 /* --- FOOTER LEGAL (FONDO OSCURO) --- */

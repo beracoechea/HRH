@@ -23,7 +23,6 @@ import '../../assets/styles/UserDetailsModal.css';
 
 export const UserDetailsModal = ({ isOpen, user, creditos = [], citas = [], onUpdateRole, onClose }) => {
     const [activeTab, setActiveTab] = useState('kyc');
-    const [editingKYC, setEditingKYC] = useState(false);
     const [editingRole, setEditingRole] = useState(false);
     const [groupModalOpen, setGroupModalOpen] = useState(false);
     const [kycForm, setKycForm] = useState({
@@ -153,11 +152,6 @@ export const UserDetailsModal = ({ isOpen, user, creditos = [], citas = [], onUp
         setKycForm(prev => ({ ...prev, [name]: skipUppercase.includes(name) ? value : value.toUpperCase() }));
     };
 
-    const saveKycEdits = async () => {
-        // Guardamos tanto en el crédito como en el perfil
-        const success = await updateUserKYC(user.id, kycForm, lastCredit?.id);
-        if (success) setEditingKYC(false);
-    };
 
     const getRoleClass = (rol) => {
         const roles = { admin: 'role-admin', rh: 'role-rh', analista: 'role-analista', aprobador: 'role-aprobador', tesorero: 'role-tesorero', marketing: 'role-marketing', cliente: 'role-cliente' };
@@ -254,23 +248,18 @@ export const UserDetailsModal = ({ isOpen, user, creditos = [], citas = [], onUp
                                         <div className="section-title">
                                             <FiCheckCircle color="var(--primary-color)" />
                                             <span>Información KYC Detectada</span>
-                                            {!editingKYC ? (
-                                                <button className="btn-edit-text" onClick={() => setEditingKYC(true)}><FiEdit /> Editar</button>
-                                            ) : (
-                                                <button className="btn-save-text" onClick={saveKycEdits}><FiSave /> Guardar</button>
-                                            )}
                                         </div>
                                         <div className="kyc-form-grid">
-                                            <KycItem label="Nombre Completo" name="nombreCompleto" value={kycForm.nombreCompleto} editing={editingKYC} onChange={handleKycChange} icon={<FiUser />} />
-                                            <KycItem label="CURP" name="curp" value={kycForm.curp} editing={editingKYC} onChange={handleKycChange} icon={<FiFileText />} />
-                                            <KycItem label="RFC" name="rfc" value={kycForm.rfc} editing={editingKYC} onChange={handleKycChange} icon={<FiFileText />} />
-                                            <KycItem label="WhatsApp" name="telefono" value={kycForm.telefono} editing={editingKYC} type="tel" onChange={handleKycChange} icon={<FiPhone />} />
-                                            <KycItem label="Correo" name="correo" value={kycForm.correo} editing={editingKYC} type="email" onChange={handleKycChange} icon={<FiMail />} />
-                                            <KycItem label="Fecha Nac." name="fechaNacimiento" value={kycForm.fechaNacimiento} editing={editingKYC} type="date" onChange={handleKycChange} icon={<FiCalendar />} />
-                                            <KycItem label="Género" name="genero" value={kycForm.genero} editing={editingKYC} onChange={handleKycChange} icon={<FiUser />} />
-                                            <KycItem label="País Nac." name="paisNacimiento" value={kycForm.paisNacimiento} editing={editingKYC} onChange={handleKycChange} icon={<FiFlag />} />
-                                            <KycItem label="Entidad Nac." name="entidadNacimiento" value={kycForm.entidadNacimiento} editing={editingKYC} onChange={handleKycChange} icon={<FiMapPin />} />
-                                            <KycItem label="Ingresos" name="ingresos" value={formatMoney(kycForm.ingresos)} editing={editingKYC} onChange={handleKycChange} icon={<FiDollarSign />} />
+                                            <KycItem label="Nombre Completo" name="nombreCompleto" value={kycForm.nombreCompleto} onChange={handleKycChange} icon={<FiUser />} />
+                                            <KycItem label="CURP" name="curp" value={kycForm.curp} onChange={handleKycChange} icon={<FiFileText />} />
+                                            <KycItem label="RFC" name="rfc" value={kycForm.rfc} onChange={handleKycChange} icon={<FiFileText />} />
+                                            <KycItem label="WhatsApp" name="telefono" value={kycForm.telefono} type="tel" onChange={handleKycChange} icon={<FiPhone />} />
+                                            <KycItem label="Correo" name="correo" value={kycForm.correo} type="email" onChange={handleKycChange} icon={<FiMail />} />
+                                            <KycItem label="Fecha Nac." name="fechaNacimiento" value={kycForm.fechaNacimiento} type="date" onChange={handleKycChange} icon={<FiCalendar />} />
+                                            <KycItem label="Género" name="genero" value={kycForm.genero} onChange={handleKycChange} icon={<FiUser />} />
+                                            <KycItem label="País Nac." name="paisNacimiento" value={kycForm.paisNacimiento} onChange={handleKycChange} icon={<FiFlag />} />
+                                            <KycItem label="Entidad Nac." name="entidadNacimiento" value={kycForm.entidadNacimiento} onChange={handleKycChange} icon={<FiMapPin />} />
+                                            <KycItem label="Ingresos" name="ingresos" value={formatMoney(kycForm.ingresos)} onChange={handleKycChange} icon={<FiDollarSign />} />
                                         </div>
 
                                         {/* Reporte IA Gemini 2.5 */}

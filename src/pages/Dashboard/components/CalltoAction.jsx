@@ -23,7 +23,7 @@ export const CtaFinanciamiento = () => {
       <section className="cta-section">
         <div className="cta-content">
           <h2>¿Necesitas financiamiento?</h2>
-          <p>Descubre<strong>CrediGo:</strong> El impulso financiero que estabas buscando.</p>
+          <p>Descubre <strong>CrediGo:</strong> El impulso financiero que estabas buscando.</p>
           
           <button className="btn-cta-big" onClick={handleOpenModal}>
             {user ? <><FiCalendar /> Agendar Cita</> : <><FiLock /> Inicia sesión</>}
@@ -31,20 +31,32 @@ export const CtaFinanciamiento = () => {
 
           <div className="cta-separator"><span>O contáctanos directamente</span></div>
 
-         <a 
+          <a 
             href={`https://wa.me/${ENTIDAD_CONFIG.CONTACTO_WHATSAPP}`} 
             target="_blank" 
             rel="noopener noreferrer" 
             className="btn-whatsapp-cta"
           >
-            <FaWhatsapp className="wa-icon-cta" /> Iniciar Chat por Whatsapp
+            <FaWhatsapp className="wa-icon-cta" /> Iniciar chat por WhatsApp
           </a>
 
           <div className="footer-contact-links">
-              <a href={`tel:+${ENTIDAD_CONFIG.UNE_TELEFONO}`} className="footer-link-item"><FiPhone /> {ENTIDAD_CONFIG.CONTACTO_TEL_VUE}</a>
-              <span className="divider">|</span>
-              <a href={`mailto:${ENTIDAD_CONFIG.CONTACTO_CORREO}`} className="footer-link-item"><FiMail /> {ENTIDAD_CONFIG.CONTACTO_CORREO}</a>
+            {/* Teléfono */}
+            <a href={`tel:+${ENTIDAD_CONFIG.CONTACTO_WHATSAPP}`} className="footer-link-item">
+              <FiPhone /> {ENTIDAD_CONFIG.CONTACTO_TEL_VUE}
+            </a>
+
+            {/* Contenedor de correos */}
+            <div className="emails-group">
+              <a href={`mailto:${ENTIDAD_CONFIG.CONTACTO_CORREO}`} className="footer-link-item">
+                <FiMail /> {ENTIDAD_CONFIG.CONTACTO_CORREO}
+              </a>
+              <a href={`mailto:${ENTIDAD_CONFIG.CONTACTO_CORREO2}`} className="footer-link-item">
+                <FiMail /> {ENTIDAD_CONFIG.CONTACTO_CORREO2}
+              </a>
+            </div>
           </div>
+      
         </div>
       </section>
 

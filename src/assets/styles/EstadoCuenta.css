@@ -6,6 +6,13 @@
     background: #fff;
     color: #000;
     line-height: 1.2;
+    overflow: visible !important; /* Added to ensure no content is clipped */
+}
+
+.estado-cuenta-container tr,
+.ec-section-title,
+.ec-header {
+    break-inside: avoid; /* Prevent splitting these elements across PDF pages */
 }
 
 .estado-cuenta-container input,
@@ -25,6 +32,15 @@
     border: 1px solid #cce5ff;
     background: #f0f8ff;
     outline: none;
+}
+
+/* styles for the read-only view during export */
+.ec-field-export {
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 1.1em;
+    padding: 2px;
+    text-align: inherit;
 }
 
 .ec-header {

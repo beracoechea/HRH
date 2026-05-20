@@ -11,7 +11,7 @@ export const HeroSection = () => {
 
       <div className="hero-content">
         <span className="hero-badge">Soluciones financieras a tu medida</span>
-        <h1>Obten el respaldo que necesitas de forma rápida, segura y transparente.</h1>
+        <h1>Obtén el respaldo que necesitas de forma rápida, segura y transparente.</h1>
       </div>
     </section>
   );

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { 
     FiClock, FiCheckCircle, FiUploadCloud, 
     FiLoader, FiTrendingUp, FiFileText, FiChevronDown, FiChevronUp, FiPenTool,
-    FiEye, FiTrash2, FiLock, FiFile, FiChevronRight, FiShield, FiDownload
+    FiEye, FiTrash2, FiLock, FiFile, FiChevronRight, FiShield, FiDownload, FiRefreshCw
 } from 'react-icons/fi';
 import { db, storage, functions } from '../../firebase/config'; 
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -79,8 +79,9 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
             const creditoRef = doc(db, "creditos", credito.id);
             const creditoSnap = await getDoc(creditoRef);
             if (creditoSnap.exists()) {
-                const nuevoExpediente = creditoSnap.data().expediente.map(docExp =>
-                    docExp.nombre === nombreDocumento
+                const data = creditoSnap.data();
+                const nuevoExpediente = (data?.expediente || []).map(docExp =>
+                    docExp?.nombre === nombreDocumento
                         ? { ...docExp, estatus: 'firmado', fecha_firma: new Date().toISOString() }
                         : docExp
                 );
@@ -88,8 +89,9 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
                 const userRef = doc(db, "usuarios", credito.usuario_id);
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
-                    const userExp = userSnap.data().expediente.map(docExp =>
-                        docExp.nombre === nombreDocumento
+                    const userData = userSnap.data();
+                    const userExp = (userData?.expediente || []).map(docExp =>
+                        docExp?.nombre === nombreDocumento
                             ? { ...docExp, estatus: 'firmado', fecha_firma: new Date().toISOString() }
                             : docExp
                     );
@@ -118,8 +120,9 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
             const creditoRef = doc(db, "creditos", credito.id);
             const creditoSnap = await getDoc(creditoRef);
             if (creditoSnap.exists()) {
-                const nuevoExpediente = creditoSnap.data().expediente.map(docExp =>
-                    docExp.nombre === nombreDocumento
+                const data = creditoSnap.data();
+                const nuevoExpediente = (data?.expediente || []).map(docExp =>
+                    docExp?.nombre === nombreDocumento
                         ? { ...docExp, url: null, estatus: 'pendiente', fecha_remocion: new Date().toISOString() }
                         : docExp
                 );
@@ -127,8 +130,9 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
                 const userRef = doc(db, "usuarios", credito.usuario_id);
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
-                    const userExp = userSnap.data().expediente.map(docExp =>
-                        docExp.nombre === nombreDocumento ? { ...docExp, url: null, estatus: 'pendiente' } : docExp
+                    const userData = userSnap.data();
+                    const userExp = (userData?.expediente || []).map(docExp =>
+                        docExp?.nombre === nombreDocumento ? { ...docExp, url: null, estatus: 'pendiente' } : docExp
                     );
                     await updateDoc(userRef, { expediente: userExp });
                 }
@@ -167,8 +171,9 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
             const creditoSnap = await getDoc(creditoRef);
             if (creditoSnap.exists()) {
                 const currentStatus = targetDoc?.estatus?.toLowerCase();
-                const nuevoExpediente = creditoSnap.data().expediente.map(docExp =>
-                    docExp.nombre === nombreDocumento
+                const data = creditoSnap.data();
+                const nuevoExpediente = (data?.expediente || []).map(docExp =>
+                    docExp?.nombre === nombreDocumento
                         ? { ...docExp, url: downloadURL, estatus: 'revision', fecha_subida: new Date().toISOString() }
                         : docExp
                 );
@@ -232,8 +237,8 @@ export const UserCreditoCard = ({ credito, expediente = [], onUploadSuccess }) =
         try {
             const docsBaseRequeridos = ['Identificación Oficial vigente', 'Comprobante de ingresos reciente', 'Comprobante de Domicilio', 'Solicitud de Crédito', 'Formato de autorización para solicitar reportes de crédito'];
 
-            const urls = docsExpediente
-                .filter(d => docsBaseRequeridos.includes(d.nombre))
+            const urls = (docsExpediente || [])
+                .filter(d => d && docsBaseRequeridos.includes(d.nombre))
                 .map(d => d.url)
                 .filter(Boolean);
 

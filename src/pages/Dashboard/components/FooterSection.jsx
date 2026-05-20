@@ -22,7 +22,7 @@ export const FooterSection = () => {
 
         <div className="footer-legal-grid">
           <div className="legal-box full-width">
-            <h4>Atencion al Usuario (UNE)</h4>
+            <h4>Atención al Usuario (UNE)</h4>
             <p className="legal-text-small">
               {ENTIDAD_CONFIG.LEYENDAS.UNE_5_9(
                 ENTIDAD_CONFIG.DOMICILIO_FISCAL,
@@ -43,7 +43,7 @@ export const FooterSection = () => {
           </div>
 
           <div className="legal-box">
-            <h4>Buro de Entidades Financieras</h4>
+            <h4>Buró de Entidades Financieras</h4>
             <p className="legal-text-small">{ENTIDAD_CONFIG.LEYENDAS.BURO_5_4}</p>
             <div className="buro-link-footer" style={{marginTop: '10px'}}>
               <img src={ENTIDAD_CONFIG.LOGOS.BURO} alt="Buró" className="buro-logo-small" />

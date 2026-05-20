@@ -11,6 +11,7 @@ export const EstadoCuentaEditorModal = ({ isOpen, onClose, credito, user }) => {
     const [formData, setFormData] = useState(null);
     const { uploadStatement } = useAccountStatements(credito?.id);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [isExporting, setIsExporting] = useState(false); // New state for PDF view
     const [status, setStatus] = useState({ open: false, type: '', message: '' });
 
     useEffect(() => {
@@ -158,10 +159,15 @@ export const EstadoCuentaEditorModal = ({ isOpen, onClose, credito, user }) => {
 
     const handleGenerate = async () => {
         setIsGenerating(true);
+        setIsExporting(true); // Switch to read-only view for capture
+        
+        // Wait a bit for the DOM to update to the read-only version
+        await new Promise(resolve => setTimeout(resolve, 300));
+
         try {
             const element = document.getElementById('estado-cuenta-export-pdf');
             const opt = {
-                margin: 0,
+                margin: [5, 0, 5, 0], // Small margin
                 filename: `Estado_Cuenta_${credito.id}_${formData.periodo}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
@@ -169,7 +175,7 @@ export const EstadoCuentaEditorModal = ({ isOpen, onClose, credito, user }) => {
                     useCORS: true,
                     logging: false,
                     letterRendering: true,
-                    windowWidth: 1000
+                    windowWidth: 1000 // Force standard width for capture
                 },
                 jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
             };
@@ -192,6 +198,7 @@ export const EstadoCuentaEditorModal = ({ isOpen, onClose, credito, user }) => {
             setStatus({ open: true, type: 'error', message: 'Ocurrió un error al generar o guardar el estado de cuenta.' });
         } finally {
             setIsGenerating(false);
+            setIsExporting(false); // Switch back to editor view
         }
     };
 
@@ -232,6 +239,7 @@ export const EstadoCuentaEditorModal = ({ isOpen, onClose, credito, user }) => {
                             id="estado-cuenta-export-pdf"
                             data={formData}
                             onChange={handleFieldChange}
+                            isExporting={isExporting}
                         />
                     </div>
                 </div>
